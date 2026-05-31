@@ -30,10 +30,13 @@ app.post('/api/users/login', async (req, res) => {
     try {
         const result = await db.query('SELECT * FROM users WHERE username = $1', [username]);
         const user = result.rows[0];
-        if (user && user.password === password) {
+        if (!user) {
+            return res.status(401).json({ success: false, message: `User "${username}" not found in database` });
+        }
+        if (user.password === password) {
             res.json({ success: true, user });
         } else {
-            res.status(401).json({ success: false, message: 'Invalid credentials' });
+            res.status(401).json({ success: false, message: 'Password incorrect' });
         }
     } catch (err) {
         res.status(500).json({ error: err.message });
