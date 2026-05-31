@@ -9,8 +9,15 @@ export const api = {
             body: JSON.stringify({ username, password })
         });
         if (!res.ok) {
-            const errData = await res.json().catch(() => ({}));
-            throw new Error(errData.error || errData.message || 'Invalid credentials');
+            const text = await res.text().catch(() => '');
+            let message = 'Invalid credentials';
+            try {
+                const errData = JSON.parse(text);
+                message = errData.error || errData.message || message;
+            } catch (e) {
+                message = `Server Error (${res.status}): ${text.substring(0, 100)}`;
+            }
+            throw new Error(message);
         }
         const data = await res.json();
         return data.user;
