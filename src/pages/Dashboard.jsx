@@ -1,0 +1,347 @@
+import { useState, useEffect } from 'react';
+import { api } from '../lib/api';
+import { useAuth } from '../context/AuthContext';
+import { Navigate } from 'react-router-dom';
+import { HardDrive, Server, Activity, Users, AlertCircle, CheckCircle, Clock, FileText, Search, X } from 'lucide-react';
+import JobDetailModal from '../components/JobDetailModal';
+
+export default function Dashboard() {
+    const { isAdmin, loading, user } = useAuth();
+    const [stats, setStats] = useState({
+        totalProducts: 0,
+        pendingWorks: [],
+        pendingOnSite: [],
+        productStatus: {}
+    });
+    const [recentRequests, setRecentRequests] = useState([]);
+    const [viewingJob, setViewingJob] = useState(null);
+    const [allComplaints, setAllComplaints] = useState([]);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [isSearchFocused, setIsSearchFocused] = useState(false);
+
+    const refreshDashboard = async () => {
+        const statsData = await api.getDashboardStats();
+        // Since we don't have customers count quickly, we'll just show total complaints
+        const complaints = statsData.complaints || [];
+        setAllComplaints(complaints);
+
+        const pending = complaints.filter(c => c.status !== 'Delivered');
+        const onSite = pending.filter(c => c.service_type === 'On-Site');
+
+        const statusCounts = {};
+        complaints.forEach(c => {
+            statusCounts[c.status] = (statusCounts[c.status] || 0) + 1;
+        });
+
+        setStats({
+            totalProducts: statsData.total || 0,
+            pendingWorks: pending.filter(c => c.service_type !== 'On-Site'),
+            pendingOnSite: onSite,
+            productStatus: statusCounts
+        });
+
+        // Most recent 8 complaints for the Recent Requests widget
+        const sorted = [...complaints].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        setRecentRequests(sorted.slice(0, 8));
+    };
+
+    useEffect(() => {
+        refreshDashboard();
+    }, [isAdmin]);
+
+    if (loading) return null;
+
+    const query = searchQuery.trim().toLowerCase();
+    
+    // Filter complaints based on query
+    const filteredComplaints = query
+        ? allComplaints.filter(c => 
+            (c.customerName && c.customerName.toLowerCase().includes(query)) ||
+            (c.customerPhone && c.customerPhone.toLowerCase().includes(query)) ||
+            (c.csr_number && c.csr_number.toLowerCase().includes(query)) ||
+            (c.item_name && c.item_name.toLowerCase().includes(query)) ||
+            (c.id && c.id.toLowerCase().includes(query))
+          )
+        : allComplaints;
+
+    // Derived stats lists
+    const filteredPending = filteredComplaints.filter(c => c.status !== 'Delivered');
+    const filteredPendingWorks = filteredPending.filter(c => c.service_type !== 'On-Site');
+    const filteredPendingOnSite = filteredPending.filter(c => c.service_type === 'On-Site');
+    
+    // For recent requests, if searching, show all matching. Otherwise, show the top 8.
+    const sortedFiltered = [...filteredComplaints].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    const displayedRecentRequests = query ? sortedFiltered : sortedFiltered.slice(0, 8);
+
+    const WidgetHeader = ({ title, icon: Icon }) => (
+        <div style={{ display: 'flex', alignItems: 'center', borderBottom: '1px solid #3b4252', paddingBottom: '0.75rem', marginBottom: '1rem', color: '#eceff4' }}>
+            <Icon size={18} style={{ marginRight: '8px', color: '#88c0d0' }} />
+            <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '500' }}>{title}</h3>
+        </div>
+    );
+
+    const widgetStyle = {
+        background: '#2e3440',
+        borderRadius: '6px',
+        padding: '1.25rem',
+        boxShadow: '0 4px 6px rgba(0,0,0,0.3)',
+        border: '1px solid #3b4252'
+    };
+
+    return (
+        <div className="dashboard-container">
+            <div className="dashboard-header">
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flex: 1, marginRight: '2rem' }}>
+                    <div style={{ position: 'relative', width: '100%', maxWidth: '500px', zIndex: 1000 }}>
+                        <div style={{
+                            background: '#2e3440',
+                            border: isSearchFocused ? '1px solid #88c0d0' : '1px solid #3b4252',
+                            borderRadius: '24px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            padding: '0.6rem 1.2rem',
+                            gap: '10px',
+                            width: '100%',
+                            boxShadow: isSearchFocused ? '0 0 10px rgba(136, 192, 208, 0.3)' : '0 4px 6px rgba(0,0,0,0.15)',
+                            transition: 'all 0.2s ease-in-out'
+                        }}>
+                            <Search size={18} color={isSearchFocused ? '#88c0d0' : '#4c566a'} />
+                            <input
+                                type="text"
+                                value={searchQuery}
+                                onChange={e => setSearchQuery(e.target.value)}
+                                onFocus={() => setIsSearchFocused(true)}
+                                onBlur={() => setIsSearchFocused(false)}
+                                placeholder="Search by customer name, phone, or CSR #..."
+                                style={{
+                                    background: 'transparent',
+                                    border: 'none',
+                                    outline: 'none',
+                                    color: '#eceff4',
+                                    fontSize: '0.95rem',
+                                    width: '100%'
+                                }}
+                            />
+                            {searchQuery && (
+                                <button
+                                    onClick={() => setSearchQuery('')}
+                                    style={{
+                                        background: 'transparent',
+                                        border: 'none',
+                                        color: '#88c0d0',
+                                        cursor: 'pointer',
+                                        padding: '2px',
+                                        display: 'flex',
+                                        alignItems: 'center'
+                                    }}
+                                >
+                                    <X size={16} />
+                                </button>
+                            )}
+                        </div>
+
+                        {/* Dropdown search results list */}
+                        {searchQuery && (
+                            <div style={{
+                                position: 'absolute',
+                                top: '100%',
+                                left: 0,
+                                right: 0,
+                                marginTop: '8px',
+                                background: '#2e3440',
+                                border: '1px solid #4c566a',
+                                borderRadius: '8px',
+                                boxShadow: '0 10px 25px rgba(0,0,0,0.5)',
+                                maxHeight: '300px',
+                                overflowY: 'auto',
+                                padding: '4px 0'
+                            }}>
+                                {filteredComplaints.length > 0 ? (
+                                    filteredComplaints.map(item => {
+                                        let statusColor = '#d8dee9';
+                                        if (item.status === 'Pending') statusColor = '#bf616a';
+                                        else if (item.status === 'Delivered') statusColor = '#a3be8c';
+                                        else if (item.status === 'Ready for Delivery') statusColor = '#8fbcbb';
+                                        else statusColor = '#ebcb8b';
+
+                                        return (
+                                            <div
+                                                key={item.id}
+                                                onMouseDown={() => {
+                                                    setViewingJob(item.id);
+                                                    setSearchQuery('');
+                                                }}
+                                                style={{
+                                                    padding: '0.75rem 1rem',
+                                                    borderBottom: '1px solid #3b4252',
+                                                    cursor: 'pointer',
+                                                    display: 'flex',
+                                                    justifyContent: 'space-between',
+                                                    alignItems: 'center',
+                                                    transition: 'background 0.15s'
+                                                }}
+                                                onMouseEnter={e => e.currentTarget.style.background = '#3b4252'}
+                                                onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                                            >
+                                                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                                    <div>
+                                                        <span style={{ color: '#88c0d0', fontWeight: 'bold', marginRight: '8px' }}>#{item.csr_number || item.id.split('-')[0].toUpperCase()}</span>
+                                                        <strong style={{ color: '#eceff4' }}>{item.item_name}</strong>
+                                                    </div>
+                                                    <div style={{ fontSize: '0.8rem', color: '#d8dee9', marginTop: '2px' }}>
+                                                        {item.customerName || '—'} · {item.customerPhone || '—'}
+                                                    </div>
+                                                </div>
+                                                <span style={{
+                                                    fontSize: '0.75rem',
+                                                    padding: '3px 8px',
+                                                    borderRadius: '12px',
+                                                    background: 'rgba(255,255,255,0.08)',
+                                                    color: statusColor,
+                                                    fontWeight: 'bold',
+                                                    textTransform: 'uppercase',
+                                                    border: `1px solid ${statusColor}40`
+                                                }}>
+                                                    {item.status}
+                                                </span>
+                                            </div>
+                                        );
+                                    })
+                                ) : (
+                                    <div style={{ padding: '1rem', textAlign: 'center', color: '#4c566a' }}>
+                                        No matching service items found.
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                </div>
+                <div style={{ background: '#3b4252', padding: '0.5rem 1rem', borderRadius: '4px', fontSize: '0.9rem', border: '1px solid #4c566a', flexShrink: 0 }}>
+                    User: <span style={{ color: '#88c0d0', fontWeight: 'bold' }}>{user?.username}</span> | Host: Hyper-CSR
+                </div>
+            </div>
+
+            <div style={{ padding: '0 1rem' }}>
+
+                <div className="dashboard-grid-widgets">
+
+
+
+                    <div style={widgetStyle}>
+                        <WidgetHeader title="Pending Field Tasks (On-Site)" icon={AlertCircle} />
+                        <ul style={{ listStyle: 'none', padding: 0, margin: 0, fontSize: '0.9rem', maxHeight: '300px', overflowY: 'auto' }}>
+                            {filteredPendingOnSite.map(work => (
+                                <li
+                                    key={work.id}
+                                    onClick={() => setViewingJob(work.id)}
+                                    style={{ display: 'flex', justifyContent: 'space-between', padding: '0.75rem 1rem', background: '#3b4252', marginBottom: '0.5rem', borderRadius: '4px', borderLeft: `3px solid var(--danger)`, cursor: 'pointer' }}>
+                                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                        <strong style={{ color: '#eceff4', fontSize: '1rem' }}>{work.item_name}</strong>
+                                        <span style={{ fontSize: '0.8rem', color: '#88c0d0', marginTop: '2px' }}>{work.customerName} - {work.customerPhone}</span>
+                                    </div>
+                                    <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                                        <div style={{ color: '#d8dee9', fontWeight: 'bold', fontSize: '0.85rem' }}>{work.status}</div>
+                                    </div>
+                                </li>
+                            ))}
+                            {filteredPendingOnSite.length === 0 && (
+                                <li style={{ padding: '2rem 1rem', textAlign: 'center', color: '#4c566a', border: '1px dashed #4c566a', borderRadius: '4px' }}>
+                                    No pending on-site requests.
+                                </li>
+                            )}
+                        </ul>
+                    </div>
+
+                    {/* Diagnostics / Pending Tasks Widget */}
+                    <div style={widgetStyle}>
+                        <WidgetHeader title="Pending In-Shop Work" icon={Activity} />
+                        <ul style={{ listStyle: 'none', padding: 0, margin: 0, fontSize: '0.9rem', maxHeight: '300px', overflowY: 'auto' }}>
+                            {filteredPendingWorks.map(work => (
+                                <li
+                                    key={work.id}
+                                    onClick={() => setViewingJob(work.id)}
+                                    style={{ display: 'flex', justifyContent: 'space-between', padding: '0.75rem 1rem', background: '#3b4252', marginBottom: '0.5rem', borderRadius: '4px', borderLeft: `3px solid ${work.status === 'Ready for Delivery' ? '#8fbcbb' : '#ebcb8b'}`, cursor: 'pointer' }}>
+                                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                        <strong style={{ color: '#eceff4', fontSize: '1rem' }}>{work.item_name}</strong>
+                                        <span style={{ fontSize: '0.8rem', color: '#88c0d0', marginTop: '2px' }}>S/N: {work.serial_no}</span>
+                                    </div>
+                                    <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                                        <div style={{ color: '#d8dee9', fontWeight: 'bold', fontSize: '0.85rem' }}>{work.status}</div>
+                                        <div style={{ color: '#4c566a', fontSize: '0.75rem', marginTop: '2px' }}>CSR: {work.csr_number || work.id.split('-')[0]}</div>
+                                    </div>
+                                </li>
+                            ))}
+                            {filteredPendingWorks.length === 0 && (
+                                <li style={{ padding: '2rem 1rem', textAlign: 'center', color: '#4c566a', border: '1px dashed #4c566a', borderRadius: '4px' }}>
+                                    All diagnostic queues are clear.
+                                </li>
+                            )}
+                        </ul>
+                    </div>
+                </div>
+
+                {/* Recent Service Requests Widget */}
+                <div style={{ ...widgetStyle, marginTop: '1.5rem' }}>
+                    <WidgetHeader title="Recent Service Requests" icon={FileText} />
+                    <div style={{ overflowX: 'auto' }}>
+                        <table style={{ width: '100%', fontSize: '0.9rem', borderCollapse: 'collapse', minWidth: '500px' }}>
+                            <thead>
+                                <tr style={{ background: '#3b4252', textAlign: 'left' }}>
+                                    <th style={{ padding: '0.5rem 0.75rem', borderRadius: '4px 0 0 4px', fontWeight: '600', color: '#88c0d0' }}>CSR #</th>
+                                    <th style={{ padding: '0.5rem 0.75rem', fontWeight: '600' }}>Customer</th>
+                                    <th style={{ padding: '0.5rem 0.75rem', fontWeight: '600' }}>Item</th>
+                                    <th style={{ padding: '0.5rem 0.75rem', fontWeight: '600' }}>Status</th>
+                                    <th style={{ padding: '0.5rem 0.75rem', textAlign: 'right', borderRadius: '0 4px 4px 0', fontWeight: '600' }}>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {displayedRecentRequests.map(req => {
+                                    let statusColor = '#d8dee9';
+                                    if (req.status === 'Pending') statusColor = '#bf616a';
+                                    else if (req.status === 'Delivered') statusColor = '#a3be8c';
+                                    else if (req.status === 'Ready for Delivery') statusColor = '#8fbcbb';
+                                    else statusColor = '#ebcb8b';
+                                    return (
+                                        <tr
+                                            key={req.id}
+                                            onClick={() => setViewingJob(req.id)}
+                                            style={{ borderBottom: '1px solid #3b4252', cursor: 'pointer', transition: 'background 0.15s' }}
+                                            onMouseEnter={e => e.currentTarget.style.background = '#3b4252'}
+                                            onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                                        >
+                                            <td style={{ padding: '0.75rem', fontWeight: 'bold', color: '#88c0d0' }}>#{req.csr_number || req.id.split('-')[0].toUpperCase()}</td>
+                                            <td style={{ padding: '0.75rem', color: '#eceff4' }}>{req.customerName || '—'}</td>
+                                            <td style={{ padding: '0.75rem' }}>{req.item_name}</td>
+                                            <td style={{ padding: '0.75rem' }}>
+                                                <span style={{ background: 'rgba(255,255,255,0.08)', padding: '3px 10px', borderRadius: '12px', color: statusColor, fontSize: '0.75rem', fontWeight: 'bold', textTransform: 'uppercase', border: `1px solid ${statusColor}40` }}>
+                                                    {req.status}
+                                                </span>
+                                            </td>
+                                            <td style={{ padding: '0.75rem', textAlign: 'right', fontSize: '0.8rem', color: '#88c0d0' }}>
+                                                {new Date(req.created_at).toLocaleString()}
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                                {displayedRecentRequests.length === 0 && (
+                                    <tr>
+                                        <td colSpan="5" style={{ padding: '2rem', textAlign: 'center', color: '#4c566a' }}>No service requests logged yet.</td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+            {viewingJob && (
+                <JobDetailModal
+                    jobId={viewingJob}
+                    onClose={() => setViewingJob(null)}
+                    onRefresh={refreshDashboard}
+                />
+            )}
+        </div>
+    );
+}

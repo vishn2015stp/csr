@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  hyper-csr:
+    build: .
+    container_name: hyper-csr
+    ports:
+      # Map host port 2255 to container port 3000
+      - "2255:3000"
+    restart: unless-stopped
+    # If your app relies on .env variables to configure Supabase, 
+    # you can pass them here or rely on a .env file mounted.
+    # env_file:
+    #   - .env.local
