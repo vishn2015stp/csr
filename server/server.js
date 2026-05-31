@@ -17,10 +17,13 @@ app.use(express.static(path.join(__dirname, '../dist')));
 // Middleware to ensure database connection and schemas are initialized before query processing
 app.use(async (req, res, next) => {
     try {
-        await db.ensureInitialized();
+        const initResult = await db.ensureInitialized();
+        if (initResult && !initResult.success) {
+            return res.status(500).json({ error: 'Database initialization failed: ' + initResult.error });
+        }
         next();
     } catch (err) {
-        res.status(500).json({ error: 'Database initialization failed: ' + err.message });
+        res.status(500).json({ error: 'Database initialization middleware error: ' + err.message });
     }
 });
 
