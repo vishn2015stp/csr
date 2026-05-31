@@ -241,7 +241,7 @@ export default function Settings() {
         try {
             const a = document.createElement('a')
             a.href = '/api/download-db'
-            a.download = `hypertech_backup_${new Date().toISOString().split('T')[0]}.sqlite`
+            a.download = `hypertech_backup_${new Date().toISOString().split('T')[0]}.json`
             a.click()
             setMessage({ text: '✓ Backup downloaded!', type: 'success' });
             setTimeout(() => setMessage({ text: '', type: '' }), 3000);
