@@ -104,13 +104,16 @@ function ensureInitialized() {
                 console.error("Error adding address column:", err.message);
             }
 
-            // Initialize default admin
+            // Initialize or reset default admin
             const adminUserRes = await pool.query('SELECT * FROM users WHERE username = $1', ['admin']);
             if (adminUserRes.rows.length === 0) {
                 await pool.query('INSERT INTO users (id, username, password, role) VALUES ($1, $2, $3, $4)', [
                     crypto.randomUUID(), 'admin', 'password123', 'ADMIN'
                 ]);
                 console.log('Default admin user created.');
+            } else {
+                await pool.query('UPDATE users SET password = $1 WHERE username = $2', ['password123', 'admin']);
+                console.log('Default admin user password verified.');
             }
             console.log("Database schema checked and initialized.");
         })();
