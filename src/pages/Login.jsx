@@ -11,11 +11,11 @@ export default function Login() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const success = await login(username, password);
-        if (success) {
+        const res = await login(username, password);
+        if (res.success) {
             navigate('/');
         } else {
-            setError('Invalid username or password');
+            setError(res.error || 'Invalid username or password');
         }
     };
 

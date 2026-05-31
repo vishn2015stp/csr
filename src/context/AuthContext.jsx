@@ -30,12 +30,13 @@ export function AuthProvider({ children }) {
             if (u) {
                 setUser(u);
                 localStorage.setItem('userId', u.id);
-                return true;
+                return { success: true };
             }
-        } catch(e) {
+        } catch (e) {
             console.error(e);
+            return { success: false, error: e.message };
         }
-        return false;
+        return { success: false, error: 'Invalid username or password' };
     };
 
     const logout = () => {
