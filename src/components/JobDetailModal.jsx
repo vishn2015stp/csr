@@ -50,6 +50,13 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
             return;
         }
         const newStatus = e.target.value;
+        if (newStatus === 'Delivered') {
+            const confirmDelivered = window.confirm("Are you sure you want to mark this request as Delivered? Once marked as Delivered, you will no longer be able to edit this request or its billing.");
+            if (!confirmDelivered) {
+                e.target.value = job.status;
+                return;
+            }
+        }
         await api.updateComplaint(jobId, { status: newStatus });
         setJob(prev => ({ ...prev, status: newStatus }));
         
