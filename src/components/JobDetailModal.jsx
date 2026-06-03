@@ -153,6 +153,13 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                 e.target.value = job.status;
                 return;
             }
+            const captchaCode = Math.floor(1000 + Math.random() * 9000).toString();
+            const captchaPrompt = window.prompt(`To confirm marking as ${newStatus}, please type the verification code: ${captchaCode}`);
+            if (captchaPrompt !== captchaCode) {
+                alert("Verification failed. Action cancelled.");
+                e.target.value = job.status;
+                return;
+            }
         }
         await api.updateComplaint(jobId, { status: newStatus });
         setJob(prev => ({ ...prev, status: newStatus }));
@@ -221,6 +228,12 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
 
     const markAsReturned = async () => {
         if (window.confirm("Mark this device as returned to the customer?")) {
+            const captchaCode = Math.floor(1000 + Math.random() * 9000).toString();
+            const captchaPrompt = window.prompt(`To confirm returning this device, please type the verification code: ${captchaCode}`);
+            if (captchaPrompt !== captchaCode) {
+                alert("Verification failed. Action cancelled.");
+                return;
+            }
             await api.updateComplaint(jobId, { flag_r: true, status: 'Delivered' });
             setJob(prev => ({ ...prev, status: 'Delivered' }));
 
