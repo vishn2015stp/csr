@@ -366,7 +366,7 @@ export default function Settings() {
                                 <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Shop Name</label>
                                 <input style={inputStyle} value={printConfig.shopName} onChange={e => set('shopName', e.target.value)} placeholder="Hypertech Digital" />
                                 <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Address</label>
-                                <textarea style={{ ...inputStyle, resize: 'vertical' }} rows={3} value={printConfig.shopAddress} onChange={e => set('shopAddress', e.target.value)} placeholder={"123 Tech Street\nCity, State 12345"} />
+                                <textarea style={{ ...inputStyle, resize: 'vertical' }} rows={3} value={printConfig.shopAddress} onChange={e => set('shopAddress', e.target.value)} placeholder={"224 Park Dr.\nGotham City"} />
                                 <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Phone</label>
                                 <input style={inputStyle} value={printConfig.shopPhone} onChange={e => set('shopPhone', e.target.value)} placeholder="055-000-0000" />
                                 <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Email</label>

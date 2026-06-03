@@ -190,7 +190,7 @@ export default function Intake() {
                             )}
 
                             <label>Full Name *</label>
-                            <input type="text" name="name" required value={formData.name} onChange={handleChange} placeholder="Jane Doe" />
+                            <input type="text" name="name" required value={formData.name} onChange={handleChange} placeholder="Kal-El" />
                             <label>Email</label>
                             <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="(Optional)" />
                             
