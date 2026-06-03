@@ -99,6 +99,12 @@ function ensureInitialized() {
 
                 // Safely add columns if they don't exist
                 try {
+                    await pool.query("ALTER TABLE users ADD COLUMN IF NOT EXISTS session_id TEXT;");
+                } catch (err) {
+                    console.error("Error adding session_id to users:", err.message);
+                }
+
+                try {
                     await pool.query("ALTER TABLE complaints ADD COLUMN IF NOT EXISTS service_type TEXT DEFAULT 'In-Shop';");
                 } catch (err) {
                     console.error("Error adding service_type:", err.message);

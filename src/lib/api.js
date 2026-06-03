@@ -2,33 +2,34 @@ const API_URL = '/api';
 
 export const api = {
     // ---- USERS ----
-    async login(username, password) {
+    async login(username, password, force = false) {
         const res = await fetch(`${API_URL}/users/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password })
+            body: JSON.stringify({ username, password, force })
         });
-        if (!res.ok) {
-            const text = await res.text().catch(() => '');
-            let message = 'Invalid credentials';
-            try {
-                const errData = JSON.parse(text);
-                message = errData.error || errData.message || message;
-                if (errData.details) {
-                    message = `${message} (${errData.details})`;
-                }
-            } catch (e) {
-                message = `Server Error (${res.status}): ${text.substring(0, 100)}`;
-            }
-            throw new Error(message);
-        }
         const data = await res.json();
-        return data.user;
+        if (!res.ok) {
+            throw new Error(data.message || data.error || 'Server error');
+        }
+        return data;
     },
-    async getUser(id) {
-        const res = await fetch(`${API_URL}/users/${id}`);
+    async getUser(id, sessionId = null) {
+        const url = sessionId ? `${API_URL}/users/${id}?sessionId=${sessionId}` : `${API_URL}/users/${id}`;
+        const res = await fetch(url);
         if (!res.ok) return null;
         return res.json();
+    },
+    async logout(userId) {
+        try {
+            await fetch(`${API_URL}/users/logout`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId })
+            });
+        } catch (e) {
+            console.error("Logout API error:", e);
+        }
     },
 
     // ---- CUSTOMERS ----

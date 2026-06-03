@@ -29,28 +29,58 @@ app.use(async (req, res, next) => {
 
 // =============== USERS ===============
 app.post('/api/users/login', async (req, res) => {
-    const { username, password } = req.body;
+    const { username, password, force } = req.body;
     try {
         const result = await db.query('SELECT * FROM users WHERE username = $1', [username]);
         const user = result.rows[0];
         if (!user) {
             return res.status(401).json({ success: false, message: `User "${username}" not found in database` });
         }
-        if (user.password === password) {
-            res.json({ success: true, user });
-        } else {
-            res.status(401).json({ success: false, message: 'Password incorrect' });
+        if (user.password !== password) {
+            return res.status(401).json({ success: false, message: 'Password incorrect' });
         }
+
+        // If user already has a session and login is not forced, alert client
+        if (user.session_id && !force) {
+            return res.json({ 
+                success: false, 
+                alreadyLoggedIn: true, 
+                message: 'This user is already logged in on another device. Do you want to log out the other device and continue here?' 
+            });
+        }
+
+        // Generate a new unique session ID
+        const newSessionId = uuidv4();
+        await db.query('UPDATE users SET session_id = $1 WHERE id = $2', [newSessionId, user.id]);
+
+        const userObj = { ...user, password: undefined, session_id: newSessionId };
+        res.json({ success: true, user: userObj, sessionId: newSessionId });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.post('/api/users/logout', async (req, res) => {
+    const { userId } = req.body;
+    try {
+        if (userId) {
+            await db.query('UPDATE users SET session_id = NULL WHERE id = $1', [userId]);
+        }
+        res.json({ success: true });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 });
 
 app.get('/api/users/:id', async (req, res) => {
+    const { sessionId } = req.query;
     try {
         const result = await db.query('SELECT * FROM users WHERE id = $1', [req.params.id]);
         const user = result.rows[0];
         if (user) {
+            if (sessionId && user.session_id !== sessionId) {
+                return res.status(401).json({ error: 'Session terminated. Access denied.' });
+            }
             res.json(user);
         } else {
             res.status(404).json({ error: 'User not found' });

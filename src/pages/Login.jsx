@@ -9,11 +9,19 @@ export default function Login() {
     const { login } = useAuth();
     const navigate = useNavigate();
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        const res = await login(username, password);
+    const handleSubmit = async (e, force = false) => {
+        if (e) e.preventDefault();
+        setError('');
+        const res = await login(username, password, force);
         if (res.success) {
             navigate('/');
+        } else if (res.alreadyLoggedIn) {
+            const confirmLogout = window.confirm(
+                "You are currently logged in on another device. Do you want to terminate that session and log in here?"
+            );
+            if (confirmLogout) {
+                handleSubmit(null, true);
+            }
         } else {
             setError(res.error || 'Invalid username or password');
         }

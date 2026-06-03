@@ -11,12 +11,22 @@ export function AuthProvider({ children }) {
         const initAuth = async () => {
             try {
                 const storedUserId = localStorage.getItem('userId');
+                const storedSessionId = localStorage.getItem('sessionId');
                 if (storedUserId) {
-                    const u = await api.getUser(storedUserId);
-                    setUser(u || null);
+                    const u = await api.getUser(storedUserId, storedSessionId);
+                    if (u) {
+                        setUser(u);
+                    } else {
+                        setUser(null);
+                        localStorage.removeItem('userId');
+                        localStorage.removeItem('sessionId');
+                    }
                 }
             } catch (e) {
                 console.error("Initialization error:", e);
+                setUser(null);
+                localStorage.removeItem('userId');
+                localStorage.removeItem('sessionId');
             } finally {
                 setLoading(false);
             }
@@ -24,13 +34,40 @@ export function AuthProvider({ children }) {
         initAuth();
     }, []);
 
-    const login = async (username, password) => {
+    // Periodically poll to check if session was overridden on another device
+    useEffect(() => {
+        if (!user) return;
+        const checkSession = async () => {
+            try {
+                const storedUserId = localStorage.getItem('userId');
+                const storedSessionId = localStorage.getItem('sessionId');
+                if (storedUserId) {
+                    const u = await api.getUser(storedUserId, storedSessionId);
+                    if (!u) {
+                        alert("Session terminated: You have logged in from another device.");
+                        setUser(null);
+                        localStorage.removeItem('userId');
+                        localStorage.removeItem('sessionId');
+                    }
+                }
+            } catch (e) {
+                console.error("Session check error:", e);
+            }
+        };
+        const interval = setInterval(checkSession, 10000);
+        return () => clearInterval(interval);
+    }, [user]);
+
+    const login = async (username, password, force = false) => {
         try {
-            const u = await api.login(username, password);
-            if (u) {
-                setUser(u);
-                localStorage.setItem('userId', u.id);
+            const data = await api.login(username, password, force);
+            if (data.success) {
+                setUser(data.user);
+                localStorage.setItem('userId', data.user.id);
+                localStorage.setItem('sessionId', data.sessionId);
                 return { success: true };
+            } else if (data.alreadyLoggedIn) {
+                return { success: false, alreadyLoggedIn: true, message: data.message };
             }
         } catch (e) {
             console.error(e);
@@ -39,9 +76,19 @@ export function AuthProvider({ children }) {
         return { success: false, error: 'Invalid username or password' };
     };
 
-    const logout = () => {
-        setUser(null);
-        localStorage.removeItem('userId');
+    const logout = async () => {
+        try {
+            const storedUserId = localStorage.getItem('userId');
+            if (storedUserId) {
+                await api.logout(storedUserId).catch(() => {});
+            }
+        } catch (e) {
+            console.error("Logout API error:", e);
+        } finally {
+            setUser(null);
+            localStorage.removeItem('userId');
+            localStorage.removeItem('sessionId');
+        }
     };
 
     return (
