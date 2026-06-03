@@ -18,6 +18,8 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
         total: 0
     });
 
+    const isDelivered = job?.status?.trim().toLowerCase() === 'delivered';
+
     useEffect(() => {
         const load = async () => {
             const j = await api.getComplaint(jobId);
@@ -43,6 +45,10 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
     }, [jobId]);
 
     const handleStatusChange = async (e) => {
+        if (isDelivered) {
+            alert("This job is already delivered and cannot be edited.");
+            return;
+        }
         const newStatus = e.target.value;
         await api.updateComplaint(jobId, { status: newStatus });
         setJob(prev => ({ ...prev, status: newStatus }));
@@ -67,6 +73,10 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
     };
 
     const handleAddLog = async () => {
+        if (isDelivered) {
+            alert("This job is already delivered and cannot be edited.");
+            return;
+        }
         if (!newLog.trim()) return;
         await api.createServiceRecord({
             complaint_id: jobId,
@@ -80,6 +90,10 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
     };
 
     const handleSaveInvoice = async () => {
+        if (isDelivered) {
+            alert("This job is already delivered and cannot be edited.");
+            return;
+        }
         try {
             const serviceFees = parseFloat(invoice.service_fees) || 0;
             const partCosts = parseFloat(invoice.part_costs) || 0;
@@ -230,7 +244,7 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                                 <select
                                     value={job.status}
                                     onChange={handleStatusChange}
-                                    disabled={job.status === 'Delivered'}
+                                    disabled={isDelivered}
                                     style={{
                                         width: '100%',
                                         padding: '0.75rem',
@@ -240,7 +254,7 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                                         borderRadius: '6px',
                                         fontSize: '1rem',
                                         outline: 'none',
-                                        cursor: job.status === 'Delivered' ? 'not-allowed' : 'pointer'
+                                        cursor: isDelivered ? 'not-allowed' : 'pointer'
                                     }}
                                 >
                                     <option value="Pending">Pending</option>
@@ -271,8 +285,8 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                             </div>
 
                             <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                <input type="text" value={newLog} onChange={e => setNewLog(e.target.value)} placeholder={job.status === 'Delivered' ? "Logging disabled (Delivered)" : "Add a log entry..."} disabled={job.status === 'Delivered'} style={{ flex: 1, padding: '0.5rem' }} />
-                                <button onClick={handleAddLog} disabled={job.status === 'Delivered'} style={{ padding: '0.5rem 1rem', background: job.status === 'Delivered' ? '#3b4252' : '#88c0d0', color: job.status === 'Delivered' ? '#4c566a' : 'black', cursor: job.status === 'Delivered' ? 'not-allowed' : 'pointer', opacity: job.status === 'Delivered' ? 0.5 : 1 }}><Save size={16} /></button>
+                                <input type="text" value={newLog} onChange={e => setNewLog(e.target.value)} placeholder={isDelivered ? "Logging disabled (Delivered)" : "Add a log entry..."} disabled={isDelivered} style={{ flex: 1, padding: '0.5rem' }} />
+                                <button onClick={handleAddLog} disabled={isDelivered} style={{ padding: '0.5rem 1rem', background: isDelivered ? '#3b4252' : '#88c0d0', color: isDelivered ? '#4c566a' : 'black', cursor: isDelivered ? 'not-allowed' : 'pointer', opacity: isDelivered ? 0.5 : 1 }}><Save size={16} /></button>
                             </div>
                         </div>
 
@@ -287,8 +301,8 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                                         value={invoice.service_fees || ''} 
                                         onChange={e => setInvoice(prev => ({ ...prev, service_fees: e.target.value }))}
                                         placeholder="0"
-                                        disabled={job.status === 'Delivered'}
-                                        style={{ width: '100%', padding: '0.4rem', background: '#2e3440', border: '1px solid #4c566a', color: '#eceff4', borderRadius: '4px', margin: 0, cursor: job.status === 'Delivered' ? 'not-allowed' : 'text' }}
+                                        disabled={isDelivered}
+                                        style={{ width: '100%', padding: '0.4rem', background: '#2e3440', border: '1px solid #4c566a', color: '#eceff4', borderRadius: '4px', margin: 0, cursor: isDelivered ? 'not-allowed' : 'text' }}
                                     />
                                 </div>
                                 <div>
@@ -298,8 +312,8 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                                         value={invoice.part_costs || ''} 
                                         onChange={e => setInvoice(prev => ({ ...prev, part_costs: e.target.value }))}
                                         placeholder="0"
-                                        disabled={job.status === 'Delivered'}
-                                        style={{ width: '100%', padding: '0.4rem', background: '#2e3440', border: '1px solid #4c566a', color: '#eceff4', borderRadius: '4px', margin: 0, cursor: job.status === 'Delivered' ? 'not-allowed' : 'text' }}
+                                        disabled={isDelivered}
+                                        style={{ width: '100%', padding: '0.4rem', background: '#2e3440', border: '1px solid #4c566a', color: '#eceff4', borderRadius: '4px', margin: 0, cursor: isDelivered ? 'not-allowed' : 'text' }}
                                     />
                                 </div>
                             </div>
@@ -311,8 +325,8 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                                     value={invoice.spares || ''} 
                                     onChange={e => setInvoice(prev => ({ ...prev, spares: e.target.value }))}
                                     placeholder="e.g. 500GB SSD, Keyboard"
-                                    disabled={job.status === 'Delivered'}
-                                    style={{ width: '100%', padding: '0.4rem', background: '#2e3440', border: '1px solid #4c566a', color: '#eceff4', borderRadius: '4px', margin: 0, cursor: job.status === 'Delivered' ? 'not-allowed' : 'text' }}
+                                    disabled={isDelivered}
+                                    style={{ width: '100%', padding: '0.4rem', background: '#2e3440', border: '1px solid #4c566a', color: '#eceff4', borderRadius: '4px', margin: 0, cursor: isDelivered ? 'not-allowed' : 'text' }}
                                 />
                             </div>
 
@@ -324,29 +338,29 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                                         value={invoice.warranty || ''} 
                                         onChange={e => setInvoice(prev => ({ ...prev, warranty: e.target.value }))}
                                         placeholder="e.g. 3 Months / No warranty"
-                                        disabled={job.status === 'Delivered'}
-                                        style={{ width: '100%', padding: '0.4rem', background: '#2e3440', border: '1px solid #4c566a', color: '#eceff4', borderRadius: '4px', margin: 0, cursor: job.status === 'Delivered' ? 'not-allowed' : 'text' }}
+                                        disabled={isDelivered}
+                                        style={{ width: '100%', padding: '0.4rem', background: '#2e3440', border: '1px solid #4c566a', color: '#eceff4', borderRadius: '4px', margin: 0, cursor: isDelivered ? 'not-allowed' : 'text' }}
                                     />
                                 </div>
                                 <button 
                                     onClick={handleSaveInvoice} 
-                                    disabled={job.status === 'Delivered'}
+                                    disabled={isDelivered}
                                     style={{ 
                                         width: '100%', 
                                         padding: '0.5rem', 
-                                        background: job.status === 'Delivered' ? '#3b4252' : '#88c0d0', 
-                                        color: job.status === 'Delivered' ? '#4c566a' : '#2e3440', 
+                                        background: isDelivered ? '#3b4252' : '#88c0d0', 
+                                        color: isDelivered ? '#4c566a' : '#2e3440', 
                                         fontWeight: 'bold', 
                                         border: 'none', 
                                         borderRadius: '4px',
-                                        cursor: job.status === 'Delivered' ? 'not-allowed' : 'pointer',
+                                        cursor: isDelivered ? 'not-allowed' : 'pointer',
                                         display: 'flex',
                                         alignItems: 'center',
                                         justifyContent: 'center',
                                         gap: '6px',
                                         height: '35px',
                                         margin: 0,
-                                        opacity: job.status === 'Delivered' ? 0.5 : 1
+                                        opacity: isDelivered ? 0.5 : 1
                                     }}
                                 >
                                     <Save size={16} /> Save Billing
@@ -358,8 +372,8 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                             <button onClick={() => setShowInvoice(true)} style={{ background: '#4c566a', padding: '1rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem' }}>
                                 <Printer size={20} /> Generate & Print Invoice
                             </button>
-                            <button onClick={markAsReturned} disabled={job.status === 'Delivered'} style={{ background: job.status === 'Delivered' ? '#3b4252' : '#a3be8c', color: job.status === 'Delivered' ? '#4c566a' : 'black', padding: '1rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem', opacity: job.status === 'Delivered' ? 0.5 : 1 }}>
-                                <ArrowLeftRight size={20} /> {job.status === 'Delivered' ? 'Already Returned' : 'Mark as Returned to Customer'}
+                            <button onClick={markAsReturned} disabled={isDelivered} style={{ background: isDelivered ? '#3b4252' : '#a3be8c', color: isDelivered ? '#4c566a' : 'black', padding: '1rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem', opacity: isDelivered ? 0.5 : 1 }}>
+                                <ArrowLeftRight size={20} /> {isDelivered ? 'Already Returned' : 'Mark as Returned to Customer'}
                             </button>
                         </div>
                     </div>
