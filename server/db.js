@@ -1,20 +1,20 @@
 const { Pool } = require('pg');
 const crypto = require('crypto');
 
-const connectionString = process.env.DATABASE_URL
-    || process.env.POSTGRES_URL
-    || process.env.DATABASE_URL_UNPOOLED
-    || process.env.POSTGRES_URL_NON_POOLING
-    || process.env.POSTGRES_URL_NO_SSL;
+// Supabase PostgreSQL connection
+// Use the pooler connection string (port 6543, transaction mode) for serverless
+const connectionString = process.env.SUPABASE_DB_URL
+    || process.env.DATABASE_URL
+    || process.env.POSTGRES_URL;
 
 const pool = new Pool({
     connectionString,
     ssl: {
-        rejectUnauthorized: false // Neon serverless Postgres requires SSL connection
+        rejectUnauthorized: false // Supabase requires SSL
     }
 });
 
-// Avoid process crashes on unexpected database idle connection drops
+// Avoid process crashes on unexpected idle connection drops
 pool.on('error', (err) => {
     console.error('Unexpected error on idle pg client:', err.message);
 });
@@ -26,10 +26,10 @@ function ensureInitialized() {
         dbInitPromise = (async () => {
             try {
                 if (!connectionString) {
-                    throw new Error("DATABASE_URL / POSTGRES_URL environment variables are not defined");
+                    throw new Error("SUPABASE_DB_URL / DATABASE_URL environment variable is not defined. Set your Supabase PostgreSQL connection string.");
                 }
 
-                // Create tables in PostgreSQL
+                // Create tables in Supabase PostgreSQL
                 await pool.query(`
                     CREATE TABLE IF NOT EXISTS users (
                         id TEXT PRIMARY KEY,
@@ -126,7 +126,7 @@ function ensureInitialized() {
                     console.log('Default admin user password verified.');
                 }
                 
-                console.log("Database schema checked and initialized.");
+                console.log("Supabase database schema checked and initialized.");
                 return { success: true };
             } catch (err) {
                 console.error("Database initialization failed:", err.message);
