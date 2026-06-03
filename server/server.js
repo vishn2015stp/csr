@@ -40,6 +40,11 @@ app.post('/api/users/login', async (req, res) => {
             return res.status(401).json({ success: false, message: 'Password incorrect' });
         }
 
+        // Check if user is active
+        if (user.is_active === false || user.is_active === 0 || user.is_active === '0') {
+            return res.status(403).json({ success: false, message: 'This account has been deactivated. Please contact your administrator.' });
+        }
+
         // If user already has a session and login is not forced, alert client
         if (user.session_id && !force) {
             return res.json({ 
@@ -72,6 +77,24 @@ app.post('/api/users/logout', async (req, res) => {
     }
 });
 
+app.post('/api/users/change-password', async (req, res) => {
+    const { userId, currentPassword, newPassword } = req.body;
+    try {
+        const result = await db.query('SELECT * FROM users WHERE id = $1', [userId]);
+        const user = result.rows[0];
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+        if (user.password !== currentPassword) {
+            return res.status(400).json({ error: 'Current password incorrect' });
+        }
+        await db.query('UPDATE users SET password = $1 WHERE id = $2', [newPassword, userId]);
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 app.get('/api/users/:id', async (req, res) => {
     const { sessionId } = req.query;
     try {
@@ -90,9 +113,36 @@ app.get('/api/users/:id', async (req, res) => {
     }
 });
 
+app.put('/api/users/:id', async (req, res) => {
+    const { id } = req.params;
+    const { password, role, is_active } = req.body;
+    try {
+        if (password) {
+            await db.query(
+                'UPDATE users SET password = $1, role = $2, is_active = $3 WHERE id = $4',
+                [password, role, is_active, id]
+            );
+        } else {
+            await db.query(
+                'UPDATE users SET role = $1, is_active = $2 WHERE id = $3',
+                [role, is_active, id]
+            );
+        }
+
+        // Security override: if deactivated, terminate session
+        if (is_active === false) {
+            await db.query('UPDATE users SET session_id = NULL WHERE id = $1', [id]);
+        }
+
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 app.get('/api/users', async (req, res) => {
     try {
-        const result = await db.query('SELECT id, username, role FROM users');
+        const result = await db.query('SELECT id, username, role, is_active FROM users');
         res.json(result.rows);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -107,10 +157,10 @@ app.post('/api/users', async (req, res) => {
     try {
         const id = uuidv4();
         await db.query(
-            'INSERT INTO users (id, username, password, role) VALUES ($1, $2, $3, $4)',
+            'INSERT INTO users (id, username, password, role, is_active) VALUES ($1, $2, $3, $4, true)',
             [id, username, password, role]
         );
-        res.status(201).json({ id, username, role });
+        res.status(201).json({ id, username, role, is_active: true });
     } catch (err) {
         if (err.message.includes('UNIQUE') || err.code === '23505') {
             res.status(400).json({ error: 'Username already exists' });
@@ -124,9 +174,36 @@ app.delete('/api/users/:id', async (req, res) => {
     try {
         const result = await db.query('SELECT * FROM users WHERE id = $1', [req.params.id]);
         const user = result.rows[0];
-        if (user && user.username === 'admin') {
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+        if (user.username === 'admin') {
             return res.status(400).json({ error: 'Cannot delete default admin user' });
         }
+
+        const username = user.username;
+
+        // Count actions in status logs
+        const statusLogsRes = await db.query('SELECT COUNT(*) FROM status_logs WHERE technician = $1', [username]);
+        const statusLogsCount = parseInt(statusLogsRes.rows[0].count || statusLogsRes.rows[0].count_all || 0);
+
+        // Count actions in service records
+        const serviceRecordsRes = await db.query('SELECT COUNT(*) FROM service_records WHERE technician = $1', [username]);
+        const serviceRecordsCount = parseInt(serviceRecordsRes.rows[0].count || serviceRecordsRes.rows[0].count_all || 0);
+
+        // Count complaints created_by logs
+        const createdCountRes = await db.query(
+            "SELECT COUNT(*) FROM status_logs WHERE technician = $1 AND status LIKE '%Request Created%'",
+            [username]
+        );
+        const createdCount = parseInt(createdCountRes.rows[0].count || createdCountRes.rows[0].count_all || 0);
+
+        if (statusLogsCount > 0 || serviceRecordsCount > 0 || createdCount > 0) {
+            return res.status(400).json({ 
+                error: 'Cannot delete this user because they have active logs or requests associated with their account. You can deactivate their account instead.' 
+            });
+        }
+
         await db.query('DELETE FROM users WHERE id = $1', [req.params.id]);
         res.json({ success: true });
     } catch (err) {
@@ -216,6 +293,16 @@ app.post('/api/complaints', async (req, res) => {
             id, customer_id, item_name, serial_no, issue, status || 'Pending', csr_number, 
             !!flag_ok, !!flag_r, !!flag_w, !!flag_p, ts, finalServiceType, finalServiceMode, finalIsDeviceIntaken
         ]);
+
+        // Audit Log: Record request creation event and user in status_logs
+        if (req.body.created_by) {
+            const logId = uuidv4();
+            await db.query(`
+                INSERT INTO status_logs (id, complaint_id, status, technician, created_at)
+                VALUES ($1, $2, $3, $4, $5)
+            `, [logId, id, 'Pending (Request Created)', req.body.created_by, ts]);
+        }
+
         const result = await db.query('SELECT * FROM complaints WHERE id = $1', [id]);
         res.json(result.rows[0]);
     } catch (err) {

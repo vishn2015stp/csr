@@ -181,5 +181,29 @@ export const api = {
             throw new Error(err.error || 'Failed to delete user');
         }
         return res.json();
+    },
+    async changePassword(userId, currentPassword, newPassword) {
+        const res = await fetch(`${API_URL}/users/change-password`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId, currentPassword, newPassword })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+            throw new Error(data.message || data.error || 'Failed to change password');
+        }
+        return data;
+    },
+    async updateUser(id, updates) {
+        const res = await fetch(`${API_URL}/users/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updates)
+        });
+        const data = await res.json();
+        if (!res.ok) {
+            throw new Error(data.message || data.error || 'Failed to update user');
+        }
+        return data;
     }
 };

@@ -35,12 +35,10 @@ export default function Sidebar({ isOpen, closeSidebar }) {
                     <History size={20} />
                     All Requests
                 </NavLink>
-                {isAdmin && (
-                    <NavLink to="/settings" onClick={closeSidebar} className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>
-                        <Database size={20} />
-                        Settings
-                    </NavLink>
-                )}
+                <NavLink to="/settings" onClick={closeSidebar} className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>
+                    <Database size={20} />
+                    Settings
+                </NavLink>
             </nav>
             <div style={{ padding: '0.5rem 1rem', borderTop: '1px solid var(--border-color)' }}>
                 <button onClick={handleLogout} className="nav-item" style={{ background: 'transparent', border: 'none', color: '#c53030', width: '100%', cursor: 'pointer', textAlign: 'left', fontWeight: 'bold' }}>

@@ -105,6 +105,12 @@ function ensureInitialized() {
                 }
 
                 try {
+                    await pool.query("ALTER TABLE users ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT true;");
+                } catch (err) {
+                    console.error("Error adding is_active to users:", err.message);
+                }
+
+                try {
                     await pool.query("ALTER TABLE complaints ADD COLUMN IF NOT EXISTS service_type TEXT DEFAULT 'In-Shop';");
                 } catch (err) {
                     console.error("Error adding service_type:", err.message);

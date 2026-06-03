@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
 import { api } from '../lib/api'
 import { v4 as uuidv4 } from 'uuid'
+import { useAuth } from '../context/AuthContext'
 
 export default function Intake() {
+    const { user } = useAuth()
     const [formData, setFormData] = useState({
         name: '', phone: '', email: '', address: '', location: '',
         itemName: '', serialNo: '', issue: '', csrNumber: '', serviceMode: 'On Center'
@@ -127,7 +129,8 @@ export default function Intake() {
                 status: 'Pending',
                 service_mode: formData.serviceMode,
                 is_device_intaken: isIntaken,
-                created_at: now
+                created_at: now,
+                created_by: user?.username || 'admin'
             });
 
             setSuccessData({
