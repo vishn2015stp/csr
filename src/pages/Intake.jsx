@@ -166,18 +166,18 @@ export default function Intake() {
                             <input type="tel" name="phone" required value={formData.phone} onChange={handleChange} placeholder="e.g. 555-0100" />
                             
                             {matchedCustomers.length > 0 && (
-                                <div style={{ background: '#3b4252', padding: '0.75rem', borderRadius: '4px', marginBottom: '1.25rem', border: '1px solid #35a7e6' }}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem', borderBottom: '1px solid #4c566a', paddingBottom: '0.25rem' }}>
-                                        <span style={{ fontSize: '0.85rem', color: '#eceff4', fontWeight: 'bold' }}>Previous customer records found:</span>
+                                <div style={{ background: '#f6f3eb', padding: '0.75rem', borderRadius: '4px', marginBottom: '1.25rem', border: '1px solid #35a7e6' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.25rem' }}>
+                                        <span style={{ fontSize: '0.85rem', color: 'var(--text-primary)', fontWeight: 'bold' }}>Previous customer records found:</span>
                                         <button type="button" onClick={() => setMatchedCustomers([])} style={{ background: '#bf616a', color: 'white', padding: '2px 6px', fontSize: '0.7rem', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Dismiss</button>
                                     </div>
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '150px', overflowY: 'auto' }}>
                                         {matchedCustomers.map((cust, idx) => (
-                                            <div key={cust.id || idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#2e3440', padding: '0.5rem', borderRadius: '4px', fontSize: '0.8rem' }}>
-                                                <div style={{ color: '#eceff4', flex: 1, paddingRight: '10px' }}>
+                                            <div key={cust.id || idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--panel-bg)', padding: '0.5rem', borderRadius: '4px', fontSize: '0.8rem' }}>
+                                                <div style={{ color: 'var(--text-primary)', flex: 1, paddingRight: '10px' }}>
                                                     <strong>{cust.name}</strong>
                                                     {cust.email && <span style={{ color: '#35a7e6', marginLeft: '6px' }}>({cust.email})</span>}
-                                                    {cust.address && <div style={{ color: '#d8dee9', fontSize: '0.75rem', marginTop: '2px' }}>{cust.address}</div>}
+                                                    {cust.address && <div style={{ color: 'var(--text-primary)', fontSize: '0.75rem', marginTop: '2px' }}>{cust.address}</div>}
                                                 </div>
                                                 <button type="button" onClick={() => handleAutofill(cust)} style={{ background: '#35a7e6', color: 'black', padding: '3px 8px', fontSize: '0.75rem', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', whiteSpace: 'nowrap' }}>Autofill</button>
                                             </div>
@@ -201,12 +201,12 @@ export default function Intake() {
                                 </>
                             )}
 
-                            <hr style={{ margin: '1rem 0', borderColor: '#333' }} />
+                            <hr style={{ margin: '1rem 0', borderColor: 'var(--border-color)' }} />
 
                             <label>Custom CSR Number</label>
                             <input type="text" name="csrNumber" value={formData.csrNumber} onChange={handleChange} placeholder="Leave blank to auto-generate number" />
 
-                            <hr style={{ margin: '1rem 0', borderColor: '#333' }} />
+                            <hr style={{ margin: '1rem 0', borderColor: 'var(--border-color)' }} />
 
                             <label style={{ display: 'block', color: 'var(--accent)', marginBottom: '0.5rem' }}>Mode of Service</label>
                             <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>

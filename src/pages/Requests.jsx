@@ -111,20 +111,20 @@ export default function Requests() {
             {/* Standard non-print content */}
             <div className="non-print">
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-                    <h1 style={{ margin: 0, fontSize: '1.8rem', color: '#eceff4' }}>Service Request Directory</h1>
-                    <div style={{ background: '#3b4252', padding: '0.5rem 1rem', borderRadius: '4px', fontSize: '0.9rem', border: '1px solid #4c566a' }}>
+                    <h1 style={{ margin: 0, fontSize: '1.8rem', color: 'var(--text-primary)' }}>Service Request Directory</h1>
+                    <div style={{ background: '#f6f3eb', padding: '0.5rem 1rem', borderRadius: '4px', fontSize: '0.9rem', border: '1px solid var(--border-color)' }}>
                         Total Records: <span style={{ color: '#35a7e6', fontWeight: 'bold' }}>{filteredRequests.length}</span>
                     </div>
                 </div>
 
                 {/* Filters card */}
-                <div style={{ background: '#2e3440', borderRadius: '6px', padding: '1.25rem', marginBottom: '1.5rem', border: '1px solid #3b4252', display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center' }}>
+                <div style={{ background: 'var(--panel-bg)', borderRadius: '6px', padding: '1.25rem', marginBottom: '1.5rem', border: '1px solid var(--border-color)', display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center' }}>
                     
                     {/* Search */}
                     <div style={{ flex: '1 1 300px', position: 'relative' }}>
                         <div style={{
-                            background: '#242933',
-                            border: '1px solid #4c566a',
+                            background: 'var(--bg-color)',
+                            border: '1px solid var(--border-color)',
                             borderRadius: '4px',
                             display: 'flex',
                             alignItems: 'center',
@@ -141,7 +141,7 @@ export default function Requests() {
                                     background: 'transparent',
                                     border: 'none',
                                     outline: 'none',
-                                    color: '#eceff4',
+                                    color: 'var(--text-primary)',
                                     fontSize: '0.9rem',
                                     width: '100%',
                                     margin: 0,
@@ -164,9 +164,9 @@ export default function Requests() {
                             style={{
                                 width: '100%',
                                 padding: '0.55rem 0.75rem',
-                                background: '#242933',
-                                border: '1px solid #4c566a',
-                                color: '#eceff4',
+                                background: 'var(--bg-color)',
+                                border: '1px solid var(--border-color)',
+                                color: 'var(--text-primary)',
                                 borderRadius: '4px',
                                 fontSize: '0.9rem',
                                 outline: 'none',
@@ -194,9 +194,9 @@ export default function Requests() {
                             style={{
                                 width: '100%',
                                 padding: '0.55rem 0.75rem',
-                                background: '#242933',
-                                border: '1px solid #4c566a',
-                                color: '#eceff4',
+                                background: 'var(--bg-color)',
+                                border: '1px solid var(--border-color)',
+                                color: 'var(--text-primary)',
                                 borderRadius: '4px',
                                 fontSize: '0.9rem',
                                 outline: 'none',
@@ -211,11 +211,11 @@ export default function Requests() {
                 </div>
 
                 {/* Table */}
-                <div style={{ background: '#2e3440', borderRadius: '6px', border: '1px solid #3b4252', padding: '1.25rem' }}>
+                <div style={{ background: 'var(--panel-bg)', borderRadius: '6px', border: '1px solid var(--border-color)', padding: '1.25rem' }}>
                     <div style={{ overflowX: 'auto' }}>
                         <table style={{ width: '100%', fontSize: '0.9rem', borderCollapse: 'collapse', minWidth: '900px' }}>
                             <thead>
-                                <tr style={{ background: '#3b4252', textAlign: 'left' }}>
+                                <tr style={{ background: '#f6f3eb', textAlign: 'left' }}>
                                     <th style={{ padding: '0.75rem 1rem', borderRadius: '4px 0 0 4px', fontWeight: '600', color: '#35a7e6' }}>CSR #</th>
                                     <th style={{ padding: '0.75rem 1rem', fontWeight: '600' }}>Customer</th>
                                     <th style={{ padding: '0.75rem 1rem', fontWeight: '600' }}>Contact Phone</th>
@@ -227,7 +227,7 @@ export default function Requests() {
                             </thead>
                             <tbody>
                                 {filteredRequests.map(req => {
-                                     let statusColor = '#d8dee9';
+                                     let statusColor = 'var(--text-primary)';
                                      if (req.status === 'Pending') statusColor = '#bf616a';
                                      else if (req.status === 'Delivered' || req.status === 'Completed') statusColor = '#a3be8c';
                                      else if (req.status === 'Ready for Delivery' || req.status === 'Ready') statusColor = '#8fbcbb';
@@ -238,15 +238,15 @@ export default function Requests() {
                                     return (
                                         <tr 
                                             key={req.id}
-                                            style={{ borderBottom: '1px solid #3b4252', transition: 'background 0.15s' }}
+                                            style={{ borderBottom: '1px solid var(--border-color)', transition: 'background 0.15s' }}
                                         >
                                             <td style={{ padding: '0.85rem 1rem', fontWeight: 'bold', color: '#35a7e6' }}>#{req.csr_number || req.id.split('-')[0].toUpperCase()}</td>
-                                            <td style={{ padding: '0.85rem 1rem', color: '#eceff4', fontWeight: '500' }}>{req.customerName || '—'}</td>
-                                            <td style={{ padding: '0.85rem 1rem', color: '#d8dee9' }}>{req.customerPhone || '—'}</td>
-                                            <td style={{ padding: '0.85rem 1rem', color: '#eceff4' }}>{req.item_name}</td>
+                                            <td style={{ padding: '0.85rem 1rem', color: 'var(--text-primary)', fontWeight: '500' }}>{req.customerName || '—'}</td>
+                                            <td style={{ padding: '0.85rem 1rem', color: 'var(--text-primary)' }}>{req.customerPhone || '—'}</td>
+                                            <td style={{ padding: '0.85rem 1rem', color: 'var(--text-primary)' }}>{req.item_name}</td>
                                             <td style={{ padding: '0.85rem 1rem' }}>
                                                 <span style={{ 
-                                                    background: 'rgba(255,255,255,0.08)', 
+                                                    background: 'rgba(0, 0, 0, 0.04)', 
                                                     padding: '3px 8px', 
                                                     borderRadius: '12px', 
                                                     color: statusColor, 
@@ -266,21 +266,21 @@ export default function Requests() {
                                                     <button 
                                                         onClick={() => setViewingJobId(req.id)}
                                                         title="View Details"
-                                                        style={{ background: '#4c566a', color: '#eceff4', padding: '0.35rem 0.6rem', borderRadius: '4px', cursor: 'pointer', border: 'none', display: 'flex', alignItems: 'center' }}
+                                                        style={{ background: '#4c566a', color: 'var(--text-primary)', padding: '0.35rem 0.6rem', borderRadius: '4px', cursor: 'pointer', border: 'none', display: 'flex', alignItems: 'center' }}
                                                     >
                                                         <Eye size={15} />
                                                     </button>
                                                     <button 
                                                         onClick={() => handlePrintIntake(req)}
                                                         title="Print Intake Slip"
-                                                        style={{ background: '#35a7e6', color: '#2e3440', padding: '0.35rem 0.6rem', borderRadius: '4px', cursor: 'pointer', border: 'none', display: 'flex', alignItems: 'center' }}
+                                                        style={{ background: '#35a7e6', color: 'var(--panel-bg)', padding: '0.35rem 0.6rem', borderRadius: '4px', cursor: 'pointer', border: 'none', display: 'flex', alignItems: 'center' }}
                                                     >
                                                         <Printer size={15} />
                                                     </button>
                                                     <button 
                                                         onClick={() => handlePrintInvoice(req)}
                                                         title="Print Invoice"
-                                                        style={{ background: '#a3be8c', color: '#2e3440', padding: '0.35rem 0.6rem', borderRadius: '4px', cursor: 'pointer', border: 'none', display: 'flex', alignItems: 'center' }}
+                                                        style={{ background: '#a3be8c', color: 'var(--panel-bg)', padding: '0.35rem 0.6rem', borderRadius: '4px', cursor: 'pointer', border: 'none', display: 'flex', alignItems: 'center' }}
                                                     >
                                                         <FileText size={15} />
                                                     </button>
@@ -319,7 +319,7 @@ export default function Requests() {
                 <div style={{ position: 'fixed', top: 0, left: 0, bottom: 0, right: 0, background: 'rgba(0,0,0,0.85)', zIndex: 9999, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                     <div style={{ background: 'white', color: 'black', padding: '1.5rem 1rem', width: '500px', maxWidth: '95%', borderRadius: '4px', boxSizing: 'border-box' }}>
                         <div className="non-print" style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem', gap: '0.5rem' }}>
-                            <button onClick={triggerPrint} style={{ background: '#444', color: 'white', border: 'none', padding: '0.5rem 1rem', borderRadius: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}><Printer size={16} /> Print</button>
+                            <button onClick={triggerPrint} style={{ background: 'var(--border-color)', color: 'white', border: 'none', padding: '0.5rem 1rem', borderRadius: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}><Printer size={16} /> Print</button>
                             <button onClick={() => setPrintIntakeData(null)} style={{ background: '#e53e3e', color: 'white', border: 'none', padding: '0.5rem 1rem', borderRadius: '4px', cursor: 'pointer' }}>Close</button>
                         </div>
                         <div className="print-receipt" style={{ color: 'black' }}>
@@ -351,7 +351,7 @@ export default function Requests() {
                 <div style={{ position: 'fixed', top: 0, left: 0, bottom: 0, right: 0, background: 'rgba(0,0,0,0.85)', zIndex: 9999, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                     <div style={{ background: 'white', color: 'black', padding: '1.5rem 1rem', width: '500px', maxWidth: '95%', borderRadius: '4px', boxSizing: 'border-box' }}>
                         <div className="non-print" style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem', gap: '0.5rem' }}>
-                            <button onClick={triggerPrint} style={{ background: '#444', color: 'white', border: 'none', padding: '0.5rem 1rem', borderRadius: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}><Printer size={16} /> Print</button>
+                            <button onClick={triggerPrint} style={{ background: 'var(--border-color)', color: 'white', border: 'none', padding: '0.5rem 1rem', borderRadius: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}><Printer size={16} /> Print</button>
                             <button onClick={() => setPrintInvoiceData(null)} style={{ background: '#e53e3e', color: 'white', border: 'none', padding: '0.5rem 1rem', borderRadius: '4px', cursor: 'pointer' }}>Close</button>
                         </div>
                         <div className="invoice-print-area" style={{ color: 'black' }}>

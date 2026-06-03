@@ -26,15 +26,15 @@ function Toggle({ label, description, checked, onChange }) {
             style={{
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                 padding: '0.75rem 1rem', marginBottom: '0.5rem',
-                background: checked ? 'rgba(187,134,252,0.08)' : '#1a1a2e',
-                border: `1px solid ${checked ? 'rgba(187,134,252,0.4)' : '#333'}`,
+                background: checked ? 'rgba(187,134,252,0.08)' : '#f6f3eb',
+                border: `1px solid ${checked ? 'rgba(187,134,252,0.4)' : 'var(--border-color)'}`,
                 borderRadius: '8px', cursor: 'pointer',
                 transition: 'all 0.2s ease'
             }}
         >
             <div>
-                <div style={{ fontWeight: '600', fontSize: '0.9rem', color: checked ? '#e0e0e0' : '#888' }}>{label}</div>
-                {description && <div style={{ fontSize: '0.75rem', color: '#666', marginTop: '2px' }}>{description}</div>}
+                <div style={{ fontWeight: '600', fontSize: '0.9rem', color: checked ? '#e0e0e0' : 'var(--text-secondary)' }}>{label}</div>
+                {description && <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '2px' }}>{description}</div>}
             </div>
             {checked
                 ? <ToggleRight size={28} color="var(--accent)" />
@@ -134,7 +134,7 @@ function InvoicePreview({ config }) {
 
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px', marginBottom: '12px' }}>
                 <thead>
-                    <tr style={{ background: '#333', color: '#fff' }}>
+                    <tr style={{ background: 'var(--border-color)', color: 'var(--text-primary)' }}>
                         <th style={{ padding: '5px 8px', textAlign: 'left' }}>Description</th>
                         <th style={{ padding: '5px 8px', textAlign: 'right' }}>Amount</th>
                     </tr>
@@ -155,7 +155,7 @@ function InvoicePreview({ config }) {
                 </tbody>
             </table>
 
-            <div style={{ textAlign: 'center', fontSize: '10px', color: '#555', borderTop: '1px dashed #ccc', paddingTop: '8px', whiteSpace: 'pre-line' }}>
+            <div style={{ textAlign: 'center', fontSize: '10px', color: '#555', borderTop: '1px dashed var(--text-secondary)', paddingTop: '8px', whiteSpace: 'pre-line' }}>
                 {config.invoiceTerms || 'Your footer terms here.'}
             </div>
         </div>
@@ -259,7 +259,7 @@ export default function Settings() {
     };
     const inputStyle = {
         width: '100%', padding: '0.6rem 0.75rem', marginBottom: '0.75rem',
-        background: '#1a1a2e', border: '1px solid #333', color: 'var(--text-primary)',
+        background: '#f6f3eb', border: '1px solid var(--border-color)', color: 'var(--text-primary)',
         borderRadius: '6px', boxSizing: 'border-box', fontFamily: 'inherit', fontSize: '0.9rem'
     };
 
@@ -267,7 +267,7 @@ export default function Settings() {
         <div className="container" style={{ maxWidth: '1400px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
                 <h1 style={{ margin: 0 }}>Settings</h1>
-                <button onClick={handleBackup} disabled={loadingConfig} style={{ display: 'flex', alignItems: 'center', gap: '6px', background: '#2c2c2c', color: '#aaa', border: '1px solid #444', padding: '0.5rem 1rem', borderRadius: '6px', fontSize: '0.85rem' }}>
+                <button onClick={handleBackup} disabled={loadingConfig} style={{ display: 'flex', alignItems: 'center', gap: '6px', background: '#2c2c2c', color: 'var(--text-secondary)', border: '1px solid var(--border-color)', padding: '0.5rem 1rem', borderRadius: '6px', fontSize: '0.85rem' }}>
                     <DownloadCloud size={16} /> Backup Database
                 </button>
             </div>
@@ -286,11 +286,11 @@ export default function Settings() {
             {/* ── PRINT LAYOUT CARD ── */}
             <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
                 {/* Card header */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '1.25rem 1.5rem', borderBottom: '1px solid #333', background: '#1a1a1a' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '1.25rem 1.5rem', borderBottom: '1px solid var(--border-color)', background: '#f6f3eb' }}>
                     <Printer size={22} color="var(--accent)" />
                     <div>
                         <h2 style={{ margin: 0, fontSize: '1.1rem' }}>Print Layout Designer</h2>
-                        <p style={{ margin: 0, fontSize: '0.8rem', color: '#888' }}>Changes update the live preview instantly</p>
+                        <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Changes update the live preview instantly</p>
                     </div>
                 </div>
 
@@ -302,13 +302,13 @@ export default function Settings() {
                         {/* Shop Identity */}
                         <div style={sectionStyle}>
                             <div style={sectionTitleStyle}>Shop Identity</div>
-                            <label style={{ fontSize: '0.8rem', color: '#aaa', display: 'block', marginBottom: '4px' }}>Shop Name</label>
+                            <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Shop Name</label>
                             <input style={inputStyle} value={printConfig.shopName} onChange={e => set('shopName', e.target.value)} placeholder="Hypertech Digital" />
-                            <label style={{ fontSize: '0.8rem', color: '#aaa', display: 'block', marginBottom: '4px' }}>Address</label>
+                            <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Address</label>
                             <textarea style={{ ...inputStyle, resize: 'vertical' }} rows={3} value={printConfig.shopAddress} onChange={e => set('shopAddress', e.target.value)} placeholder={"123 Tech Street\nCity, State 12345"} />
-                            <label style={{ fontSize: '0.8rem', color: '#aaa', display: 'block', marginBottom: '4px' }}>Phone</label>
+                            <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Phone</label>
                             <input style={inputStyle} value={printConfig.shopPhone} onChange={e => set('shopPhone', e.target.value)} placeholder="055-000-0000" />
-                            <label style={{ fontSize: '0.8rem', color: '#aaa', display: 'block', marginBottom: '4px' }}>Email</label>
+                            <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Email</label>
                             <input style={inputStyle} value={printConfig.shopEmail} onChange={e => set('shopEmail', e.target.value)} placeholder="info@shop.com" />
                         </div>
 
@@ -326,9 +326,9 @@ export default function Settings() {
                         {/* Footer Text */}
                         <div style={sectionStyle}>
                             <div style={sectionTitleStyle}>Footer / Terms Text</div>
-                            <label style={{ fontSize: '0.8rem', color: '#aaa', display: 'block', marginBottom: '4px' }}>Intake Slip Footer</label>
+                            <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Intake Slip Footer</label>
                             <textarea style={{ ...inputStyle, resize: 'vertical' }} rows={3} value={printConfig.intakeTerms} onChange={e => set('intakeTerms', e.target.value)} />
-                            <label style={{ fontSize: '0.8rem', color: '#aaa', display: 'block', marginBottom: '4px' }}>Invoice Footer</label>
+                            <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Invoice Footer</label>
                             <textarea style={{ ...inputStyle, resize: 'vertical' }} rows={3} value={printConfig.invoiceTerms} onChange={e => set('invoiceTerms', e.target.value)} />
                         </div>
 
@@ -341,12 +341,12 @@ export default function Settings() {
                     {/* ── RIGHT PANEL: Live Preview ── */}
                     <div className="settings-right-panel">
                         {/* Tab switcher */}
-                        <div style={{ display: 'flex', borderBottom: '1px solid #333' }}>
+                        <div style={{ display: 'flex', borderBottom: '1px solid var(--border-color)' }}>
                             {['intake', 'invoice'].map(tab => (
                                 <button key={tab} onClick={() => setActiveTab(tab)} style={{
                                     flex: 1, padding: '0.85rem', background: 'transparent', border: 'none',
                                     borderBottom: activeTab === tab ? '2px solid var(--accent)' : '2px solid transparent',
-                                    color: activeTab === tab ? 'var(--accent)' : '#666',
+                                    color: activeTab === tab ? 'var(--accent)' : 'var(--text-secondary)',
                                     fontWeight: activeTab === tab ? '700' : '400',
                                     cursor: 'pointer', fontSize: '0.9rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
                                     transition: 'all 0.2s'
@@ -375,11 +375,11 @@ export default function Settings() {
             
             {/* ── USER MANAGEMENT CARD ── */}
             <div className="card" style={{ padding: 0, overflow: 'hidden', marginTop: '2rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '1.25rem 1.5rem', borderBottom: '1px solid #333', background: '#1a1a1a' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '1.25rem 1.5rem', borderBottom: '1px solid var(--border-color)', background: '#f6f3eb' }}>
                     <Users size={22} color="var(--accent)" />
                     <div>
                         <h2 style={{ margin: 0, fontSize: '1.1rem' }}>User Management</h2>
-                        <p style={{ margin: 0, fontSize: '0.8rem', color: '#888' }}>Manage system access and assign roles</p>
+                        <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Manage system access and assign roles</p>
                     </div>
                 </div>
 
@@ -402,7 +402,7 @@ export default function Settings() {
                         <div className="table-responsive">
                             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
                                 <thead>
-                                    <tr style={{ borderBottom: '1px solid #333', textAlign: 'left', color: '#888' }}>
+                                    <tr style={{ borderBottom: '1px solid var(--border-color)', textAlign: 'left', color: 'var(--text-secondary)' }}>
                                         <th style={{ padding: '0.5rem' }}>Username</th>
                                         <th style={{ padding: '0.5rem' }}>Access Role</th>
                                         <th style={{ padding: '0.5rem', textAlign: 'right' }}>Actions</th>
@@ -410,15 +410,15 @@ export default function Settings() {
                                 </thead>
                                 <tbody>
                                     {users.map(u => (
-                                        <tr key={u.id} style={{ borderBottom: '1px solid #222' }}>
+                                        <tr key={u.id} style={{ borderBottom: '1px solid var(--border-color)' }}>
                                             <td style={{ padding: '0.75rem 0.5rem', fontWeight: 'bold' }}>{u.username}</td>
                                             <td style={{ padding: '0.75rem 0.5rem' }}>
                                                 <span style={{
                                                     fontSize: '0.75rem',
                                                     padding: '2px 8px',
                                                     borderRadius: '12px',
-                                                    background: u.role === 'ADMIN' ? 'rgba(187,134,252,0.15)' : 'rgba(255,255,255,0.05)',
-                                                    color: u.role === 'ADMIN' ? 'var(--accent)' : '#aaa',
+                                                    background: u.role === 'ADMIN' ? 'rgba(187,134,252,0.15)' : 'rgba(0, 0, 0, 0.03)',
+                                                    color: u.role === 'ADMIN' ? 'var(--accent)' : 'var(--text-secondary)',
                                                     fontWeight: 'bold'
                                                 }}>{u.role}</span>
                                             </td>
@@ -445,11 +445,11 @@ export default function Settings() {
                     </div>
 
                     {/* Create User Form Panel */}
-                    <div style={{ flex: '1 1 45%', minWidth: '300px', background: '#1e1e1e', padding: '1.5rem', borderRadius: '8px', border: '1px solid #333' }}>
+                    <div style={{ flex: '1 1 45%', minWidth: '300px', background: '#1e1e1e', padding: '1.5rem', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
                         <h3 style={{ fontSize: '0.85rem', color: '#35a7e6', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '1rem', marginTop: 0 }}>Create User Account</h3>
                         <form onSubmit={handleCreateUser}>
                             <div style={{ marginBottom: '1rem' }}>
-                                <label style={{ fontSize: '0.8rem', color: '#aaa', display: 'block', marginBottom: '4px' }}>Username</label>
+                                <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Username</label>
                                 <input
                                     type="text"
                                     required
@@ -458,13 +458,13 @@ export default function Settings() {
                                     placeholder="Enter username..."
                                     style={{
                                         width: '100%', padding: '0.6rem 0.75rem',
-                                        background: '#222', border: '1px solid #333', color: '#fff',
+                                        background: 'var(--bg-color)', border: '1px solid var(--border-color)', color: 'var(--text-primary)',
                                         borderRadius: '6px', boxSizing: 'border-box'
                                     }}
                                 />
                             </div>
                             <div style={{ marginBottom: '1rem' }}>
-                                <label style={{ fontSize: '0.8rem', color: '#aaa', display: 'block', marginBottom: '4px' }}>Password</label>
+                                <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Password</label>
                                 <input
                                     type="password"
                                     required
@@ -473,19 +473,19 @@ export default function Settings() {
                                     placeholder="Enter password..."
                                     style={{
                                         width: '100%', padding: '0.6rem 0.75rem',
-                                        background: '#222', border: '1px solid #333', color: '#fff',
+                                        background: 'var(--bg-color)', border: '1px solid var(--border-color)', color: 'var(--text-primary)',
                                         borderRadius: '6px', boxSizing: 'border-box'
                                     }}
                                 />
                             </div>
                             <div style={{ marginBottom: '1.5rem' }}>
-                                <label style={{ fontSize: '0.8rem', color: '#aaa', display: 'block', marginBottom: '4px' }}>Access Role</label>
+                                <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Access Role</label>
                                 <select
                                     value={newUser.role}
                                     onChange={e => setNewUser({ ...newUser, role: e.target.value })}
                                     style={{
                                         width: '100%', padding: '0.6rem 0.75rem',
-                                        background: '#222', border: '1px solid #333', color: '#fff',
+                                        background: 'var(--bg-color)', border: '1px solid var(--border-color)', color: 'var(--text-primary)',
                                         borderRadius: '6px', boxSizing: 'border-box', cursor: 'pointer'
                                     }}
                                 >

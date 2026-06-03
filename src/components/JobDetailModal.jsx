@@ -254,7 +254,7 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
             <div style={{ position: 'fixed', top: 0, left: 0, bottom: 0, right: 0, background: 'rgba(0,0,0,0.85)', zIndex: 9999, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                 <div style={{ background: 'white', color: 'black', padding: '1.5rem 1rem', width: '500px', maxWidth: '95%', borderRadius: '4px', boxSizing: 'border-box' }}>
                     <div className="non-print" style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem' }}>
-                        <button onClick={() => window.print()} style={{ marginRight: '1rem', background: '#444' }}><Printer size={16} /> Print</button>
+                        <button onClick={() => window.print()} style={{ marginRight: '1rem', background: 'var(--border-color)' }}><Printer size={16} /> Print</button>
                         <button onClick={() => setShowInvoice(false)} style={{ background: '#e53e3e' }}>Close</button>
                     </div>
                     <div className="invoice-print-area">
@@ -309,22 +309,22 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
 
     return (
         <div style={{ position: 'fixed', top: 0, left: 0, bottom: 0, right: 0, background: 'rgba(0,0,0,0.7)', zIndex: 1100, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-            <div style={{ background: '#2e3440', border: '1px solid #3b4252', borderRadius: '8px', width: '900px', maxWidth: '95%', maxHeight: '90vh', display: 'flex', flexDirection: 'column', boxShadow: '0 10px 25px rgba(0,0,0,0.5)' }}>
+            <div style={{ background: 'var(--panel-bg)', border: '1px solid var(--border-color)', borderRadius: '8px', width: '900px', maxWidth: '95%', maxHeight: '90vh', display: 'flex', flexDirection: 'column', boxShadow: '0 10px 25px rgba(0,0,0,0.5)' }}>
 
                 {/* Header */}
-                <div style={{ padding: '1rem', borderBottom: '1px solid #3b4252', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#242933', borderRadius: '8px 8px 0 0' }}>
-                    <h2 style={{ margin: 0, color: '#eceff4' }}>PENDING BOOK DETAIL</h2>
-                    <button onClick={onClose} style={{ background: 'transparent', color: '#eceff4', border: 'none', cursor: 'pointer', padding: '0.5rem' }}>
+                <div style={{ padding: '1rem', borderBottom: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--bg-color)', borderRadius: '8px 8px 0 0' }}>
+                    <h2 style={{ margin: 0, color: 'var(--text-primary)' }}>PENDING BOOK DETAIL</h2>
+                    <button onClick={onClose} style={{ background: 'transparent', color: 'var(--text-primary)', border: 'none', cursor: 'pointer', padding: '0.5rem' }}>
                         <X size={24} />
                     </button>
                 </div>
 
                 {/* Body */}
-                <div className="modal-body-grid" style={{ padding: '1.5rem', overflowY: 'auto', flex: 1, color: '#d8dee9' }}>
+                <div className="modal-body-grid" style={{ padding: '1.5rem', overflowY: 'auto', flex: 1, color: 'var(--text-primary)' }}>
 
                     {/* Left Column - Details */}
                     <div>
-                        <div style={{ background: '#3b4252', padding: '1rem', borderRadius: '4px', marginBottom: '1.5rem' }}>
+                        <div style={{ background: '#f6f3eb', padding: '1rem', borderRadius: '4px', marginBottom: '1.5rem' }}>
                             <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: '0.5rem', fontSize: '0.9rem' }}>
                                 <strong style={{ color: '#35a7e6' }}>Tracking ID:</strong> <span>{job.csr_number || job.id.split('-')[0].toUpperCase()}</span>
                                 <strong style={{ color: '#35a7e6' }}>Date Rcvd:</strong> <span>{new Date(job.created_at).toLocaleDateString()}</span>
@@ -336,7 +336,7 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                         </div>
 
                         <div style={{ marginBottom: '1.5rem' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #4c566a', paddingBottom: '0.5rem', marginBottom: '0.5rem' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem', marginBottom: '0.5rem' }}>
                                 <h3 style={{ margin: 0, color: '#ebcb8b' }}>Product & Complaint</h3>
                                 {!isDelivered && (
                                     <button 
@@ -352,7 +352,7 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                                         }}
                                         style={{ 
                                             background: '#4c566a', 
-                                            color: '#eceff4', 
+                                            color: 'var(--text-primary)', 
                                             padding: '2px 8px', 
                                             fontSize: '0.8rem', 
                                             border: 'none', 
@@ -366,32 +366,32 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                             </div>
 
                             {isEditingProduct ? (
-                                <div style={{ background: '#242933', padding: '1rem', borderRadius: '4px', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                                <div style={{ background: 'var(--bg-color)', padding: '1rem', borderRadius: '4px', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                                     <div>
-                                        <label style={{ fontSize: '0.8rem', color: '#eceff4', display: 'block', marginBottom: '4px' }}>Item Name *</label>
+                                        <label style={{ fontSize: '0.8rem', color: 'var(--text-primary)', display: 'block', marginBottom: '4px' }}>Item Name *</label>
                                         <input 
                                             type="text" 
                                             value={editItemName} 
                                             onChange={e => setEditItemName(e.target.value)} 
-                                            style={{ width: '100%', padding: '0.4rem', background: '#2e3440', border: '1px solid #4c566a', color: '#eceff4', borderRadius: '4px' }} 
+                                            style={{ width: '100%', padding: '0.4rem', background: 'var(--panel-bg)', border: '1px solid var(--border-color)', color: 'var(--text-primary)', borderRadius: '4px' }} 
                                         />
                                     </div>
                                     <div>
-                                        <label style={{ fontSize: '0.8rem', color: '#eceff4', display: 'block', marginBottom: '4px' }}>Serial Number</label>
+                                        <label style={{ fontSize: '0.8rem', color: 'var(--text-primary)', display: 'block', marginBottom: '4px' }}>Serial Number</label>
                                         <input 
                                             type="text" 
                                             value={editSerialNo} 
                                             onChange={e => setEditSerialNo(e.target.value)} 
-                                            style={{ width: '100%', padding: '0.4rem', background: '#2e3440', border: '1px solid #4c566a', color: '#eceff4', borderRadius: '4px' }} 
+                                            style={{ width: '100%', padding: '0.4rem', background: 'var(--panel-bg)', border: '1px solid var(--border-color)', color: 'var(--text-primary)', borderRadius: '4px' }} 
                                         />
                                     </div>
                                     <div>
-                                        <label style={{ fontSize: '0.8rem', color: '#eceff4', display: 'block', marginBottom: '4px' }}>Issue Description *</label>
+                                        <label style={{ fontSize: '0.8rem', color: 'var(--text-primary)', display: 'block', marginBottom: '4px' }}>Issue Description *</label>
                                         <textarea 
                                             value={editIssue} 
                                             onChange={e => setEditIssue(e.target.value)} 
                                             rows="3"
-                                            style={{ width: '100%', padding: '0.4rem', background: '#2e3440', border: '1px solid #4c566a', color: '#eceff4', borderRadius: '4px' }}
+                                            style={{ width: '100%', padding: '0.4rem', background: 'var(--panel-bg)', border: '1px solid var(--border-color)', color: 'var(--text-primary)', borderRadius: '4px' }}
                                         ></textarea>
                                     </div>
                                     
@@ -404,7 +404,7 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                                             disabled={job.is_device_intaken === 1}
                                             style={{ cursor: job.is_device_intaken === 1 ? 'not-allowed' : 'pointer' }}
                                         />
-                                        <label htmlFor="editIsIntaken" style={{ fontSize: '0.9rem', color: job.is_device_intaken === 1 ? '#777' : '#eceff4', cursor: job.is_device_intaken === 1 ? 'not-allowed' : 'pointer' }}>
+                                        <label htmlFor="editIsIntaken" style={{ fontSize: '0.9rem', color: job.is_device_intaken === 1 ? '#777' : 'var(--text-primary)', cursor: job.is_device_intaken === 1 ? 'not-allowed' : 'pointer' }}>
                                             Device Taken for Service (Intaken) {job.is_device_intaken === 1 && "(Locked)"}
                                         </label>
                                     </div>
@@ -414,7 +414,7 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                                         style={{ 
                                             padding: '0.5rem', 
                                             background: '#35a7e6', 
-                                            color: '#2e3440', 
+                                            color: 'var(--panel-bg)', 
                                             fontWeight: 'bold', 
                                             border: 'none', 
                                             borderRadius: '4px', 
@@ -426,10 +426,10 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                                     </button>
                                 </div>
                             ) : (
-                                <div style={{ background: '#242933', padding: '1rem', borderRadius: '4px' }}>
+                                <div style={{ background: 'var(--bg-color)', padding: '1rem', borderRadius: '4px' }}>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
                                         <div>
-                                            <strong style={{ fontSize: '1.1rem', color: '#eceff4' }}>{job.item_name}</strong>
+                                            <strong style={{ fontSize: '1.1rem', color: 'var(--text-primary)' }}>{job.item_name}</strong>
                                             {job.serial_no && <div style={{ fontSize: '0.85rem', color: '#35a7e6', marginTop: '2px' }}>S/N: {job.serial_no}</div>}
                                         </div>
                                         <div>
@@ -456,7 +456,7 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                                                 width: '100%', 
                                                 padding: '0.5rem', 
                                                 background: '#ebcb8b', 
-                                                color: '#2e3440', 
+                                                color: 'var(--panel-bg)', 
                                                 fontWeight: 'bold', 
                                                 border: 'none', 
                                                 borderRadius: '4px', 
@@ -472,14 +472,14 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                         </div>
 
                         <div>
-                            <h3 style={{ borderBottom: '1px solid #4c566a', paddingBottom: '0.5rem', color: '#a3be8c' }}>Service Status</h3>
-                            <div style={{ background: '#242933', padding: '1rem', borderRadius: '4px' }}>
+                            <h3 style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem', color: '#a3be8c' }}>Service Status</h3>
+                            <div style={{ background: 'var(--bg-color)', padding: '1rem', borderRadius: '4px' }}>
                                 {isDelivered ? (
                                     <div style={{
                                         width: '100%',
                                         padding: '0.75rem',
                                         background: '#a3be8c',
-                                        color: '#2e3440',
+                                        color: 'var(--panel-bg)',
                                         borderRadius: '6px',
                                         fontSize: '1rem',
                                         fontWeight: 'bold',
@@ -495,9 +495,9 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                                         style={{
                                             width: '100%',
                                             padding: '0.75rem',
-                                            background: '#2e3440',
-                                            border: '1px solid #4c566a',
-                                            color: '#eceff4',
+                                            background: 'var(--panel-bg)',
+                                            border: '1px solid var(--border-color)',
+                                            color: 'var(--text-primary)',
                                             borderRadius: '6px',
                                             fontSize: '1rem',
                                             outline: 'none',
@@ -530,12 +530,12 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                     {/* Right Column - Logs & Actions */}
                     <div style={{ display: 'flex', flexDirection: 'column' }}>
 
-                        <div style={{ background: '#3b4252', padding: '1rem', borderRadius: '4px', flex: 1, display: 'flex', flexDirection: 'column' }}>
-                            <h3 style={{ borderBottom: '1px solid #4c566a', paddingBottom: '0.5rem', margin: '0 0 1rem 0' }}>Technician Logs</h3>
+                        <div style={{ background: '#f6f3eb', padding: '1rem', borderRadius: '4px', flex: 1, display: 'flex', flexDirection: 'column' }}>
+                            <h3 style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem', margin: '0 0 1rem 0' }}>Technician Logs</h3>
 
                             <div style={{ flex: 1, overflowY: 'auto', marginBottom: '1rem', maxHeight: '200px' }}>
                                 {logs.map(lg => (
-                                    <div key={lg.id} style={{ background: '#2e3440', padding: '0.5rem', marginBottom: '0.5rem', borderRadius: '4px', fontSize: '0.85rem' }}>
+                                    <div key={lg.id} style={{ background: 'var(--panel-bg)', padding: '0.5rem', marginBottom: '0.5rem', borderRadius: '4px', fontSize: '0.85rem' }}>
                                         <div style={{ color: '#35a7e6', marginBottom: '2px' }}>{new Date(lg.created_at).toLocaleString()} - {lg.technician}</div>
                                         <div>{lg.issues}</div>
                                     </div>
@@ -545,16 +545,16 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
 
                             {!isDelivered && (
                                 <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                    <input type="text" value={newLog} onChange={e => setNewLog(e.target.value)} placeholder="Add a log entry..." style={{ flex: 1, padding: '0.5rem', background: '#2e3440', border: '1px solid #4c566a', color: '#eceff4', borderRadius: '4px' }} />
+                                    <input type="text" value={newLog} onChange={e => setNewLog(e.target.value)} placeholder="Add a log entry..." style={{ flex: 1, padding: '0.5rem', background: 'var(--panel-bg)', border: '1px solid var(--border-color)', color: 'var(--text-primary)', borderRadius: '4px' }} />
                                     <button onClick={handleAddLog} style={{ padding: '0.5rem 1rem', background: '#35a7e6', color: 'black', border: 'none', borderRadius: '4px', cursor: 'pointer' }}><Save size={16} /></button>
                                 </div>
                             )}
                         </div>
 
-                        <div style={{ background: '#3b4252', padding: '1rem', borderRadius: '4px', marginTop: '1.5rem' }}>
+                        <div style={{ background: '#f6f3eb', padding: '1rem', borderRadius: '4px', marginTop: '1.5rem' }}>
                             {isDelivered ? (
                                 <>
-                                    <h3 style={{ borderBottom: '1px solid #4c566a', paddingBottom: '0.5rem', margin: '0 0 1rem 0', color: '#a3be8c' }}>Billing & Warranty (Locked)</h3>
+                                    <h3 style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem', margin: '0 0 1rem 0', color: '#a3be8c' }}>Billing & Warranty (Locked)</h3>
                                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '0.75rem', fontSize: '0.9rem' }}>
                                         <div>
                                             <span style={{ color: '#35a7e6', display: 'block', fontSize: '0.8rem' }}>Service Charge</span>
@@ -582,51 +582,51 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                                 </>
                             ) : (
                                 <>
-                                    <h3 style={{ borderBottom: '1px solid #4c566a', paddingBottom: '0.5rem', margin: '0 0 1rem 0', color: '#35a7e6' }}>Billing & Warranty</h3>
+                                    <h3 style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem', margin: '0 0 1rem 0', color: '#35a7e6' }}>Billing & Warranty</h3>
                                     
                                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '0.75rem' }}>
                                         <div>
-                                            <label style={{ fontSize: '0.8rem', color: '#d8dee9', display: 'block', marginBottom: '4px' }}>Service Charge (₹)</label>
+                                            <label style={{ fontSize: '0.8rem', color: 'var(--text-primary)', display: 'block', marginBottom: '4px' }}>Service Charge (₹)</label>
                                             <input 
                                                 type="number" 
                                                 value={invoice.service_fees || ''} 
                                                 onChange={e => setInvoice(prev => ({ ...prev, service_fees: e.target.value }))}
                                                 placeholder="0"
-                                                style={{ width: '100%', padding: '0.4rem', background: '#2e3440', border: '1px solid #4c566a', color: '#eceff4', borderRadius: '4px', margin: 0 }}
+                                                style={{ width: '100%', padding: '0.4rem', background: 'var(--panel-bg)', border: '1px solid var(--border-color)', color: 'var(--text-primary)', borderRadius: '4px', margin: 0 }}
                                             />
                                         </div>
                                         <div>
-                                            <label style={{ fontSize: '0.8rem', color: '#d8dee9', display: 'block', marginBottom: '4px' }}>Spare Cost (₹)</label>
+                                            <label style={{ fontSize: '0.8rem', color: 'var(--text-primary)', display: 'block', marginBottom: '4px' }}>Spare Cost (₹)</label>
                                             <input 
                                                 type="number" 
                                                 value={invoice.part_costs || ''} 
                                                 onChange={e => setInvoice(prev => ({ ...prev, part_costs: e.target.value }))}
                                                 placeholder="0"
-                                                style={{ width: '100%', padding: '0.4rem', background: '#2e3440', border: '1px solid #4c566a', color: '#eceff4', borderRadius: '4px', margin: 0 }}
+                                                style={{ width: '100%', padding: '0.4rem', background: 'var(--panel-bg)', border: '1px solid var(--border-color)', color: 'var(--text-primary)', borderRadius: '4px', margin: 0 }}
                                             />
                                         </div>
                                     </div>
 
                                     <div style={{ marginBottom: '0.75rem' }}>
-                                        <label style={{ fontSize: '0.8rem', color: '#d8dee9', display: 'block', marginBottom: '4px' }}>Spares Used</label>
+                                        <label style={{ fontSize: '0.8rem', color: 'var(--text-primary)', display: 'block', marginBottom: '4px' }}>Spares Used</label>
                                         <input 
                                             type="text" 
                                             value={invoice.spares || ''} 
                                             onChange={e => setInvoice(prev => ({ ...prev, spares: e.target.value }))}
                                             placeholder="e.g. 500GB SSD, Keyboard"
-                                            style={{ width: '100%', padding: '0.4rem', background: '#2e3440', border: '1px solid #4c566a', color: '#eceff4', borderRadius: '4px', margin: 0 }}
+                                            style={{ width: '100%', padding: '0.4rem', background: 'var(--panel-bg)', border: '1px solid var(--border-color)', color: 'var(--text-primary)', borderRadius: '4px', margin: 0 }}
                                         />
                                     </div>
 
                                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '0.5rem', alignItems: 'end' }}>
                                         <div>
-                                            <label style={{ fontSize: '0.8rem', color: '#d8dee9', display: 'block', marginBottom: '4px' }}>Warranty Period</label>
+                                            <label style={{ fontSize: '0.8rem', color: 'var(--text-primary)', display: 'block', marginBottom: '4px' }}>Warranty Period</label>
                                             <input 
                                                 type="text" 
                                                 value={invoice.warranty || ''} 
                                                 onChange={e => setInvoice(prev => ({ ...prev, warranty: e.target.value }))}
                                                 placeholder="e.g. 3 Months / No warranty"
-                                                style={{ width: '100%', padding: '0.4rem', background: '#2e3440', border: '1px solid #4c566a', color: '#eceff4', borderRadius: '4px', margin: 0 }}
+                                                style={{ width: '100%', padding: '0.4rem', background: 'var(--panel-bg)', border: '1px solid var(--border-color)', color: 'var(--text-primary)', borderRadius: '4px', margin: 0 }}
                                             />
                                         </div>
                                         <button 
@@ -635,7 +635,7 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                                                 width: '100%', 
                                                 padding: '0.5rem', 
                                                 background: '#35a7e6', 
-                                                color: '#2e3440', 
+                                                color: 'var(--panel-bg)', 
                                                 fontWeight: 'bold', 
                                                 border: 'none', 
                                                 borderRadius: '4px',
