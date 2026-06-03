@@ -9,9 +9,14 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
     const [customer, setCustomer] = useState(null);
     const [newLog, setNewLog] = useState('');
     const [logs, setLogs] = useState([]);
-
-    // Simple state to toggle pseudo invoice mode
     const [showInvoice, setShowInvoice] = useState(false);
+    const [invoice, setInvoice] = useState({
+        service_fees: 0,
+        part_costs: 0,
+        spares: '',
+        warranty: '',
+        total: 0
+    });
 
     useEffect(() => {
         const load = async () => {
@@ -23,6 +28,16 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
             }
             const sLogs = await api.getServiceRecords(jobId);
             setLogs(sLogs); // api returns desc
+
+            // Fetch invoice/billing records
+            try {
+                const invoices = await api.getInvoices(jobId);
+                if (invoices && invoices.length > 0) {
+                    setInvoice(invoices[0]);
+                }
+            } catch (err) {
+                console.error('Error fetching invoice:', err);
+            }
         };
         load();
     }, [jobId]);
@@ -62,6 +77,28 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
         setNewLog('');
         const sLogs = await api.getServiceRecords(jobId);
         setLogs(sLogs);
+    };
+
+    const handleSaveInvoice = async () => {
+        try {
+            const serviceFees = parseFloat(invoice.service_fees) || 0;
+            const partCosts = parseFloat(invoice.part_costs) || 0;
+            const totalVal = serviceFees + partCosts;
+
+            const saved = await api.createInvoice({
+                complaint_id: jobId,
+                service_fees: serviceFees,
+                part_costs: partCosts,
+                spares: invoice.spares || '',
+                warranty: invoice.warranty || '',
+                total: totalVal
+            });
+            
+            setInvoice(saved);
+            alert("Billing & warranty details saved successfully!");
+        } catch (err) {
+            alert("Failed to save billing details: " + err.message);
+        }
     };
 
     const markAsReturned = async () => {
@@ -107,6 +144,7 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                         <p style={{ textAlign: 'center' }}>Service Invoice</p>
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '2rem' }}>
                             <div>
+                                <p><strong>Receipt #:</strong> {invoice.receipt_number || 'Pending'}</p>
                                 <p><strong>CSR #:</strong> {job.csr_number || job.id.split('-')[0].toUpperCase()}</p>
                                 <p><strong>Customer:</strong> {customer.name}</p>
                                 <p><strong>Product:</strong> {job.item_name}</p>
@@ -120,21 +158,28 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                             <thead>
                                 <tr style={{ borderBottom: '1px solid black' }}>
                                     <th style={{ textAlign: 'left', padding: '0.5rem' }}>Description</th>
-                                    <th style={{ textAlign: 'right', padding: '0.5rem' }}>Total</th>
+                                    <th style={{ textAlign: 'right', padding: '0.5rem' }}>Amount</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td style={{ padding: '0.5rem' }}>Service & Repair ({job.issue})</td>
-                                    <td style={{ textAlign: 'right', padding: '0.5rem' }}>______</td>
+                                    <td style={{ padding: '0.5rem' }}>
+                                        <strong>Service & Repair Fee</strong>
+                                        <div style={{ fontSize: '0.85rem', color: '#555', marginTop: '4px' }}>({job.issue})</div>
+                                    </td>
+                                    <td style={{ textAlign: 'right', padding: '0.5rem', fontWeight: 'bold' }}>₹{invoice.service_fees || 0}</td>
                                 </tr>
                                 <tr>
-                                    <td style={{ padding: '0.5rem' }}>Spare Parts</td>
-                                    <td style={{ textAlign: 'right', padding: '0.5rem' }}>______</td>
+                                    <td style={{ padding: '0.5rem' }}>
+                                        <strong>Spare Parts Charge</strong>
+                                        {invoice.spares && <div style={{ fontSize: '0.85rem', color: '#555', marginTop: '4px' }}>Spares used: {invoice.spares}</div>}
+                                        {invoice.warranty && <div style={{ fontSize: '0.85rem', color: '#555', marginTop: '4px' }}>Warranty: {invoice.warranty}</div>}
+                                    </td>
+                                    <td style={{ textAlign: 'right', padding: '0.5rem', fontWeight: 'bold' }}>₹{invoice.part_costs || 0}</td>
                                 </tr>
-                                <tr style={{ fontWeight: 'bold' }}>
+                                <tr style={{ borderTop: '2px solid black', fontWeight: 'bold', fontSize: '1.1rem' }}>
                                     <td style={{ padding: '0.5rem' }}>Total Amount</td>
-                                    <td style={{ textAlign: 'right', padding: '0.5rem' }}>______</td>
+                                    <td style={{ textAlign: 'right', padding: '0.5rem' }}>₹{invoice.total || (parseFloat(invoice.service_fees || 0) + parseFloat(invoice.part_costs || 0))}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -227,6 +272,78 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                             <div style={{ display: 'flex', gap: '0.5rem' }}>
                                 <input type="text" value={newLog} onChange={e => setNewLog(e.target.value)} placeholder="Add a log entry..." style={{ flex: 1, padding: '0.5rem' }} />
                                 <button onClick={handleAddLog} style={{ padding: '0.5rem 1rem', background: '#88c0d0', color: 'black' }}><Save size={16} /></button>
+                            </div>
+                        </div>
+
+                        <div style={{ background: '#3b4252', padding: '1rem', borderRadius: '4px', marginTop: '1.5rem' }}>
+                            <h3 style={{ borderBottom: '1px solid #4c566a', paddingBottom: '0.5rem', margin: '0 0 1rem 0', color: '#88c0d0' }}>Billing & Warranty</h3>
+                            
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '0.75rem' }}>
+                                <div>
+                                    <label style={{ fontSize: '0.8rem', color: '#d8dee9', display: 'block', marginBottom: '4px' }}>Service Charge (₹)</label>
+                                    <input 
+                                        type="number" 
+                                        value={invoice.service_fees || ''} 
+                                        onChange={e => setInvoice(prev => ({ ...prev, service_fees: e.target.value }))}
+                                        placeholder="0"
+                                        style={{ width: '100%', padding: '0.4rem', background: '#2e3440', border: '1px solid #4c566a', color: '#eceff4', borderRadius: '4px', margin: 0 }}
+                                    />
+                                </div>
+                                <div>
+                                    <label style={{ fontSize: '0.8rem', color: '#d8dee9', display: 'block', marginBottom: '4px' }}>Spare Cost (₹)</label>
+                                    <input 
+                                        type="number" 
+                                        value={invoice.part_costs || ''} 
+                                        onChange={e => setInvoice(prev => ({ ...prev, part_costs: e.target.value }))}
+                                        placeholder="0"
+                                        style={{ width: '100%', padding: '0.4rem', background: '#2e3440', border: '1px solid #4c566a', color: '#eceff4', borderRadius: '4px', margin: 0 }}
+                                    />
+                                </div>
+                            </div>
+
+                            <div style={{ marginBottom: '0.75rem' }}>
+                                <label style={{ fontSize: '0.8rem', color: '#d8dee9', display: 'block', marginBottom: '4px' }}>Spares Used</label>
+                                <input 
+                                    type="text" 
+                                    value={invoice.spares || ''} 
+                                    onChange={e => setInvoice(prev => ({ ...prev, spares: e.target.value }))}
+                                    placeholder="e.g. 500GB SSD, Keyboard"
+                                    style={{ width: '100%', padding: '0.4rem', background: '#2e3440', border: '1px solid #4c566a', color: '#eceff4', borderRadius: '4px', margin: 0 }}
+                                />
+                            </div>
+
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '0.5rem', alignItems: 'end' }}>
+                                <div>
+                                    <label style={{ fontSize: '0.8rem', color: '#d8dee9', display: 'block', marginBottom: '4px' }}>Warranty Period</label>
+                                    <input 
+                                        type="text" 
+                                        value={invoice.warranty || ''} 
+                                        onChange={e => setInvoice(prev => ({ ...prev, warranty: e.target.value }))}
+                                        placeholder="e.g. 3 Months / No warranty"
+                                        style={{ width: '100%', padding: '0.4rem', background: '#2e3440', border: '1px solid #4c566a', color: '#eceff4', borderRadius: '4px', margin: 0 }}
+                                    />
+                                </div>
+                                <button 
+                                    onClick={handleSaveInvoice} 
+                                    style={{ 
+                                        width: '100%', 
+                                        padding: '0.5rem', 
+                                        background: '#88c0d0', 
+                                        color: '#2e3440', 
+                                        fontWeight: 'bold', 
+                                        border: 'none', 
+                                        borderRadius: '4px',
+                                        cursor: 'pointer',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        gap: '6px',
+                                        height: '35px',
+                                        margin: 0
+                                    }}
+                                >
+                                    <Save size={16} /> Save Billing
+                                </button>
                             </div>
                         </div>
 

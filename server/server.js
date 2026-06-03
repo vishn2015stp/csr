@@ -304,19 +304,27 @@ app.get('/api/status_logs', async (req, res) => {
 // =============== INVOICES ===============
 app.post('/api/invoices', async (req, res) => {
     const id = req.body.id || uuidv4();
-    const { complaint_id, receipt_number, service_fees, part_costs, total, created_at } = req.body;
+    const { complaint_id, receipt_number, service_fees, part_costs, total, spares, warranty, created_at } = req.body;
     const ts = created_at || new Date().toISOString();
     try {
         const resExist = await db.query('SELECT * FROM invoices WHERE complaint_id = $1', [complaint_id]);
         const existing = resExist.rows[0];
         if (existing) {
-            return res.json(existing);
+            await db.query(
+                'UPDATE invoices SET receipt_number = $1, service_fees = $2, part_costs = $3, total = $4, spares = $5, warranty = $6 WHERE complaint_id = $7',
+                [receipt_number || existing.receipt_number, service_fees ?? 0, part_costs ?? 0, total ?? 0, spares || '', warranty || '', complaint_id]
+            );
+            const updated = await db.query('SELECT * FROM invoices WHERE complaint_id = $1', [complaint_id]);
+            return res.json(updated.rows[0]);
         }
+        
+        const invoiceNum = receipt_number || ('INV-' + Date.now().toString().slice(-6));
         await db.query(
-            'INSERT INTO invoices (id, complaint_id, receipt_number, service_fees, part_costs, total, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7)',
-            [id, complaint_id, receipt_number, service_fees || 0, part_costs || 0, total || 0, ts]
+            'INSERT INTO invoices (id, complaint_id, receipt_number, service_fees, part_costs, total, spares, warranty, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)',
+            [id, complaint_id, invoiceNum, service_fees ?? 0, part_costs ?? 0, total ?? 0, spares || '', warranty || '', ts]
         );
-        res.json({ id });
+        const created = await db.query('SELECT * FROM invoices WHERE id = $1', [id]);
+        res.json(created.rows[0]);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }

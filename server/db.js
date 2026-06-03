@@ -86,6 +86,8 @@ function ensureInitialized() {
                         service_fees REAL DEFAULT 0,
                         part_costs REAL DEFAULT 0,
                         total REAL DEFAULT 0,
+                        spares TEXT,
+                        warranty TEXT,
                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                     );
                     CREATE TABLE IF NOT EXISTS settings (
@@ -112,6 +114,13 @@ function ensureInitialized() {
                     await pool.query("ALTER TABLE customers ADD COLUMN IF NOT EXISTS address TEXT;");
                 } catch (err) {
                     console.error("Error adding address column:", err.message);
+                }
+
+                try {
+                    await pool.query("ALTER TABLE invoices ADD COLUMN IF NOT EXISTS spares TEXT;");
+                    await pool.query("ALTER TABLE invoices ADD COLUMN IF NOT EXISTS warranty TEXT;");
+                } catch (err) {
+                    console.error("Error adding invoice billing columns:", err.message);
                 }
 
                 // Initialize default admin
