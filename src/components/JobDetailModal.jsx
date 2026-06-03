@@ -25,7 +25,7 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
     const [editIssue, setEditIssue] = useState('');
     const [editIsIntaken, setEditIsIntaken] = useState(false);
 
-    const isDelivered = job?.status?.trim().toLowerCase() === 'delivered';
+    const isDelivered = job?.status?.trim().toLowerCase() === 'delivered' || job?.status?.trim().toLowerCase() === 'completed';
 
     useEffect(() => {
         const load = async () => {
@@ -61,7 +61,7 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                 item_name: editItemName,
                 serial_no: editSerialNo,
                 issue: editIssue,
-                is_device_intaken: editIsIntaken ? 1 : 0
+                is_device_intaken: job.is_device_intaken === 1 ? 1 : (editIsIntaken ? 1 : 0)
             };
             await api.updateComplaint(jobId, updates);
             setJob(prev => ({
@@ -96,13 +96,16 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
 
     const handleStatusChange = async (e) => {
         if (isDelivered) {
-            alert("This job is already delivered and cannot be edited.");
+            alert("This job is already completed/delivered and cannot be edited.");
             return;
         }
         const newStatus = e.target.value;
-        if (newStatus === 'Delivered') {
-            const confirmDelivered = window.confirm("Are you sure you want to mark this request as Delivered? Once marked as Delivered, you will no longer be able to edit this request or its billing.");
-            if (!confirmDelivered) {
+        if (newStatus === 'Delivered' || newStatus === 'Completed') {
+            const confirmMsg = newStatus === 'Completed'
+                ? "Are you sure you want to mark this request as Completed? Once marked as Completed, you will no longer be able to edit this request or its billing."
+                : "Are you sure you want to mark this request as Delivered? Once marked as Delivered, you will no longer be able to edit this request or its billing.";
+            const confirmAction = window.confirm(confirmMsg);
+            if (!confirmAction) {
                 e.target.value = job.status;
                 return;
             }
@@ -354,10 +357,11 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                                             id="editIsIntaken" 
                                             checked={editIsIntaken} 
                                             onChange={e => setEditIsIntaken(e.target.checked)} 
-                                            style={{ cursor: 'pointer' }}
+                                            disabled={job.is_device_intaken === 1}
+                                            style={{ cursor: job.is_device_intaken === 1 ? 'not-allowed' : 'pointer' }}
                                         />
-                                        <label htmlFor="editIsIntaken" style={{ fontSize: '0.9rem', color: '#eceff4', cursor: 'pointer' }}>
-                                            Device Taken for Service (Intaken)
+                                        <label htmlFor="editIsIntaken" style={{ fontSize: '0.9rem', color: job.is_device_intaken === 1 ? '#777' : '#eceff4', cursor: job.is_device_intaken === 1 ? 'not-allowed' : 'pointer' }}>
+                                            Device Taken for Service (Intaken) {job.is_device_intaken === 1 && "(Locked)"}
                                         </label>
                                     </div>
 
@@ -438,7 +442,7 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                                         textAlign: 'center',
                                         textTransform: 'uppercase'
                                     }}>
-                                        Delivered (Locked)
+                                        {job.status === 'Completed' ? 'Completed (Locked)' : 'Delivered (Locked)'}
                                     </div>
                                 ) : (
                                     <select
@@ -456,12 +460,22 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                                             cursor: 'pointer'
                                         }}
                                     >
-                                        <option value="Pending">Pending</option>
-                                        <option value="Waiting for Spare">Waiting for Spare</option>
-                                        <option value="Replaced">Replaced</option>
-                                        <option value="Send to Service Center">Send to Service Center</option>
-                                        <option value="Ready">Ready</option>
-                                        <option value="Delivered">Delivered</option>
+                                        {(job.service_mode || 'On Center') === 'Onsite' && job.is_device_intaken !== 1 ? (
+                                            <>
+                                                <option value="Pending">Pending</option>
+                                                <option value="In Progress">In Progress</option>
+                                                <option value="Completed">Completed</option>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <option value="Pending">Pending</option>
+                                                <option value="Waiting for Spare">Waiting for Spare</option>
+                                                <option value="Replaced">Replaced</option>
+                                                <option value="Send to Service Center">Send to Service Center</option>
+                                                <option value="Ready">Ready</option>
+                                                <option value="Delivered">Delivered</option>
+                                            </>
+                                        )}
                                     </select>
                                 )}
                             </div>
@@ -600,7 +614,7 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                             <button onClick={() => setShowInvoice(true)} style={{ background: '#4c566a', padding: '1rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem' }}>
                                 <Printer size={20} /> Generate & Print Invoice
                             </button>
-                            {!isDelivered && (
+                            {job.is_device_intaken === 1 && !isDelivered && (
                                 <button onClick={markAsReturned} style={{ background: '#a3be8c', color: 'black', padding: '1rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem' }}>
                                     <ArrowLeftRight size={20} /> Mark as Returned to Customer
                                 </button>
