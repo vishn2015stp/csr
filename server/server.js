@@ -170,7 +170,12 @@ app.post('/api/complaints', async (req, res) => {
     const ts = created_at || new Date().toISOString();
     const finalServiceType = service_type || 'In-Shop';
     const finalServiceMode = service_mode || 'On Center';
-    const finalIsDeviceIntaken = is_device_intaken === false ? 0 : 1;
+    let finalIsDeviceIntaken = 1;
+    if (is_device_intaken !== undefined && is_device_intaken !== null) {
+        finalIsDeviceIntaken = (is_device_intaken === 1 || is_device_intaken === true || is_device_intaken === '1') ? 1 : 0;
+    } else {
+        finalIsDeviceIntaken = finalServiceMode === 'Onsite' ? 0 : 1;
+    }
 
     try {
         await db.query(`
