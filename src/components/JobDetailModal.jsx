@@ -241,29 +241,44 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                         <div>
                             <h3 style={{ borderBottom: '1px solid #4c566a', paddingBottom: '0.5rem', color: '#a3be8c' }}>Service Status</h3>
                             <div style={{ background: '#242933', padding: '1rem', borderRadius: '4px' }}>
-                                <select
-                                    value={job.status}
-                                    onChange={handleStatusChange}
-                                    disabled={isDelivered}
-                                    style={{
+                                {isDelivered ? (
+                                    <div style={{
                                         width: '100%',
                                         padding: '0.75rem',
-                                        background: '#2e3440',
-                                        border: '1px solid #4c566a',
-                                        color: '#eceff4',
+                                        background: '#a3be8c',
+                                        color: '#2e3440',
                                         borderRadius: '6px',
                                         fontSize: '1rem',
-                                        outline: 'none',
-                                        cursor: isDelivered ? 'not-allowed' : 'pointer'
-                                    }}
-                                >
-                                    <option value="Pending">Pending</option>
-                                    <option value="Waiting for Spare">Waiting for Spare</option>
-                                    <option value="Replaced">Replaced</option>
-                                    <option value="Send to Service Center">Send to Service Center</option>
-                                    <option value="Ready">Ready</option>
-                                    <option value="Delivered">Delivered</option>
-                                </select>
+                                        fontWeight: 'bold',
+                                        textAlign: 'center',
+                                        textTransform: 'uppercase'
+                                    }}>
+                                        Delivered (Locked)
+                                    </div>
+                                ) : (
+                                    <select
+                                        value={job.status}
+                                        onChange={handleStatusChange}
+                                        style={{
+                                            width: '100%',
+                                            padding: '0.75rem',
+                                            background: '#2e3440',
+                                            border: '1px solid #4c566a',
+                                            color: '#eceff4',
+                                            borderRadius: '6px',
+                                            fontSize: '1rem',
+                                            outline: 'none',
+                                            cursor: 'pointer'
+                                        }}
+                                    >
+                                        <option value="Pending">Pending</option>
+                                        <option value="Waiting for Spare">Waiting for Spare</option>
+                                        <option value="Replaced">Replaced</option>
+                                        <option value="Send to Service Center">Send to Service Center</option>
+                                        <option value="Ready">Ready</option>
+                                        <option value="Delivered">Delivered</option>
+                                    </select>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -284,97 +299,127 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                                 {logs.length === 0 && <div style={{ color: '#4c566a', fontStyle: 'italic' }}>No logs yet...</div>}
                             </div>
 
-                            <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                <input type="text" value={newLog} onChange={e => setNewLog(e.target.value)} placeholder={isDelivered ? "Logging disabled (Delivered)" : "Add a log entry..."} disabled={isDelivered} style={{ flex: 1, padding: '0.5rem' }} />
-                                <button onClick={handleAddLog} disabled={isDelivered} style={{ padding: '0.5rem 1rem', background: isDelivered ? '#3b4252' : '#88c0d0', color: isDelivered ? '#4c566a' : 'black', cursor: isDelivered ? 'not-allowed' : 'pointer', opacity: isDelivered ? 0.5 : 1 }}><Save size={16} /></button>
-                            </div>
+                            {!isDelivered && (
+                                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                    <input type="text" value={newLog} onChange={e => setNewLog(e.target.value)} placeholder="Add a log entry..." style={{ flex: 1, padding: '0.5rem', background: '#2e3440', border: '1px solid #4c566a', color: '#eceff4', borderRadius: '4px' }} />
+                                    <button onClick={handleAddLog} style={{ padding: '0.5rem 1rem', background: '#88c0d0', color: 'black', border: 'none', borderRadius: '4px', cursor: 'pointer' }}><Save size={16} /></button>
+                                </div>
+                            )}
                         </div>
 
                         <div style={{ background: '#3b4252', padding: '1rem', borderRadius: '4px', marginTop: '1.5rem' }}>
-                            <h3 style={{ borderBottom: '1px solid #4c566a', paddingBottom: '0.5rem', margin: '0 0 1rem 0', color: '#88c0d0' }}>Billing & Warranty</h3>
-                            
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '0.75rem' }}>
-                                <div>
-                                    <label style={{ fontSize: '0.8rem', color: '#d8dee9', display: 'block', marginBottom: '4px' }}>Service Charge (₹)</label>
-                                    <input 
-                                        type="number" 
-                                        value={invoice.service_fees || ''} 
-                                        onChange={e => setInvoice(prev => ({ ...prev, service_fees: e.target.value }))}
-                                        placeholder="0"
-                                        disabled={isDelivered}
-                                        style={{ width: '100%', padding: '0.4rem', background: '#2e3440', border: '1px solid #4c566a', color: '#eceff4', borderRadius: '4px', margin: 0, cursor: isDelivered ? 'not-allowed' : 'text' }}
-                                    />
-                                </div>
-                                <div>
-                                    <label style={{ fontSize: '0.8rem', color: '#d8dee9', display: 'block', marginBottom: '4px' }}>Spare Cost (₹)</label>
-                                    <input 
-                                        type="number" 
-                                        value={invoice.part_costs || ''} 
-                                        onChange={e => setInvoice(prev => ({ ...prev, part_costs: e.target.value }))}
-                                        placeholder="0"
-                                        disabled={isDelivered}
-                                        style={{ width: '100%', padding: '0.4rem', background: '#2e3440', border: '1px solid #4c566a', color: '#eceff4', borderRadius: '4px', margin: 0, cursor: isDelivered ? 'not-allowed' : 'text' }}
-                                    />
-                                </div>
-                            </div>
+                            {isDelivered ? (
+                                <>
+                                    <h3 style={{ borderBottom: '1px solid #4c566a', paddingBottom: '0.5rem', margin: '0 0 1rem 0', color: '#a3be8c' }}>Billing & Warranty (Locked)</h3>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '0.75rem', fontSize: '0.9rem' }}>
+                                        <div>
+                                            <span style={{ color: '#88c0d0', display: 'block', fontSize: '0.8rem' }}>Service Charge</span>
+                                            <strong style={{ fontSize: '1.1rem' }}>₹{invoice.service_fees || 0}</strong>
+                                        </div>
+                                        <div>
+                                            <span style={{ color: '#88c0d0', display: 'block', fontSize: '0.8rem' }}>Spare Cost</span>
+                                            <strong style={{ fontSize: '1.1rem' }}>₹{invoice.part_costs || 0}</strong>
+                                        </div>
+                                    </div>
+                                    <div style={{ marginBottom: '0.75rem', fontSize: '0.9rem' }}>
+                                        <span style={{ color: '#88c0d0', display: 'block', fontSize: '0.8rem' }}>Spares Used</span>
+                                        <strong>{invoice.spares || 'None'}</strong>
+                                    </div>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', fontSize: '0.9rem', alignItems: 'end' }}>
+                                        <div>
+                                            <span style={{ color: '#88c0d0', display: 'block', fontSize: '0.8rem' }}>Warranty Period</span>
+                                            <strong>{invoice.warranty || 'No warranty'}</strong>
+                                        </div>
+                                        <div style={{ textAlign: 'right' }}>
+                                            <span style={{ color: '#88c0d0', display: 'block', fontSize: '0.8rem' }}>Total Amount</span>
+                                            <strong style={{ fontSize: '1.25rem', color: '#a3be8c' }}>₹{invoice.total || (parseFloat(invoice.service_fees || 0) + parseFloat(invoice.part_costs || 0))}</strong>
+                                        </div>
+                                    </div>
+                                </>
+                            ) : (
+                                <>
+                                    <h3 style={{ borderBottom: '1px solid #4c566a', paddingBottom: '0.5rem', margin: '0 0 1rem 0', color: '#88c0d0' }}>Billing & Warranty</h3>
+                                    
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '0.75rem' }}>
+                                        <div>
+                                            <label style={{ fontSize: '0.8rem', color: '#d8dee9', display: 'block', marginBottom: '4px' }}>Service Charge (₹)</label>
+                                            <input 
+                                                type="number" 
+                                                value={invoice.service_fees || ''} 
+                                                onChange={e => setInvoice(prev => ({ ...prev, service_fees: e.target.value }))}
+                                                placeholder="0"
+                                                style={{ width: '100%', padding: '0.4rem', background: '#2e3440', border: '1px solid #4c566a', color: '#eceff4', borderRadius: '4px', margin: 0 }}
+                                            />
+                                        </div>
+                                        <div>
+                                            <label style={{ fontSize: '0.8rem', color: '#d8dee9', display: 'block', marginBottom: '4px' }}>Spare Cost (₹)</label>
+                                            <input 
+                                                type="number" 
+                                                value={invoice.part_costs || ''} 
+                                                onChange={e => setInvoice(prev => ({ ...prev, part_costs: e.target.value }))}
+                                                placeholder="0"
+                                                style={{ width: '100%', padding: '0.4rem', background: '#2e3440', border: '1px solid #4c566a', color: '#eceff4', borderRadius: '4px', margin: 0 }}
+                                            />
+                                        </div>
+                                    </div>
 
-                            <div style={{ marginBottom: '0.75rem' }}>
-                                <label style={{ fontSize: '0.8rem', color: '#d8dee9', display: 'block', marginBottom: '4px' }}>Spares Used</label>
-                                <input 
-                                    type="text" 
-                                    value={invoice.spares || ''} 
-                                    onChange={e => setInvoice(prev => ({ ...prev, spares: e.target.value }))}
-                                    placeholder="e.g. 500GB SSD, Keyboard"
-                                    disabled={isDelivered}
-                                    style={{ width: '100%', padding: '0.4rem', background: '#2e3440', border: '1px solid #4c566a', color: '#eceff4', borderRadius: '4px', margin: 0, cursor: isDelivered ? 'not-allowed' : 'text' }}
-                                />
-                            </div>
+                                    <div style={{ marginBottom: '0.75rem' }}>
+                                        <label style={{ fontSize: '0.8rem', color: '#d8dee9', display: 'block', marginBottom: '4px' }}>Spares Used</label>
+                                        <input 
+                                            type="text" 
+                                            value={invoice.spares || ''} 
+                                            onChange={e => setInvoice(prev => ({ ...prev, spares: e.target.value }))}
+                                            placeholder="e.g. 500GB SSD, Keyboard"
+                                            style={{ width: '100%', padding: '0.4rem', background: '#2e3440', border: '1px solid #4c566a', color: '#eceff4', borderRadius: '4px', margin: 0 }}
+                                        />
+                                    </div>
 
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '0.5rem', alignItems: 'end' }}>
-                                <div>
-                                    <label style={{ fontSize: '0.8rem', color: '#d8dee9', display: 'block', marginBottom: '4px' }}>Warranty Period</label>
-                                    <input 
-                                        type="text" 
-                                        value={invoice.warranty || ''} 
-                                        onChange={e => setInvoice(prev => ({ ...prev, warranty: e.target.value }))}
-                                        placeholder="e.g. 3 Months / No warranty"
-                                        disabled={isDelivered}
-                                        style={{ width: '100%', padding: '0.4rem', background: '#2e3440', border: '1px solid #4c566a', color: '#eceff4', borderRadius: '4px', margin: 0, cursor: isDelivered ? 'not-allowed' : 'text' }}
-                                    />
-                                </div>
-                                <button 
-                                    onClick={handleSaveInvoice} 
-                                    disabled={isDelivered}
-                                    style={{ 
-                                        width: '100%', 
-                                        padding: '0.5rem', 
-                                        background: isDelivered ? '#3b4252' : '#88c0d0', 
-                                        color: isDelivered ? '#4c566a' : '#2e3440', 
-                                        fontWeight: 'bold', 
-                                        border: 'none', 
-                                        borderRadius: '4px',
-                                        cursor: isDelivered ? 'not-allowed' : 'pointer',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        gap: '6px',
-                                        height: '35px',
-                                        margin: 0,
-                                        opacity: isDelivered ? 0.5 : 1
-                                    }}
-                                >
-                                    <Save size={16} /> Save Billing
-                                </button>
-                            </div>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '0.5rem', alignItems: 'end' }}>
+                                        <div>
+                                            <label style={{ fontSize: '0.8rem', color: '#d8dee9', display: 'block', marginBottom: '4px' }}>Warranty Period</label>
+                                            <input 
+                                                type="text" 
+                                                value={invoice.warranty || ''} 
+                                                onChange={e => setInvoice(prev => ({ ...prev, warranty: e.target.value }))}
+                                                placeholder="e.g. 3 Months / No warranty"
+                                                style={{ width: '100%', padding: '0.4rem', background: '#2e3440', border: '1px solid #4c566a', color: '#eceff4', borderRadius: '4px', margin: 0 }}
+                                            />
+                                        </div>
+                                        <button 
+                                            onClick={handleSaveInvoice} 
+                                            style={{ 
+                                                width: '100%', 
+                                                padding: '0.5rem', 
+                                                background: '#88c0d0', 
+                                                color: '#2e3440', 
+                                                fontWeight: 'bold', 
+                                                border: 'none', 
+                                                borderRadius: '4px',
+                                                cursor: 'pointer',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                gap: '6px',
+                                                height: '35px',
+                                                margin: 0
+                                            }}
+                                        >
+                                            <Save size={16} /> Save Billing
+                                        </button>
+                                    </div>
+                                </>
+                            )}
                         </div>
 
                         <div style={{ marginTop: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                             <button onClick={() => setShowInvoice(true)} style={{ background: '#4c566a', padding: '1rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem' }}>
                                 <Printer size={20} /> Generate & Print Invoice
                             </button>
-                            <button onClick={markAsReturned} disabled={isDelivered} style={{ background: isDelivered ? '#3b4252' : '#a3be8c', color: isDelivered ? '#4c566a' : 'black', padding: '1rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem', opacity: isDelivered ? 0.5 : 1 }}>
-                                <ArrowLeftRight size={20} /> {isDelivered ? 'Already Returned' : 'Mark as Returned to Customer'}
-                            </button>
+                            {!isDelivered && (
+                                <button onClick={markAsReturned} style={{ background: '#a3be8c', color: 'black', padding: '1rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem' }}>
+                                    <ArrowLeftRight size={20} /> Mark as Returned to Customer
+                                </button>
+                            )}
                         </div>
                     </div>
 

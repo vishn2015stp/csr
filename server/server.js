@@ -220,6 +220,12 @@ app.put('/api/complaints/:id', async (req, res) => {
         const keys = Object.keys(req.body);
         const values = Object.values(req.body);
         if (keys.length === 0) return res.json({});
+
+        // Block editing if already delivered
+        const currentComplaint = await db.query('SELECT status FROM complaints WHERE id = $1', [req.params.id]);
+        if (currentComplaint.rows[0] && currentComplaint.rows[0].status.trim().toLowerCase() === 'delivered') {
+            return res.status(400).json({ error: 'This service request has been delivered and is locked for editing.' });
+        }
         
         const mappedValues = values.map((val, idx) => {
             const key = keys[idx];
@@ -307,6 +313,12 @@ app.post('/api/invoices', async (req, res) => {
     const { complaint_id, receipt_number, service_fees, part_costs, total, spares, warranty, created_at } = req.body;
     const ts = created_at || new Date().toISOString();
     try {
+        // Block billing updates if the complaint is already delivered
+        const currentComplaint = await db.query('SELECT status FROM complaints WHERE id = $1', [complaint_id]);
+        if (currentComplaint.rows[0] && currentComplaint.rows[0].status.trim().toLowerCase() === 'delivered') {
+            return res.status(400).json({ error: 'This service request is already delivered and billing is locked.' });
+        }
+
         const resExist = await db.query('SELECT * FROM invoices WHERE complaint_id = $1', [complaint_id]);
         const existing = resExist.rows[0];
         if (existing) {
