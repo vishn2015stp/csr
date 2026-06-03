@@ -1,7 +1,11 @@
 const { Pool } = require('pg');
 const crypto = require('crypto');
 
-const connectionString = process.env.DATABASE_URL || process.env.POSTGRES_URL;
+const connectionString = process.env.DATABASE_URL
+    || process.env.POSTGRES_URL
+    || process.env.DATABASE_URL_UNPOOLED
+    || process.env.POSTGRES_URL_NON_POOLING
+    || process.env.POSTGRES_URL_NO_SSL;
 
 const pool = new Pool({
     connectionString,

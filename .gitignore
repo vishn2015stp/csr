@@ -12,6 +12,9 @@ dist
 *.local
 .env
 .env.*
+server/package-lock.json
+server/database.sqlite
+database.sqlite
 
 # Editor directories and files
 .vscode/*
