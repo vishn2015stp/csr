@@ -14,6 +14,9 @@ export const api = {
             try {
                 const errData = JSON.parse(text);
                 message = errData.error || errData.message || message;
+                if (errData.details) {
+                    message = `${message} (${errData.details})`;
+                }
             } catch (e) {
                 message = `Server Error (${res.status}): ${text.substring(0, 100)}`;
             }
