@@ -19,6 +19,7 @@ export default function Dashboard() {
     const [searchQuery, setSearchQuery] = useState('');
     const [isSearchFocused, setIsSearchFocused] = useState(false);
     const [showDetailedTable, setShowDetailedTable] = useState(false);
+    const [detailedTableMode, setDetailedTableMode] = useState('in-shop');
 
 
     const refreshDashboard = async () => {
@@ -72,9 +73,8 @@ export default function Dashboard() {
     const filteredPendingOnSite = filteredPending.filter(c => c.service_type === 'On-Site' || c.service_mode === 'Onsite');
     
     // Calculate onsite stats for the header badge
-    const activeOnsiteRequests = filteredComplaints.filter(c => (c.service_type === 'On-Site' || c.service_mode === 'Onsite') && c.status !== 'Delivered');
-    const completedOnsiteCount = activeOnsiteRequests.filter(c => c.status === 'Completed').length;
-    const totalOnsiteCount = activeOnsiteRequests.length;
+    const readyOnsiteCount = filteredPendingOnSite.filter(w => w.status === 'In Progress' || w.status === 'Ready' || w.status === 'Ready for Delivery').length;
+    const totalOnsiteCount = filteredPendingOnSite.length;
     
     // For recent requests, if searching, show all matching. Otherwise, show the top 8 (excluding delivered/completed).
     const activeComplaints = filteredComplaints.filter(c => c.status !== 'Delivered' && c.status !== 'Completed');
@@ -97,16 +97,24 @@ export default function Dashboard() {
     };
 
     if (showDetailedTable) {
-        const readyCount = filteredPendingWorks.filter(w => w.status === 'Ready for Delivery' || w.status === 'Ready').length;
-        const totalCount = filteredPendingWorks.length;
+        const isOnsite = detailedTableMode === 'onsite';
+        const dataList = isOnsite ? filteredPendingOnSite : filteredPendingWorks;
+        const readyCount = isOnsite
+            ? dataList.filter(w => w.status === 'In Progress' || w.status === 'Ready' || w.status === 'Ready for Delivery').length
+            : dataList.filter(w => w.status === 'Ready for Delivery' || w.status === 'Ready').length;
+        const totalCount = dataList.length;
         return (
             <div className="dashboard-container">
                 <div style={{ padding: '2rem 1rem' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
                         <div>
-                            <h2 style={{ margin: 0, fontSize: '1.8rem', color: '#eceff4', fontWeight: 'bold' }}>Detailed Pending In-Shop Queue</h2>
+                            <h2 style={{ margin: 0, fontSize: '1.8rem', color: '#eceff4', fontWeight: 'bold' }}>
+                                {isOnsite ? 'Detailed Pending On-Site Queue' : 'Detailed Pending In-Shop Queue'}
+                            </h2>
                             <p style={{ margin: '4px 0 0 0', color: '#88c0d0', fontSize: '0.95rem' }}>
-                                Currently showing {readyCount} ready for delivery out of {totalCount} total pending in-shop devices
+                                {isOnsite 
+                                    ? `Currently showing ${readyCount} in progress out of ${totalCount} total pending field tasks`
+                                    : `Currently showing ${readyCount} ready for delivery out of ${totalCount} total pending in-shop devices`}
                             </p>
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
@@ -200,7 +208,7 @@ export default function Dashboard() {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {filteredPendingWorks.map(work => {
+                                    {dataList.map(work => {
                                         let statusColor = '#d8dee9';
                                         if (work.status === 'Pending') statusColor = '#bf616a';
                                         else if (work.status === 'Delivered' || work.status === 'Completed') statusColor = '#a3be8c';
@@ -219,7 +227,7 @@ export default function Dashboard() {
                                                 <td style={{ padding: '1rem', fontWeight: 'bold', color: '#88c0d0' }}>#{work.csr_number || work.id.split('-')[0].toUpperCase()}</td>
                                                 <td style={{ padding: '1rem', color: '#eceff4', fontWeight: '500' }}>{work.customerName || '—'}</td>
                                                 <td style={{ padding: '1rem', color: '#d8dee9' }}>{work.customerPhone || '—'}</td>
-                                                <td style={{ padding: '1rem', color: '#eceff4' }}>{work.item_name}</td>
+                                                <td style={{ padding: '1rem', color: '#eceff4' }}>{work.item_name || '—'}</td>
                                                 <td style={{ padding: '1rem', fontFamily: 'monospace' }}>{work.serial_no || '—'}</td>
                                                 <td style={{ padding: '1rem' }}>
                                                     <span style={{ 
@@ -262,10 +270,10 @@ export default function Dashboard() {
                                             </tr>
                                         );
                                     })}
-                                    {filteredPendingWorks.length === 0 && (
+                                    {dataList.length === 0 && (
                                         <tr>
                                             <td colSpan="8" style={{ padding: '3rem', textAlign: 'center', color: '#4c566a' }}>
-                                                No pending in-shop works found.
+                                                {isOnsite ? 'No pending field tasks found.' : 'No pending in-shop works found.'}
                                             </td>
                                         </tr>
                                     )}
@@ -434,7 +442,10 @@ export default function Dashboard() {
                                 <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '500' }}>Pending In-Shop Work</h3>
                             </div>
                             <button 
-                                onClick={() => setShowDetailedTable(true)}
+                                onClick={() => {
+                                    setDetailedTableMode('in-shop');
+                                    setShowDetailedTable(true);
+                                }}
                                 title="View detailed table"
                                 style={{
                                     background: 'rgba(136, 192, 208, 0.1)',
@@ -494,17 +505,39 @@ export default function Dashboard() {
                                 <AlertCircle size={18} style={{ marginRight: '8px', color: '#88c0d0' }} />
                                 <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '500' }}>Pending Field Tasks (On-Site)</h3>
                             </div>
-                            <div style={{
-                                background: 'rgba(163, 190, 140, 0.1)',
-                                color: '#a3be8c',
-                                border: '1px solid rgba(163, 190, 140, 0.3)',
-                                borderRadius: '16px',
-                                padding: '3px 10px',
-                                fontSize: '0.8rem',
-                                fontWeight: 'bold'
-                            }}>
-                                {completedOnsiteCount}/{totalOnsiteCount}
-                            </div>
+                            <button 
+                                onClick={() => {
+                                    setDetailedTableMode('onsite');
+                                    setShowDetailedTable(true);
+                                }}
+                                title="View detailed table"
+                                style={{
+                                    background: 'rgba(136, 192, 208, 0.1)',
+                                    color: '#88c0d0',
+                                    border: '1px solid rgba(136, 192, 208, 0.3)',
+                                    borderRadius: '16px',
+                                    padding: '3px 10px',
+                                    fontSize: '0.8rem',
+                                    cursor: 'pointer',
+                                    fontWeight: 'bold',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '6px',
+                                    transition: 'all 0.2s',
+                                    margin: 0
+                                }}
+                                onMouseEnter={e => {
+                                    e.currentTarget.style.background = 'rgba(136, 192, 208, 0.2)';
+                                    e.currentTarget.style.borderColor = '#88c0d0';
+                                }}
+                                onMouseLeave={e => {
+                                    e.currentTarget.style.background = 'rgba(136, 192, 208, 0.1)';
+                                    e.currentTarget.style.borderColor = 'rgba(136, 192, 208, 0.3)';
+                                }}
+                            >
+                                <span>{readyOnsiteCount}/{totalOnsiteCount}</span>
+                                <span style={{ fontSize: '0.7rem' }}>➔</span>
+                            </button>
                         </div>
                         <ul style={{ listStyle: 'none', padding: 0, margin: 0, fontSize: '0.9rem', maxHeight: '300px', overflowY: 'auto' }}>
                             {filteredPendingOnSite.map(work => {
