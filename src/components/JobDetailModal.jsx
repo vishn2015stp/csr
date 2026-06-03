@@ -337,7 +337,7 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
 
                         <div style={{ marginBottom: '1.5rem' }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem', marginBottom: '0.5rem' }}>
-                                <h3 style={{ margin: 0, color: '#ebcb8b' }}>Product & Complaint</h3>
+                                <h3 style={{ margin: 0, color: 'var(--text-primary)' }}>Product & Complaint</h3>
                                 {!isDelivered && (
                                     <button 
                                         onClick={() => {
@@ -352,7 +352,7 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                                         }}
                                         style={{ 
                                             background: '#4c566a', 
-                                            color: 'var(--text-primary)', 
+                                            color: '#fff', 
                                             padding: '2px 8px', 
                                             fontSize: '0.8rem', 
                                             border: 'none', 
@@ -656,11 +656,11 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                         </div>
 
                         <div style={{ marginTop: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                            <button onClick={() => setShowInvoice(true)} style={{ background: '#4c566a', padding: '1rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem' }}>
+                            <button onClick={() => setShowInvoice(true)} style={{ background: '#4c566a', color: '#fff', padding: '1rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
                                 <Printer size={20} /> Generate & Print Invoice
                             </button>
                             {job.is_device_intaken === 1 && !isDelivered && (
-                                <button onClick={markAsReturned} style={{ background: '#a3be8c', color: 'black', padding: '1rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem' }}>
+                                <button onClick={markAsReturned} style={{ background: '#a3be8c', color: 'black', padding: '1rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
                                     <ArrowLeftRight size={20} /> Mark as Returned to Customer
                                 </button>
                             )}

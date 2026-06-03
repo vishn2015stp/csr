@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom'
-import { ClipboardList, Database, Wrench, LayoutDashboard, LogOut, X, History } from 'lucide-react'
+import { ClipboardList, Database, LayoutDashboard, LogOut, X, History } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 
 export default function Sidebar({ isOpen, closeSidebar }) {
@@ -15,7 +15,7 @@ export default function Sidebar({ isOpen, closeSidebar }) {
         <aside className={`sidebar ${isOpen ? 'open' : ''}`} style={{ display: 'flex', flexDirection: 'column' }}>
             <div className="sidebar-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <Wrench size={24} />
+                    <img src="/logo.png" alt="Logo" style={{ height: '32px', width: '32px', borderRadius: '6px', objectFit: 'cover' }} />
                     Hyper-CSR
                 </div>
                 <button className="mobile-close-btn" onClick={closeSidebar} style={{ background: 'transparent', border: 'none', color: 'var(--text-primary)', padding: 0, cursor: 'pointer' }}>
@@ -42,8 +42,8 @@ export default function Sidebar({ isOpen, closeSidebar }) {
                     </NavLink>
                 )}
             </nav>
-            <div style={{ padding: '0.5rem 1rem', borderTop: '1px solid #333' }}>
-                <button onClick={handleLogout} className="nav-item" style={{ background: 'transparent', border: 'none', color: '#ecc94b', width: '100%', cursor: 'pointer', textAlign: 'left', fontWeight: 'bold' }}>
+            <div style={{ padding: '0.5rem 1rem', borderTop: '1px solid var(--border-color)' }}>
+                <button onClick={handleLogout} className="nav-item" style={{ background: 'transparent', border: 'none', color: '#c53030', width: '100%', cursor: 'pointer', textAlign: 'left', fontWeight: 'bold' }}>
                     <LogOut size={20} style={{ marginRight: '10px', verticalAlign: 'middle' }} />
                     <span style={{ verticalAlign: 'middle' }}>Logout</span>
                 </button>

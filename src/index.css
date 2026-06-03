@@ -288,7 +288,8 @@ button:disabled {
   border-radius: 9999px;
   font-size: 0.875rem;
   font-weight: bold;
-  background-color: #333;
+  background-color: var(--border-color);
+  color: var(--text-primary);
 }
 
 .badge.Pending {
@@ -493,7 +494,7 @@ button:disabled {
 .settings-left-panel {
   width: 340px;
   flex-shrink: 0;
-  border-right: 1px solid #333;
+  border-right: 1px solid var(--border-color);
   padding: 1.5rem;
   overflow-y: auto;
   max-height: 80vh;
@@ -501,7 +502,7 @@ button:disabled {
 
 .settings-right-panel {
   flex: 1;
-  background: #111;
+  background: var(--bg-color);
   display: flex;
   flex-direction: column;
 }
@@ -515,7 +516,7 @@ button:disabled {
   .settings-left-panel {
     width: 100%;
     border-right: none;
-    border-bottom: 1px solid #333;
+    border-bottom: 1px solid var(--border-color);
     max-height: none;
   }
   
@@ -530,19 +531,19 @@ button:disabled {
   height: 100vh;
   align-items: center;
   justify-content: center;
-  background-color: #0f0f0f;
+  background-color: var(--bg-color);
   padding: 1rem;
   box-sizing: border-box;
 }
 
 .login-card {
-  background: #1a1a1a;
+  background: var(--panel-bg);
   padding: 3rem;
   border-radius: 12px;
   width: 100%;
   max-width: 400px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
-  border: 1px solid #333;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.06);
+  border: 1px solid var(--border-color);
   box-sizing: border-box;
 }
 

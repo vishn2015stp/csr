@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
-import { Menu, Wrench } from 'lucide-react'
+import { Menu } from 'lucide-react'
 import Sidebar from './components/Sidebar'
 import Intake from './pages/Intake'
 import Settings from './pages/Settings'
@@ -35,7 +35,7 @@ function App() {
     <>
       <div className="mobile-header">
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--accent)', fontWeight: 'bold', fontSize: '1.25rem' }}>
-          <Wrench size={24} /> Hyper-CSR
+          <img src="/logo.png" alt="Logo" style={{ height: '28px', width: '28px', borderRadius: '4px', objectFit: 'cover' }} /> Hyper-CSR
         </div>
         <button onClick={() => setIsSidebarOpen(true)} style={{ background: 'transparent', padding: '0.25rem', border: 'none', cursor: 'pointer' }}>
           <Menu size={28} color="var(--text-primary)" />

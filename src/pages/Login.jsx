@@ -22,15 +22,18 @@ export default function Login() {
     return (
         <div className="login-container">
             <form onSubmit={handleSubmit} className="login-card">
-                <h2 style={{ textAlign: 'center', marginBottom: '2rem', color: '#35a7e6' }}>Hyper-CSR</h2>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '2rem' }}>
+                    <img src="/logo.png" alt="Hypertech Digital Logo" style={{ height: '64px', width: '64px', borderRadius: '12px', marginBottom: '1rem', boxShadow: '0 4px 12px rgba(0,0,0,0.06)' }} />
+                    <h2 style={{ margin: 0, color: '#35a7e6' }}>Hyper-CSR</h2>
+                </div>
                 {error && <p style={{ color: '#ff6b6b', background: 'rgba(255,0,0,0.1)', padding: '0.5rem', borderRadius: '4px', textAlign: 'center' }}>{error}</p>}
                 <div style={{ marginBottom: '1.5rem' }}>
                     <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)' }}>Username</label>
-                    <input type="text" value={username} onChange={e => setUsername(e.target.value)} style={{ width: '100%', padding: '0.75rem', borderRadius: '6px', border: '1px solid var(--border-color)', background: 'var(--bg-color)', color: 'white', boxSizing: 'border-box' }} required />
+                    <input type="text" value={username} onChange={e => setUsername(e.target.value)} style={{ width: '100%', padding: '0.75rem', borderRadius: '6px', border: '1px solid var(--border-color)', background: 'var(--bg-color)', color: 'var(--text-primary)', boxSizing: 'border-box' }} required />
                 </div>
                 <div style={{ marginBottom: '2rem' }}>
                     <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)' }}>Password</label>
-                    <input type="password" value={password} onChange={e => setPassword(e.target.value)} style={{ width: '100%', padding: '0.75rem', borderRadius: '6px', border: '1px solid var(--border-color)', background: 'var(--bg-color)', color: 'white', boxSizing: 'border-box' }} required />
+                    <input type="password" value={password} onChange={e => setPassword(e.target.value)} style={{ width: '100%', padding: '0.75rem', borderRadius: '6px', border: '1px solid var(--border-color)', background: 'var(--bg-color)', color: 'var(--text-primary)', boxSizing: 'border-box' }} required />
                 </div>
                 <button 
                     type="submit" 

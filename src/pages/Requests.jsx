@@ -266,7 +266,7 @@ export default function Requests() {
                                                     <button 
                                                         onClick={() => setViewingJobId(req.id)}
                                                         title="View Details"
-                                                        style={{ background: '#4c566a', color: 'var(--text-primary)', padding: '0.35rem 0.6rem', borderRadius: '4px', cursor: 'pointer', border: 'none', display: 'flex', alignItems: 'center' }}
+                                                        style={{ background: '#4c566a', color: '#fff', padding: '0.35rem 0.6rem', borderRadius: '4px', cursor: 'pointer', border: 'none', display: 'flex', alignItems: 'center' }}
                                                     >
                                                         <Eye size={15} />
                                                     </button>

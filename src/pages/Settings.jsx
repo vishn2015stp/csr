@@ -267,8 +267,8 @@ export default function Settings() {
         <div className="container" style={{ maxWidth: '1400px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
                 <h1 style={{ margin: 0 }}>Settings</h1>
-                <button onClick={handleBackup} disabled={loadingConfig} style={{ display: 'flex', alignItems: 'center', gap: '6px', background: '#2c2c2c', color: 'var(--text-secondary)', border: '1px solid var(--border-color)', padding: '0.5rem 1rem', borderRadius: '6px', fontSize: '0.85rem' }}>
-                    <DownloadCloud size={16} /> Backup Database
+                <button onClick={handleBackup} disabled={loadingConfig} style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'var(--panel-bg)', color: 'var(--text-primary)', border: '1px solid var(--border-color)', padding: '0.5rem 1rem', borderRadius: '6px', fontSize: '0.85rem', cursor: 'pointer' }}>
+                    <DownloadCloud size={16} color="var(--accent)" /> Backup Database
                 </button>
             </div>
 
@@ -445,7 +445,7 @@ export default function Settings() {
                     </div>
 
                     {/* Create User Form Panel */}
-                    <div style={{ flex: '1 1 45%', minWidth: '300px', background: '#1e1e1e', padding: '1.5rem', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+                    <div style={{ flex: '1 1 45%', minWidth: '300px', background: '#f6f3eb', padding: '1.5rem', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
                         <h3 style={{ fontSize: '0.85rem', color: '#35a7e6', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '1rem', marginTop: 0 }}>Create User Account</h3>
                         <form onSubmit={handleCreateUser}>
                             <div style={{ marginBottom: '1rem' }}>
