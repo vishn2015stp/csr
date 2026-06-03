@@ -81,7 +81,10 @@ export default function Intake() {
             try {
                 const res = await fetch('/api/customers');
                 const customersList = await res.json();
-                existingCust = customersList.find(c => c.phone === formData.phone.trim());
+                existingCust = customersList.find(c => 
+                    c.phone && c.phone.trim() === formData.phone.trim() &&
+                    c.name && c.name.trim().toLowerCase() === formData.name.trim().toLowerCase()
+                );
             } catch(e) {}
 
             if (existingCust) {
