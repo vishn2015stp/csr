@@ -1,15 +1,22 @@
 import { NavLink, useNavigate } from 'react-router-dom'
-import { ClipboardList, Database, LayoutDashboard, LogOut, X, History } from 'lucide-react'
+import { Database, LayoutDashboard, LogOut, X, History } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 
 export default function Sidebar({ isOpen, closeSidebar }) {
-    const { isAdmin, logout } = useAuth();
+    const { logout } = useAuth();
     const navigate = useNavigate();
 
     const handleLogout = () => {
         logout();
         navigate('/login');
     }
+
+    // Only close sidebar when user taps a link on mobile
+    const handleNavClick = () => {
+        if (window.innerWidth <= 768) {
+            closeSidebar();
+        }
+    };
 
     return (
         <aside className={`sidebar ${isOpen ? 'open' : 'closed'}`} style={{ display: 'flex', flexDirection: 'column' }}>
@@ -23,15 +30,15 @@ export default function Sidebar({ isOpen, closeSidebar }) {
                 </button>
             </div>
             <nav className="nav-links" style={{ flexGrow: 1 }}>
-                <NavLink to="/" end onClick={closeSidebar} className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>
+                <NavLink to="/" end onClick={handleNavClick} className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>
                     <LayoutDashboard size={20} />
                     Dashboard
                 </NavLink>
-                <NavLink to="/requests" onClick={closeSidebar} className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>
+                <NavLink to="/requests" onClick={handleNavClick} className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>
                     <History size={20} />
                     All Requests
                 </NavLink>
-                <NavLink to="/settings" onClick={closeSidebar} className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>
+                <NavLink to="/settings" onClick={handleNavClick} className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>
                     <Database size={20} />
                     Settings
                 </NavLink>

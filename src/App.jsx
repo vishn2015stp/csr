@@ -53,7 +53,10 @@ function App() {
 
       <Sidebar isOpen={isSidebarOpen} closeSidebar={() => setIsSidebarOpen(false)} />
       
-      <div className={`mobile-overlay ${isSidebarOpen ? 'show' : ''}`} onClick={() => setIsSidebarOpen(false)}></div>
+      <div 
+        className={`mobile-overlay ${isSidebarOpen && window.innerWidth <= 768 ? 'show' : ''}`} 
+        onClick={() => setIsSidebarOpen(false)}
+      />
 
       <main className={`main-content ${isSidebarOpen ? '' : 'full-width'}`}>
         <Routes>

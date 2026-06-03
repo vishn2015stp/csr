@@ -26,8 +26,14 @@ body {
 
 #root {
   display: flex;
-  height: 100vh;
-  overflow: hidden;
+  min-height: 100vh;
+}
+
+@media (min-width: 769px) {
+  #root {
+    height: 100vh;
+    overflow: hidden;
+  }
 }
 
 /* Global utility classes */
@@ -299,26 +305,26 @@ button:disabled {
 .main-content {
   flex: 1;
   margin-top: 60px;
-  margin-left: 250px;
-  height: calc(100vh - 60px);
-  overflow: hidden;
+  margin-left: 0;
+  min-height: calc(100vh - 60px);
   transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   background-color: var(--bg-color);
   position: relative;
-}
-
-.main-content.full-width {
-  margin-left: 0;
-}
-
-@media (max-width: 768px) {
-  .main-content {
-    margin-left: 0 !important;
-    height: calc(100vh - 60px);
-  }
+  overflow-y: auto;
 }
 
 @media (min-width: 769px) {
+  .main-content {
+    margin-left: 250px;
+    height: calc(100vh - 60px);
+    min-height: unset;
+    overflow: hidden;
+  }
+
+  .main-content.full-width {
+    margin-left: 0;
+  }
+
   /* Scroll page container layouts internally for desktop single-screen UX */
   .container {
     height: 100%;
