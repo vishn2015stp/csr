@@ -4,13 +4,15 @@ import { v4 as uuidv4 } from 'uuid'
 
 export default function Intake() {
     const [formData, setFormData] = useState({
-        name: '', phone: '', email: '', address: '',
-        itemName: '', serialNo: '', issue: '', csrNumber: '', serviceMode: 'On Center', isDeviceIntaken: true
+        name: '', phone: '', email: '', address: '', location: '',
+        itemName: '', serialNo: '', issue: '', csrNumber: '', serviceMode: 'On Center'
     })
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState(null)
     const [successData, setSuccessData] = useState(null)
     const [recentIntakes, setRecentIntakes] = useState([])
+    const [customers, setCustomers] = useState([])
+    const [matchedCustomer, setMatchedCustomer] = useState(null)
     const [printConfig, setPrintConfig] = useState({
         shopName: 'Hypertech Digital',
         shopAddress: '',
@@ -28,6 +30,11 @@ export default function Intake() {
                 setPrintConfig(JSON.parse(settings.print_settings));
             }
         } catch (e) {}
+        try {
+            const res = await fetch('/api/customers');
+            const custs = await res.json();
+            setCustomers(custs);
+        } catch (e) {}
     }
 
     useEffect(() => {
@@ -36,28 +43,62 @@ export default function Intake() {
 
     const handleChange = (e) => {
         const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
-        setFormData({ ...formData, [e.target.name]: value })
+        setFormData(prev => {
+            const updated = { ...prev, [e.target.name]: value };
+            if (e.target.name === 'phone') {
+                const cleanPhone = value.trim();
+                if (cleanPhone.length >= 4) {
+                    const match = customers.find(c => c.phone && c.phone.trim() === cleanPhone);
+                    if (match) {
+                        setMatchedCustomer(match);
+                    } else {
+                        setMatchedCustomer(null);
+                    }
+                } else {
+                    setMatchedCustomer(null);
+                }
+            }
+            return updated;
+        });
     }
+
+    const handleAutofill = () => {
+        if (matchedCustomer) {
+            setFormData(prev => ({
+                ...prev,
+                name: matchedCustomer.name || '',
+                email: matchedCustomer.email || '',
+                address: matchedCustomer.address || '',
+                location: matchedCustomer.location || ''
+            }));
+            setMatchedCustomer(null);
+        }
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault()
         setLoading(true)
         setError(null)
         try {
-
             let customerId;
-            // Get all customers to find by phone (in a real app, backend would filter)
-            // But doing it this way for simplicity as we lack a specific endpoint
-            // Wait, we can fetch all or just create
             let existingCust;
             try {
                 const res = await fetch('/api/customers');
-                const customers = await res.json();
-                existingCust = customers.find(c => c.phone === formData.phone);
+                const customersList = await res.json();
+                existingCust = customersList.find(c => c.phone === formData.phone.trim());
             } catch(e) {}
 
             if (existingCust) {
                 customerId = existingCust.id;
+                // Update customer to capture latest details, address, and location
+                await api.updateCustomer({
+                    id: customerId,
+                    name: formData.name,
+                    phone: formData.phone,
+                    email: formData.email,
+                    address: formData.address,
+                    location: formData.location
+                });
             } else {
                 customerId = uuidv4();
                 await api.createCustomer({
@@ -66,6 +107,7 @@ export default function Intake() {
                     phone: formData.phone,
                     email: formData.email,
                     address: formData.address,
+                    location: formData.location,
                     created_at: new Date().toISOString()
                 });
             }
@@ -73,16 +115,19 @@ export default function Intake() {
             const complaintId = uuidv4();
             const now = new Date().toISOString();
             const finalCsrNumber = formData.csrNumber.trim() || Math.floor(100000 + Math.random() * 900000).toString();
+            
+            const isIntaken = formData.serviceMode === 'On Center' ? 1 : 0;
+            
             await api.createComplaint({
                 id: complaintId,
                 csr_number: finalCsrNumber,
                 customer_id: customerId,
-                item_name: formData.itemName,
-                serial_no: formData.serialNo,
-                issue: formData.issue,
+                item_name: formData.itemName || 'Onsite Service Request',
+                serial_no: formData.serialNo || '—',
+                issue: formData.issue || 'Onsite service request logged.',
                 status: 'Pending',
                 service_mode: formData.serviceMode,
-                is_device_intaken: formData.isDeviceIntaken,
+                is_device_intaken: isIntaken,
                 created_at: now
             });
 
@@ -90,14 +135,15 @@ export default function Intake() {
                 id: complaintId,
                 date: new Date(now).toLocaleString(),
                 csrNumber: finalCsrNumber,
-                customerName: existingCust?.name || formData.name,
+                customerName: formData.name,
                 customerPhone: formData.phone,
-                itemName: formData.itemName,
-                serialNo: formData.serialNo,
+                itemName: formData.itemName || 'Onsite Service Request',
+                serialNo: formData.serialNo || '—',
                 serviceMode: formData.serviceMode,
-                isDeviceIntaken: formData.isDeviceIntaken
+                isDeviceIntaken: isIntaken === 1
             })
-            setFormData({ name: '', phone: '', email: '', address: '', itemName: '', serialNo: '', issue: '', csrNumber: '', serviceMode: 'On Center', isDeviceIntaken: true })
+            setFormData({ name: '', phone: '', email: '', address: '', location: '', itemName: '', serialNo: '', issue: '', csrNumber: '', serviceMode: 'On Center' })
+            setMatchedCustomer(null)
             fetchRecent()
         } catch (err) {
             console.error(err)
@@ -119,12 +165,27 @@ export default function Intake() {
                             <h2>Customer Details</h2>
                             <label>Phone Number *</label>
                             <input type="tel" name="phone" required value={formData.phone} onChange={handleChange} placeholder="e.g. 555-0100" />
+                            
+                            {matchedCustomer && (
+                                <div style={{ background: '#3b4252', padding: '0.75rem', borderRadius: '4px', marginBottom: '1.25rem', border: '1px solid #88c0d0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <span style={{ fontSize: '0.85rem', color: '#eceff4' }}>Previous details found: <strong>{matchedCustomer.name}</strong></span>
+                                    <div style={{ display: 'flex', gap: '8px' }}>
+                                        <button type="button" onClick={handleAutofill} style={{ background: '#88c0d0', color: 'black', padding: '3px 8px', fontSize: '0.75rem', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>Autofill</button>
+                                        <button type="button" onClick={() => setMatchedCustomer(null)} style={{ background: '#bf616a', color: 'white', padding: '3px 8px', fontSize: '0.75rem', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Dismiss</button>
+                                    </div>
+                                </div>
+                             )}
+
                             <label>Full Name *</label>
                             <input type="text" name="name" required value={formData.name} onChange={handleChange} placeholder="Jane Doe" />
                             <label>Email</label>
                             <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="(Optional)" />
-                            <label>Address</label>
-                            <input type="text" name="address" value={formData.address} onChange={handleChange} placeholder="Street, City (Optional)" />
+                            
+                            <label>Address {formData.serviceMode === 'Onsite' ? '*' : '(Optional)'}</label>
+                            <input type="text" name="address" required={formData.serviceMode === 'Onsite'} value={formData.address} onChange={handleChange} placeholder={formData.serviceMode === 'Onsite' ? "Enter full address (Required for Onsite)" : "Street, City (Optional)"} />
+                            
+                            <label>Location (Map Link / Landmark)</label>
+                            <input type="text" name="location" value={formData.location} onChange={handleChange} placeholder="e.g. Near metro station or landmarks" />
 
                             <hr style={{ margin: '1rem 0', borderColor: '#333' }} />
 
@@ -144,21 +205,18 @@ export default function Intake() {
                                     Onsite
                                 </label>
                             </div>
-
-                            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', background: '#1a1a1a', padding: '0.75rem', borderRadius: '4px', border: '1px solid #333' }}>
-                                <input type="checkbox" name="isDeviceIntaken" checked={formData.isDeviceIntaken} onChange={handleChange} style={{ width: '1.2rem', height: '1.2rem' }} />
-                                <strong>Intake Device for Service</strong>
-                            </label>
                         </div>
 
                         <div className="card">
                             <h2>Device Details</h2>
-                            <label>Item Name *</label>
-                            <input type="text" name="itemName" required value={formData.itemName} onChange={handleChange} placeholder="e.g. MacBook Pro 2021" />
-                            <label>Serial Number *</label>
-                            <input type="text" name="serialNo" required value={formData.serialNo} onChange={handleChange} placeholder="e.g. C02..." />
-                            <label>Issue Description *</label>
-                            <textarea name="issue" required value={formData.issue} onChange={handleChange} rows="3" placeholder="Describe the problem..."></textarea>
+                            <label>Item Name {formData.serviceMode === 'On Center' ? '*' : '(Optional)'}</label>
+                            <input type="text" name="itemName" required={formData.serviceMode === 'On Center'} value={formData.itemName} onChange={handleChange} placeholder="e.g. MacBook Pro 2021" />
+                            
+                            <label>Serial Number {formData.serviceMode === 'On Center' ? '*' : '(Optional)'}</label>
+                            <input type="text" name="serialNo" required={formData.serviceMode === 'On Center'} value={formData.serialNo} onChange={handleChange} placeholder="e.g. C02..." />
+                            
+                            <label>Issue Description {formData.serviceMode === 'On Center' ? '*' : '(Optional)'}</label>
+                            <textarea name="issue" required={formData.serviceMode === 'On Center'} value={formData.issue} onChange={handleChange} rows="3" placeholder="Describe the problem..."></textarea>
                         </div>
                     </div>
                     <button type="submit" disabled={loading} style={{ width: '100%', fontSize: '1.1rem', padding: '1rem' }}>

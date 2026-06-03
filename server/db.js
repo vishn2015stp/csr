@@ -43,6 +43,7 @@ function ensureInitialized() {
                         phone TEXT NOT NULL,
                         email TEXT,
                         address TEXT,
+                        location TEXT,
                         serial_no TEXT,
                         delivery_date TEXT,
                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -112,8 +113,9 @@ function ensureInitialized() {
 
                 try {
                     await pool.query("ALTER TABLE customers ADD COLUMN IF NOT EXISTS address TEXT;");
+                    await pool.query("ALTER TABLE customers ADD COLUMN IF NOT EXISTS location TEXT;");
                 } catch (err) {
-                    console.error("Error adding address column:", err.message);
+                    console.error("Error adding customer address/location columns:", err.message);
                 }
 
                 try {

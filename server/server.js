@@ -107,11 +107,11 @@ app.delete('/api/users/:id', async (req, res) => {
 // =============== CUSTOMERS ===============
 app.post('/api/customers', async (req, res) => {
     const id = req.body.id || uuidv4();
-    const { name, phone, email, address, serial_no, delivery_date } = req.body;
+    const { name, phone, email, address, location, serial_no, delivery_date } = req.body;
     try {
         await db.query(
-            'INSERT INTO customers (id, name, phone, email, address, serial_no, delivery_date) VALUES ($1, $2, $3, $4, $5, $6, $7)',
-            [id, name, phone, email, address, serial_no, delivery_date]
+            'INSERT INTO customers (id, name, phone, email, address, location, serial_no, delivery_date) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)',
+            [id, name, phone, email, address, location || '', serial_no, delivery_date]
         );
         const result = await db.query('SELECT * FROM customers WHERE id = $1', [id]);
         res.json(result.rows[0]);
@@ -121,19 +121,19 @@ app.post('/api/customers', async (req, res) => {
 });
 
 app.put('/api/customers', async (req, res) => {
-    const { id, name, phone, email, address, serial_no, delivery_date } = req.body;
+    const { id, name, phone, email, address, location, serial_no, delivery_date } = req.body;
     try {
         const resExist = await db.query('SELECT * FROM customers WHERE id = $1', [id]);
         const existing = resExist.rows[0];
         if (existing) {
             await db.query(
-                'UPDATE customers SET name = $1, phone = $2, email = $3, address = $4, serial_no = $5, delivery_date = $6 WHERE id = $7',
-                [name, phone, email, address, serial_no, delivery_date, id]
+                'UPDATE customers SET name = $1, phone = $2, email = $3, address = $4, location = $5, serial_no = $6, delivery_date = $7 WHERE id = $8',
+                [name, phone, email, address, location || '', serial_no, delivery_date, id]
             );
         } else {
             await db.query(
-                'INSERT INTO customers (id, name, phone, email, address, serial_no, delivery_date) VALUES ($1, $2, $3, $4, $5, $6, $7)',
-                [id, name, phone, email, address, serial_no, delivery_date]
+                'INSERT INTO customers (id, name, phone, email, address, location, serial_no, delivery_date) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)',
+                [id, name, phone, email, address, location || '', serial_no, delivery_date]
             );
         }
         const result = await db.query('SELECT * FROM customers WHERE id = $1', [id]);
