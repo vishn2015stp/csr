@@ -18,6 +18,13 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
         total: 0
     });
 
+    // Product editing states
+    const [isEditingProduct, setIsEditingProduct] = useState(false);
+    const [editItemName, setEditItemName] = useState('');
+    const [editSerialNo, setEditSerialNo] = useState('');
+    const [editIssue, setEditIssue] = useState('');
+    const [editIsIntaken, setEditIsIntaken] = useState(false);
+
     const isDelivered = job?.status?.trim().toLowerCase() === 'delivered';
 
     useEffect(() => {
@@ -27,6 +34,10 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                 setJob(j);
                 const c = await api.getCustomer(j.customer_id);
                 setCustomer(c);
+                setEditItemName(j.item_name || '');
+                setEditSerialNo(j.serial_no || '');
+                setEditIssue(j.issue || '');
+                setEditIsIntaken(j.is_device_intaken === 1);
             }
             const sLogs = await api.getServiceRecords(jobId);
             setLogs(sLogs); // api returns desc
@@ -43,6 +54,45 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
         };
         load();
     }, [jobId]);
+
+    const handleSaveProduct = async () => {
+        try {
+            const updates = {
+                item_name: editItemName,
+                serial_no: editSerialNo,
+                issue: editIssue,
+                is_device_intaken: editIsIntaken ? 1 : 0
+            };
+            await api.updateComplaint(jobId, updates);
+            setJob(prev => ({
+                ...prev,
+                ...updates
+            }));
+            setIsEditingProduct(false);
+            if (onRefresh) onRefresh();
+            alert("Product details updated successfully!");
+        } catch (err) {
+            alert("Failed to update product details: " + err.message);
+        }
+    };
+
+    const handleQuickIntake = async () => {
+        try {
+            const updates = {
+                is_device_intaken: 1
+            };
+            await api.updateComplaint(jobId, updates);
+            setJob(prev => ({
+                ...prev,
+                is_device_intaken: 1
+            }));
+            setEditIsIntaken(true);
+            if (onRefresh) onRefresh();
+            alert("Device marked as Taken for Service!");
+        } catch (err) {
+            alert("Failed to update status: " + err.message);
+        }
+    };
 
     const handleStatusChange = async (e) => {
         if (isDelivered) {
@@ -239,11 +289,138 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                         </div>
 
                         <div style={{ marginBottom: '1.5rem' }}>
-                            <h3 style={{ borderBottom: '1px solid #4c566a', paddingBottom: '0.5rem', color: '#ebcb8b' }}>Product & Complaint</h3>
-                            <p style={{ background: '#242933', padding: '1rem', borderRadius: '4px' }}>
-                                <strong>{job.item_name}</strong> - S/N: {job.serial_no}<br /><br />
-                                {job.issue}
-                            </p>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #4c566a', paddingBottom: '0.5rem', marginBottom: '0.5rem' }}>
+                                <h3 style={{ margin: 0, color: '#ebcb8b' }}>Product & Complaint</h3>
+                                {!isDelivered && (
+                                    <button 
+                                        onClick={() => {
+                                            if (isEditingProduct) {
+                                                // Reset to actual job values on cancel
+                                                setEditItemName(job.item_name || '');
+                                                setEditSerialNo(job.serial_no || '');
+                                                setEditIssue(job.issue || '');
+                                                setEditIsIntaken(job.is_device_intaken === 1);
+                                            }
+                                            setIsEditingProduct(!isEditingProduct);
+                                        }}
+                                        style={{ 
+                                            background: '#4c566a', 
+                                            color: '#eceff4', 
+                                            padding: '2px 8px', 
+                                            fontSize: '0.8rem', 
+                                            border: 'none', 
+                                            borderRadius: '4px', 
+                                            cursor: 'pointer' 
+                                        }}
+                                    >
+                                        {isEditingProduct ? 'Cancel' : 'Edit Details'}
+                                    </button>
+                                )}
+                            </div>
+
+                            {isEditingProduct ? (
+                                <div style={{ background: '#242933', padding: '1rem', borderRadius: '4px', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                                    <div>
+                                        <label style={{ fontSize: '0.8rem', color: '#eceff4', display: 'block', marginBottom: '4px' }}>Item Name *</label>
+                                        <input 
+                                            type="text" 
+                                            value={editItemName} 
+                                            onChange={e => setEditItemName(e.target.value)} 
+                                            style={{ width: '100%', padding: '0.4rem', background: '#2e3440', border: '1px solid #4c566a', color: '#eceff4', borderRadius: '4px' }} 
+                                        />
+                                    </div>
+                                    <div>
+                                        <label style={{ fontSize: '0.8rem', color: '#eceff4', display: 'block', marginBottom: '4px' }}>Serial Number</label>
+                                        <input 
+                                            type="text" 
+                                            value={editSerialNo} 
+                                            onChange={e => setEditSerialNo(e.target.value)} 
+                                            style={{ width: '100%', padding: '0.4rem', background: '#2e3440', border: '1px solid #4c566a', color: '#eceff4', borderRadius: '4px' }} 
+                                        />
+                                    </div>
+                                    <div>
+                                        <label style={{ fontSize: '0.8rem', color: '#eceff4', display: 'block', marginBottom: '4px' }}>Issue Description *</label>
+                                        <textarea 
+                                            value={editIssue} 
+                                            onChange={e => setEditIssue(e.target.value)} 
+                                            rows="3"
+                                            style={{ width: '100%', padding: '0.4rem', background: '#2e3440', border: '1px solid #4c566a', color: '#eceff4', borderRadius: '4px' }}
+                                        ></textarea>
+                                    </div>
+                                    
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: '4px 0' }}>
+                                        <input 
+                                            type="checkbox" 
+                                            id="editIsIntaken" 
+                                            checked={editIsIntaken} 
+                                            onChange={e => setEditIsIntaken(e.target.checked)} 
+                                            style={{ cursor: 'pointer' }}
+                                        />
+                                        <label htmlFor="editIsIntaken" style={{ fontSize: '0.9rem', color: '#eceff4', cursor: 'pointer' }}>
+                                            Device Taken for Service (Intaken)
+                                        </label>
+                                    </div>
+
+                                    <button 
+                                        onClick={handleSaveProduct} 
+                                        style={{ 
+                                            padding: '0.5rem', 
+                                            background: '#88c0d0', 
+                                            color: '#2e3440', 
+                                            fontWeight: 'bold', 
+                                            border: 'none', 
+                                            borderRadius: '4px', 
+                                            cursor: 'pointer',
+                                            marginTop: '4px'
+                                        }}
+                                    >
+                                        Save Details
+                                    </button>
+                                </div>
+                            ) : (
+                                <div style={{ background: '#242933', padding: '1rem', borderRadius: '4px' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
+                                        <div>
+                                            <strong style={{ fontSize: '1.1rem', color: '#eceff4' }}>{job.item_name}</strong>
+                                            {job.serial_no && <div style={{ fontSize: '0.85rem', color: '#88c0d0', marginTop: '2px' }}>S/N: {job.serial_no}</div>}
+                                        </div>
+                                        <div>
+                                            {job.is_device_intaken === 1 ? (
+                                                <span style={{ background: 'rgba(163, 190, 140, 0.2)', color: '#a3be8c', padding: '4px 8px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 'bold', border: '1px solid #a3be8c' }}>
+                                                    Intaken (Taken for Service)
+                                                </span>
+                                            ) : (
+                                                <span style={{ background: 'rgba(235, 203, 139, 0.2)', color: '#ebcb8b', padding: '4px 8px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 'bold', border: '1px solid #ebcb8b' }}>
+                                                    On-Site (Not Taken)
+                                                </span>
+                                            )}
+                                        </div>
+                                    </div>
+                                    
+                                    <p style={{ margin: '0 0 1rem 0', whiteSpace: 'pre-line', fontSize: '0.95rem' }}>
+                                        {job.issue}
+                                    </p>
+
+                                    {job.is_device_intaken !== 1 && !isDelivered && (
+                                        <button 
+                                            onClick={handleQuickIntake} 
+                                            style={{ 
+                                                width: '100%', 
+                                                padding: '0.5rem', 
+                                                background: '#ebcb8b', 
+                                                color: '#2e3440', 
+                                                fontWeight: 'bold', 
+                                                border: 'none', 
+                                                borderRadius: '4px', 
+                                                cursor: 'pointer',
+                                                fontSize: '0.85rem'
+                                            }}
+                                        >
+                                            Mark as Taken for Service (Intake Device)
+                                        </button>
+                                    )}
+                                </div>
+                            )}
                         </div>
 
                         <div>
