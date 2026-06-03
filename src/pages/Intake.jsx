@@ -184,8 +184,12 @@ export default function Intake() {
                             <label>Address {formData.serviceMode === 'Onsite' ? '*' : '(Optional)'}</label>
                             <input type="text" name="address" required={formData.serviceMode === 'Onsite'} value={formData.address} onChange={handleChange} placeholder={formData.serviceMode === 'Onsite' ? "Enter full address (Required for Onsite)" : "Street, City (Optional)"} />
                             
-                            <label>Location (Map Link / Landmark)</label>
-                            <input type="text" name="location" value={formData.location} onChange={handleChange} placeholder="e.g. Near metro station or landmarks" />
+                            {formData.serviceMode === 'Onsite' && (
+                                <>
+                                    <label>Location (Map Link / Landmark)</label>
+                                    <input type="text" name="location" value={formData.location} onChange={handleChange} placeholder="e.g. Near metro station or landmarks" />
+                                </>
+                            )}
 
                             <hr style={{ margin: '1rem 0', borderColor: '#333' }} />
 
