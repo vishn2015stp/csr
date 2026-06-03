@@ -499,18 +499,17 @@ export default function Settings() {
                                                 <td style={{ padding: '0.75rem 0.5rem', textAlign: 'right' }}>
                                                     <button
                                                         onClick={() => handleStartEditUser(u)}
-                                                        disabled={u.username === 'admin'}
                                                         style={{
                                                             background: 'transparent',
                                                             border: 'none',
                                                             color: 'var(--text-secondary)',
-                                                            cursor: u.username === 'admin' ? 'not-allowed' : 'pointer',
+                                                            cursor: 'pointer',
                                                             padding: '4px',
                                                             marginRight: '8px'
                                                         }}
                                                         title="Edit User"
                                                     >
-                                                        <Edit2 size={16} color={u.username === 'admin' ? '#aaa' : 'var(--accent)'} />
+                                                        <Edit2 size={16} color="var(--accent)" />
                                                     </button>
                                                     <button
                                                         onClick={() => handleDeleteUser(u.id)}
@@ -558,11 +557,12 @@ export default function Settings() {
                                             <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Access Role</label>
                                             <select
                                                 value={editUserRole}
+                                                disabled={editingUser.username === 'admin'}
                                                 onChange={e => setEditUserRole(e.target.value)}
                                                 style={{
                                                     width: '100%', padding: '0.6rem 0.75rem',
                                                     background: 'var(--bg-color)', border: '1px solid var(--border-color)', color: 'var(--text-primary)',
-                                                    borderRadius: '6px', boxSizing: 'border-box', cursor: 'pointer'
+                                                    borderRadius: '6px', boxSizing: 'border-box', cursor: editingUser.username === 'admin' ? 'not-allowed' : 'pointer'
                                                 }}
                                             >
                                                 <option value="STAFF">STAFF (Read & Service Actions)</option>
@@ -573,11 +573,12 @@ export default function Settings() {
                                             <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Status</label>
                                             <select
                                                 value={editUserActive ? "true" : "false"}
+                                                disabled={editingUser.username === 'admin'}
                                                 onChange={e => setEditUserActive(e.target.value === "true")}
                                                 style={{
                                                     width: '100%', padding: '0.6rem 0.75rem',
                                                     background: 'var(--bg-color)', border: '1px solid var(--border-color)', color: 'var(--text-primary)',
-                                                    borderRadius: '6px', boxSizing: 'border-box', cursor: 'pointer'
+                                                    borderRadius: '6px', boxSizing: 'border-box', cursor: editingUser.username === 'admin' ? 'not-allowed' : 'pointer'
                                                 }}
                                             >
                                                 <option value="true">Active</option>
