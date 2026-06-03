@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom'
-import { ClipboardList, Database, Wrench, LayoutDashboard, LogOut, X } from 'lucide-react'
+import { ClipboardList, Database, Wrench, LayoutDashboard, LogOut, X, History } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 
 export default function Sidebar({ isOpen, closeSidebar }) {
@@ -30,6 +30,10 @@ export default function Sidebar({ isOpen, closeSidebar }) {
                 <NavLink to="/intake" onClick={closeSidebar} className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>
                     <ClipboardList size={20} />
                     Service Request
+                </NavLink>
+                <NavLink to="/requests" onClick={closeSidebar} className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>
+                    <History size={20} />
+                    All Requests
                 </NavLink>
                 {isAdmin && (
                     <NavLink to="/settings" onClick={closeSidebar} className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>

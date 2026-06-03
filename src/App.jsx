@@ -6,6 +6,7 @@ import Intake from './pages/Intake'
 import Settings from './pages/Settings'
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
+import Requests from './pages/Requests'
 import { useAuth } from './context/AuthContext'
 
 function ProtectedRoute({ children }) {
@@ -49,6 +50,7 @@ function App() {
         <Routes>
           <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/intake" element={<ProtectedRoute><Intake /></ProtectedRoute>} />
+          <Route path="/requests" element={<ProtectedRoute><Requests /></ProtectedRoute>} />
           <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
