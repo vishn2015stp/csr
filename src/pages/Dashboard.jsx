@@ -18,6 +18,8 @@ export default function Dashboard() {
     const [allComplaints, setAllComplaints] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [isSearchFocused, setIsSearchFocused] = useState(false);
+    const [showDetailedTable, setShowDetailedTable] = useState(false);
+
 
     const refreshDashboard = async () => {
         const statsData = await api.getDashboardStats();
@@ -87,6 +89,193 @@ export default function Dashboard() {
         boxShadow: '0 4px 6px rgba(0,0,0,0.3)',
         border: '1px solid #3b4252'
     };
+
+    if (showDetailedTable) {
+        const readyCount = filteredPendingWorks.filter(w => w.status === 'Ready for Delivery' || w.status === 'Ready').length;
+        const totalCount = filteredPendingWorks.length;
+        return (
+            <div className="dashboard-container">
+                <div style={{ padding: '2rem 1rem' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
+                        <div>
+                            <h2 style={{ margin: 0, fontSize: '1.8rem', color: '#eceff4', fontWeight: 'bold' }}>Detailed Pending In-Shop Queue</h2>
+                            <p style={{ margin: '4px 0 0 0', color: '#88c0d0', fontSize: '0.95rem' }}>
+                                Currently showing {readyCount} ready for delivery out of {totalCount} total pending in-shop devices
+                            </p>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                            <div style={{ position: 'relative', width: '300px' }}>
+                                <div style={{
+                                    background: '#2e3440',
+                                    border: '1px solid #3b4252',
+                                    borderRadius: '24px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    padding: '0.5rem 1rem',
+                                    gap: '10px',
+                                    width: '100%',
+                                }}>
+                                    <Search size={16} color="#88c0d0" />
+                                    <input
+                                        type="text"
+                                        value={searchQuery}
+                                        onChange={e => setSearchQuery(e.target.value)}
+                                        placeholder="Filter queue..."
+                                        style={{
+                                            background: 'transparent',
+                                            border: 'none',
+                                            outline: 'none',
+                                            color: '#eceff4',
+                                            fontSize: '0.9rem',
+                                            width: '100%',
+                                            margin: 0,
+                                            padding: 0
+                                        }}
+                                    />
+                                    {searchQuery && (
+                                        <button
+                                            onClick={() => setSearchQuery('')}
+                                            style={{
+                                                background: 'transparent',
+                                                border: 'none',
+                                                color: '#88c0d0',
+                                                cursor: 'pointer',
+                                                padding: '2px',
+                                                display: 'flex',
+                                                alignItems: 'center'
+                                            }}
+                                        >
+                                            <X size={14} />
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+                            <button 
+                                onClick={() => setShowDetailedTable(false)}
+                                style={{
+                                    background: 'transparent',
+                                    border: '1px solid #88c0d0',
+                                    color: '#88c0d0',
+                                    padding: '0.6rem 1.2rem',
+                                    borderRadius: '24px',
+                                    cursor: 'pointer',
+                                    fontWeight: 'bold',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '8px',
+                                    transition: 'all 0.2s',
+                                    flexShrink: 0
+                                }}
+                                onMouseEnter={e => {
+                                    e.currentTarget.style.background = 'rgba(136, 192, 208, 0.1)';
+                                }}
+                                onMouseLeave={e => {
+                                    e.currentTarget.style.background = 'transparent';
+                                }}
+                            >
+                                ← Back to Dashboard
+                            </button>
+                        </div>
+                    </div>
+
+                    <div style={{ ...widgetStyle, padding: '1.5rem' }}>
+                        <div style={{ overflowX: 'auto' }}>
+                            <table style={{ width: '100%', fontSize: '0.95rem', borderCollapse: 'collapse', minWidth: '800px' }}>
+                                <thead>
+                                    <tr style={{ background: '#3b4252', textAlign: 'left' }}>
+                                        <th style={{ padding: '0.75rem 1rem', borderRadius: '4px 0 0 4px', fontWeight: '600', color: '#88c0d0' }}>CSR #</th>
+                                        <th style={{ padding: '0.75rem 1rem', fontWeight: '600' }}>Customer</th>
+                                        <th style={{ padding: '0.75rem 1rem', fontWeight: '600' }}>Phone</th>
+                                        <th style={{ padding: '0.75rem 1rem', fontWeight: '600' }}>Device / Item</th>
+                                        <th style={{ padding: '0.75rem 1rem', fontWeight: '600' }}>Serial Number</th>
+                                        <th style={{ padding: '0.75rem 1rem', fontWeight: '600' }}>Status</th>
+                                        <th style={{ padding: '0.75rem 1rem', fontWeight: '600' }}>Received Date</th>
+                                        <th style={{ padding: '0.75rem 1rem', textAlign: 'right', borderRadius: '0 4px 4px 0', fontWeight: '600' }}>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {filteredPendingWorks.map(work => {
+                                        let statusColor = '#d8dee9';
+                                        if (work.status === 'Pending') statusColor = '#bf616a';
+                                        else if (work.status === 'Delivered') statusColor = '#a3be8c';
+                                        else if (work.status === 'Ready for Delivery' || work.status === 'Ready') statusColor = '#8fbcbb';
+                                        else statusColor = '#ebcb8b';
+                                        
+                                        return (
+                                            <tr 
+                                                key={work.id}
+                                                style={{ borderBottom: '1px solid #3b4252', transition: 'background 0.15s' }}
+                                                onMouseEnter={e => e.currentTarget.style.background = '#3b4252'}
+                                                onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                                            >
+                                                <td style={{ padding: '1rem', fontWeight: 'bold', color: '#88c0d0' }}>#{work.csr_number || work.id.split('-')[0].toUpperCase()}</td>
+                                                <td style={{ padding: '1rem', color: '#eceff4', fontWeight: '500' }}>{work.customerName || '—'}</td>
+                                                <td style={{ padding: '1rem', color: '#d8dee9' }}>{work.customerPhone || '—'}</td>
+                                                <td style={{ padding: '1rem', color: '#eceff4' }}>{work.item_name}</td>
+                                                <td style={{ padding: '1rem', fontFamily: 'monospace' }}>{work.serial_no || '—'}</td>
+                                                <td style={{ padding: '1rem' }}>
+                                                    <span style={{ 
+                                                        background: 'rgba(255,255,255,0.08)', 
+                                                        padding: '4px 10px', 
+                                                        borderRadius: '12px', 
+                                                        color: statusColor, 
+                                                        fontSize: '0.75rem', 
+                                                        fontWeight: 'bold', 
+                                                        textTransform: 'uppercase',
+                                                        border: `1px solid ${statusColor}40`
+                                                    }}>
+                                                        {work.status}
+                                                    </span>
+                                                </td>
+                                                <td style={{ padding: '1rem', fontSize: '0.85rem', color: '#88c0d0' }}>
+                                                    {new Date(work.created_at).toLocaleDateString()}
+                                                </td>
+                                                <td style={{ padding: '1rem', textAlign: 'right' }}>
+                                                    <button 
+                                                        onClick={() => setViewingJob(work.id)}
+                                                        style={{
+                                                            background: '#88c0d0',
+                                                            color: '#2e3440',
+                                                            border: 'none',
+                                                            padding: '0.4rem 0.8rem',
+                                                            borderRadius: '4px',
+                                                            fontSize: '0.85rem',
+                                                            fontWeight: 'bold',
+                                                            cursor: 'pointer',
+                                                            transition: 'background 0.2s',
+                                                            margin: 0
+                                                        }}
+                                                        onMouseEnter={e => e.currentTarget.style.background = '#8fbcbb'}
+                                                        onMouseLeave={e => e.currentTarget.style.background = '#88c0d0'}
+                                                    >
+                                                        Details
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
+                                    {filteredPendingWorks.length === 0 && (
+                                        <tr>
+                                            <td colSpan="8" style={{ padding: '3rem', textAlign: 'center', color: '#4c566a' }}>
+                                                No pending in-shop works found.
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                {viewingJob && (
+                    <JobDetailModal
+                        jobId={viewingJob}
+                        onClose={() => setViewingJob(null)}
+                        onRefresh={refreshDashboard}
+                    />
+                )}
+            </div>
+        );
+    }
 
     return (
         <div className="dashboard-container">
@@ -254,7 +443,42 @@ export default function Dashboard() {
 
                     {/* Diagnostics / Pending Tasks Widget */}
                     <div style={widgetStyle}>
-                        <WidgetHeader title="Pending In-Shop Work" icon={Activity} />
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #3b4252', paddingBottom: '0.75rem', marginBottom: '1rem' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', color: '#eceff4' }}>
+                                <Activity size={18} style={{ marginRight: '8px', color: '#88c0d0' }} />
+                                <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '500' }}>Pending In-Shop Work</h3>
+                            </div>
+                            <button 
+                                onClick={() => setShowDetailedTable(true)}
+                                title="View detailed table"
+                                style={{
+                                    background: 'rgba(136, 192, 208, 0.1)',
+                                    color: '#88c0d0',
+                                    border: '1px solid rgba(136, 192, 208, 0.3)',
+                                    borderRadius: '16px',
+                                    padding: '3px 10px',
+                                    fontSize: '0.8rem',
+                                    cursor: 'pointer',
+                                    fontWeight: 'bold',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '6px',
+                                    transition: 'all 0.2s',
+                                    margin: 0
+                                }}
+                                onMouseEnter={e => {
+                                    e.currentTarget.style.background = 'rgba(136, 192, 208, 0.2)';
+                                    e.currentTarget.style.borderColor = '#88c0d0';
+                                }}
+                                onMouseLeave={e => {
+                                    e.currentTarget.style.background = 'rgba(136, 192, 208, 0.1)';
+                                    e.currentTarget.style.borderColor = 'rgba(136, 192, 208, 0.3)';
+                                }}
+                            >
+                                <span>{filteredPendingWorks.filter(w => w.status === 'Ready for Delivery' || w.status === 'Ready').length}/{filteredPendingWorks.length}</span>
+                                <span style={{ fontSize: '0.7rem' }}>➔</span>
+                            </button>
+                        </div>
                         <ul style={{ listStyle: 'none', padding: 0, margin: 0, fontSize: '0.9rem', maxHeight: '300px', overflowY: 'auto' }}>
                             {filteredPendingWorks.map(work => (
                                 <li
