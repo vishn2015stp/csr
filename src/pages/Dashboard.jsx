@@ -103,8 +103,8 @@ export default function Dashboard() {
                                 Currently showing {readyCount} ready for delivery out of {totalCount} total pending in-shop devices
                             </p>
                         </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                            <div style={{ position: 'relative', width: '300px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+                            <div style={{ position: 'relative', width: '100%', maxWidth: '300px' }}>
                                 <div style={{
                                     background: '#2e3440',
                                     border: '1px solid #3b4252',
@@ -280,7 +280,7 @@ export default function Dashboard() {
     return (
         <div className="dashboard-container">
             <div className="dashboard-header">
-                <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flex: 1, marginRight: '2rem' }}>
+                <div className="dashboard-search-container">
                     <div style={{ position: 'relative', width: '100%', maxWidth: '500px', zIndex: 1000 }}>
                         <div style={{
                             background: '#2e3440',

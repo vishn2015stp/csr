@@ -294,10 +294,10 @@ export default function Settings() {
                     </div>
                 </div>
 
-                <div style={{ display: 'flex', minHeight: '600px' }}>
+                <div className="settings-designer">
 
                     {/* ── LEFT PANEL: Controls ── */}
-                    <div style={{ width: '340px', flexShrink: 0, borderRight: '1px solid #333', padding: '1.5rem', overflowY: 'auto', maxHeight: '80vh' }}>
+                    <div className="settings-left-panel">
 
                         {/* Shop Identity */}
                         <div style={sectionStyle}>
@@ -339,7 +339,7 @@ export default function Settings() {
                     </div>
 
                     {/* ── RIGHT PANEL: Live Preview ── */}
-                    <div style={{ flex: 1, background: '#111', display: 'flex', flexDirection: 'column' }}>
+                    <div className="settings-right-panel">
                         {/* Tab switcher */}
                         <div style={{ display: 'flex', borderBottom: '1px solid #333' }}>
                             {['intake', 'invoice'].map(tab => (

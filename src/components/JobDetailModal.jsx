@@ -155,7 +155,7 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
     if (showInvoice) {
         return (
             <div style={{ position: 'fixed', top: 0, left: 0, bottom: 0, right: 0, background: 'rgba(0,0,0,0.85)', zIndex: 9999, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                <div style={{ background: 'white', color: 'black', padding: '2rem', width: '500px', maxWidth: '100%', borderRadius: '4px' }}>
+                <div style={{ background: 'white', color: 'black', padding: '1.5rem 1rem', width: '500px', maxWidth: '95%', borderRadius: '4px', boxSizing: 'border-box' }}>
                     <div className="non-print" style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem' }}>
                         <button onClick={() => window.print()} style={{ marginRight: '1rem', background: '#444' }}><Printer size={16} /> Print</button>
                         <button onClick={() => setShowInvoice(false)} style={{ background: '#e53e3e' }}>Close</button>

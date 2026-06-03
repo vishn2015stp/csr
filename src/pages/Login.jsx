@@ -20,8 +20,8 @@ export default function Login() {
     };
 
     return (
-        <div style={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', backgroundColor: '#0f0f0f' }}>
-            <form onSubmit={handleSubmit} style={{ background: '#1a1a1a', padding: '3rem', borderRadius: '12px', width: '350px', boxShadow: '0 8px 32px rgba(0,0,0,0.5)', border: '1px solid #333' }}>
+        <div className="login-container">
+            <form onSubmit={handleSubmit} className="login-card">
                 <h2 style={{ textAlign: 'center', marginBottom: '2rem', color: '#ff4d4d' }}>Hyper-CSR</h2>
                 {error && <p style={{ color: '#ff6b6b', background: 'rgba(255,0,0,0.1)', padding: '0.5rem', borderRadius: '4px', textAlign: 'center' }}>{error}</p>}
                 <div style={{ marginBottom: '1.5rem' }}>

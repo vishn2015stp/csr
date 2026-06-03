@@ -157,7 +157,7 @@ export default function Requests() {
                     </div>
 
                     {/* Status filter */}
-                    <div style={{ flex: '0 1 200px' }}>
+                    <div style={{ flex: '1 1 180px' }}>
                         <select
                             value={statusFilter}
                             onChange={e => setStatusFilter(e.target.value)}
@@ -184,7 +184,7 @@ export default function Requests() {
                     </div>
 
                     {/* Mode filter */}
-                    <div style={{ flex: '0 1 200px' }}>
+                    <div style={{ flex: '1 1 180px' }}>
                         <select
                             value={modeFilter}
                             onChange={e => setModeFilter(e.target.value)}
@@ -312,7 +312,7 @@ export default function Requests() {
             {/* Print Slip Overlay (triggered via print buttons) */}
             {printIntakeData && (
                 <div style={{ position: 'fixed', top: 0, left: 0, bottom: 0, right: 0, background: 'rgba(0,0,0,0.85)', zIndex: 9999, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                    <div style={{ background: 'white', color: 'black', padding: '2rem', width: '500px', maxWidth: '100%', borderRadius: '4px' }}>
+                    <div style={{ background: 'white', color: 'black', padding: '1.5rem 1rem', width: '500px', maxWidth: '95%', borderRadius: '4px', boxSizing: 'border-box' }}>
                         <div className="non-print" style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem', gap: '0.5rem' }}>
                             <button onClick={triggerPrint} style={{ background: '#444', color: 'white', border: 'none', padding: '0.5rem 1rem', borderRadius: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}><Printer size={16} /> Print</button>
                             <button onClick={() => setPrintIntakeData(null)} style={{ background: '#e53e3e', color: 'white', border: 'none', padding: '0.5rem 1rem', borderRadius: '4px', cursor: 'pointer' }}>Close</button>
@@ -344,7 +344,7 @@ export default function Requests() {
             {/* Print Invoice Overlay (triggered via print buttons) */}
             {printInvoiceData && (
                 <div style={{ position: 'fixed', top: 0, left: 0, bottom: 0, right: 0, background: 'rgba(0,0,0,0.85)', zIndex: 9999, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                    <div style={{ background: 'white', color: 'black', padding: '2rem', width: '500px', maxWidth: '100%', borderRadius: '4px' }}>
+                    <div style={{ background: 'white', color: 'black', padding: '1.5rem 1rem', width: '500px', maxWidth: '95%', borderRadius: '4px', boxSizing: 'border-box' }}>
                         <div className="non-print" style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem', gap: '0.5rem' }}>
                             <button onClick={triggerPrint} style={{ background: '#444', color: 'white', border: 'none', padding: '0.5rem 1rem', borderRadius: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}><Printer size={16} /> Print</button>
                             <button onClick={() => setPrintInvoiceData(null)} style={{ background: '#e53e3e', color: 'white', border: 'none', padding: '0.5rem 1rem', borderRadius: '4px', cursor: 'pointer' }}>Close</button>

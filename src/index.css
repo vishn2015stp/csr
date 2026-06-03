@@ -1,3 +1,7 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 :root {
   --bg-color: #121212;
   --panel-bg: #1e1e1e;
@@ -477,5 +481,89 @@ button:disabled {
     grid-template-columns: 1fr;
     gap: 1.5rem;
     padding: 1rem !important;
+  }
+}
+
+/* Settings Page Responsiveness */
+.settings-designer {
+  display: flex;
+  min-height: 600px;
+}
+
+.settings-left-panel {
+  width: 340px;
+  flex-shrink: 0;
+  border-right: 1px solid #333;
+  padding: 1.5rem;
+  overflow-y: auto;
+  max-height: 80vh;
+}
+
+.settings-right-panel {
+  flex: 1;
+  background: #111;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 900px) {
+  .settings-designer {
+    flex-direction: column;
+    min-height: auto;
+  }
+  
+  .settings-left-panel {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #333;
+    max-height: none;
+  }
+  
+  .settings-right-panel {
+    width: 100%;
+  }
+}
+
+/* Login Page Responsiveness */
+.login-container {
+  display: flex;
+  height: 100vh;
+  align-items: center;
+  justify-content: center;
+  background-color: #0f0f0f;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+.login-card {
+  background: #1a1a1a;
+  padding: 3rem;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  border: 1px solid #333;
+  box-sizing: border-box;
+}
+
+@media (max-width: 480px) {
+  .login-card {
+    padding: 2rem 1.25rem;
+  }
+}
+
+/* Dashboard Header search container responsiveness */
+.dashboard-search-container {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+  margin-right: 2rem;
+}
+
+@media (max-width: 768px) {
+  .dashboard-search-container {
+    margin-right: 0;
+    width: 100%;
   }
 }
