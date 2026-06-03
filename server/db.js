@@ -117,6 +117,13 @@ function ensureInitialized() {
                 }
 
                 try {
+                    await pool.query("ALTER TABLE complaints ADD COLUMN IF NOT EXISTS warranty_details TEXT;");
+                    await pool.query("ALTER TABLE complaints ADD COLUMN IF NOT EXISTS warranty_status TEXT;");
+                } catch (err) {
+                    console.error("Error adding warranty fields:", err.message);
+                }
+
+                try {
                     await pool.query("ALTER TABLE complaints ADD COLUMN IF NOT EXISTS service_mode TEXT DEFAULT 'On Center';");
                     await pool.query("ALTER TABLE complaints ADD COLUMN IF NOT EXISTS is_device_intaken INTEGER DEFAULT 1;");
                 } catch (err) {

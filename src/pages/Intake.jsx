@@ -7,7 +7,8 @@ export default function Intake() {
     const { user } = useAuth()
     const [formData, setFormData] = useState({
         name: '', phone: '', email: '', address: '', location: '',
-        itemName: '', serialNo: '', issue: '', csrNumber: '', serviceMode: 'On Center'
+        itemName: '', serialNo: '', issue: '', csrNumber: '', serviceMode: 'On Center',
+        isWarranty: false, warrantyDetails: ''
     })
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState(null)
@@ -126,11 +127,13 @@ export default function Intake() {
                 item_name: formData.itemName || 'Onsite Service Request',
                 serial_no: formData.serialNo || '—',
                 issue: formData.issue || 'Onsite service request logged.',
-                status: 'Pending',
+                status: formData.isWarranty ? 'Warranty' : 'Pending',
                 service_mode: formData.serviceMode,
                 is_device_intaken: isIntaken,
                 created_at: now,
-                created_by: user?.username || 'admin'
+                created_by: user?.username || 'admin',
+                warranty_details: formData.isWarranty ? formData.warrantyDetails : '',
+                warranty_status: formData.isWarranty ? 'Packed' : null
             });
 
             setSuccessData({
@@ -144,7 +147,7 @@ export default function Intake() {
                 serviceMode: formData.serviceMode,
                 isDeviceIntaken: isIntaken === 1
             })
-            setFormData({ name: '', phone: '', email: '', address: '', location: '', itemName: '', serialNo: '', issue: '', csrNumber: '', serviceMode: 'On Center' })
+            setFormData({ name: '', phone: '', email: '', address: '', location: '', itemName: '', serialNo: '', issue: '', csrNumber: '', serviceMode: 'On Center', isWarranty: false, warrantyDetails: '' })
             setMatchedCustomers([])
             fetchRecent()
         } catch (err) {
@@ -209,9 +212,37 @@ export default function Intake() {
                             <label>Custom CSR Number</label>
                             <input type="text" name="csrNumber" value={formData.csrNumber} onChange={handleChange} placeholder="Leave blank to auto-generate number" />
 
-                            <hr style={{ margin: '1rem 0', borderColor: 'var(--border-color)' }} />
+                             <hr style={{ margin: '1rem 0', borderColor: 'var(--border-color)' }} />
 
-                            <label style={{ display: 'block', color: 'var(--accent)', marginBottom: '0.5rem' }}>Mode of Service</label>
+                             <div style={{ marginBottom: '1rem' }}>
+                                 <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontWeight: 'bold' }}>
+                                     <input 
+                                         type="checkbox" 
+                                         name="isWarranty" 
+                                         checked={formData.isWarranty} 
+                                         onChange={handleChange} 
+                                         style={{ width: 'auto', margin: 0 }}
+                                     />
+                                     Device Under Warranty
+                                 </label>
+                             </div>
+
+                             {formData.isWarranty && (
+                                 <div style={{ marginBottom: '1rem' }}>
+                                     <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Warranty Details</label>
+                                     <input 
+                                         type="text" 
+                                         name="warrantyDetails" 
+                                         value={formData.warrantyDetails} 
+                                         onChange={handleChange} 
+                                         placeholder="e.g. Purchase date, brand warranty details..." 
+                                     />
+                                 </div>
+                             )}
+
+                             <hr style={{ margin: '1rem 0', borderColor: 'var(--border-color)' }} />
+
+                             <label style={{ display: 'block', color: 'var(--accent)', marginBottom: '0.5rem' }}>Mode of Service</label>
                             <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
                                 <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
                                     <input type="radio" name="serviceMode" value="On Center" checked={formData.serviceMode === 'On Center'} onChange={handleChange} />

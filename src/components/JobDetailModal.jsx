@@ -25,6 +25,10 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
     const [editIssue, setEditIssue] = useState('');
     const [editIsIntaken, setEditIsIntaken] = useState(false);
 
+    // Multiple spares and warranty states
+    const [newSpareName, setNewSpareName] = useState('');
+    const [newSpareCost, setNewSpareCost] = useState('');
+
     const isDelivered = job?.status?.trim().toLowerCase() === 'delivered' || job?.status?.trim().toLowerCase() === 'completed';
 
     useEffect(() => {
@@ -183,6 +187,77 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
         if (onRefresh) onRefresh();
     };
 
+    const handleWarrantyStatusChange = async (e) => {
+        const newWStatus = e.target.value;
+        try {
+            await api.updateComplaint(jobId, { warranty_status: newWStatus });
+            setJob(prev => ({ ...prev, warranty_status: newWStatus }));
+
+            await api.createStatusLog({
+                complaint_id: jobId,
+                status: `Warranty (${newWStatus})`,
+                technician: user?.username || 'Unknown'
+            });
+
+            await api.createServiceRecord({
+                complaint_id: jobId,
+                technician: user?.username || 'Unknown',
+                issues: `Warranty status updated to: ${newWStatus}`,
+                resolution_status: `Warranty: ${newWStatus}`
+            });
+
+            const sLogs = await api.getServiceRecords(jobId);
+            setLogs(sLogs);
+
+            if (onRefresh) onRefresh();
+        } catch (err) {
+            alert("Failed to update warranty status: " + err.message);
+        }
+    };
+
+    const getSparesList = () => {
+        if (!invoice.spares) return [];
+        if (invoice.spares.startsWith('[')) {
+            try {
+                return JSON.parse(invoice.spares);
+            } catch (e) {
+                return [{ name: invoice.spares, cost: parseFloat(invoice.part_costs) || 0 }];
+            }
+        }
+        return [{ name: invoice.spares, cost: parseFloat(invoice.part_costs) || 0 }];
+    };
+
+    const sparesList = getSparesList();
+
+    const handleAddSpare = () => {
+        if (!newSpareName.trim()) return;
+        const costVal = parseFloat(newSpareCost) || 0;
+        const newSpare = { name: newSpareName.trim(), cost: costVal };
+        const updatedList = [...sparesList, newSpare];
+        const newPartCosts = updatedList.reduce((sum, s) => sum + s.cost, 0);
+
+        setInvoice(prev => ({
+            ...prev,
+            spares: JSON.stringify(updatedList),
+            part_costs: newPartCosts,
+            total: (parseFloat(prev.service_fees) || 0) + newPartCosts
+        }));
+        setNewSpareName('');
+        setNewSpareCost('');
+    };
+
+    const handleRemoveSpare = (index) => {
+        const updatedList = sparesList.filter((_, idx) => idx !== index);
+        const newPartCosts = updatedList.reduce((sum, s) => sum + s.cost, 0);
+
+        setInvoice(prev => ({
+            ...prev,
+            spares: updatedList.length > 0 ? JSON.stringify(updatedList) : '',
+            part_costs: newPartCosts,
+            total: (parseFloat(prev.service_fees) || 0) + newPartCosts
+        }));
+    };
+
     const handleAddLog = async () => {
         if (isDelivered) {
             alert("This job is already delivered and cannot be edited.");
@@ -303,7 +378,20 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                                 <tr>
                                     <td style={{ padding: '0.5rem' }}>
                                         <strong>Spare Parts Charge</strong>
-                                        {invoice.spares && <div style={{ fontSize: '0.85rem', color: '#555', marginTop: '4px' }}>Spares used: {invoice.spares}</div>}
+                                        {invoice.spares && (
+                                            <div style={{ fontSize: '0.85rem', color: '#555', marginTop: '4px' }}>
+                                                Spares used: {(() => {
+                                                    if (invoice.spares.startsWith('[')) {
+                                                        try {
+                                                            return JSON.parse(invoice.spares).map(s => `${s.name} (₹${s.cost})`).join(', ');
+                                                        } catch (e) {
+                                                            return invoice.spares;
+                                                        }
+                                                    }
+                                                    return invoice.spares;
+                                                })()}
+                                            </div>
+                                        )}
                                         {invoice.warranty && <div style={{ fontSize: '0.85rem', color: '#555', marginTop: '4px' }}>Warranty: {invoice.warranty}</div>}
                                     </td>
                                     <td style={{ textAlign: 'right', padding: '0.5rem', fontWeight: 'bold' }}>₹{invoice.part_costs || 0}</td>
@@ -522,6 +610,7 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                                                 <option value="Pending">Pending</option>
                                                 <option value="In Progress">In Progress</option>
                                                 <option value="Completed">Completed</option>
+                                                <option value="Warranty">Warranty</option>
                                             </>
                                         ) : (
                                             <>
@@ -531,12 +620,58 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                                                 <option value="Replaced">Replaced</option>
                                                 <option value="Send to Service Center">Send to Service Center</option>
                                                 <option value="Ready">Ready</option>
+                                                <option value="Warranty">Warranty</option>
                                                 <option value="Delivered">Delivered</option>
                                             </>
                                         )}
                                     </select>
                                 )}
                             </div>
+
+                            {/* Warranty Status Update Option */}
+                            {job.status === 'Warranty' && (
+                                <div style={{ background: '#f6f3eb', padding: '1rem', borderRadius: '4px', marginTop: '1rem', border: '1px solid var(--border-color)' }}>
+                                    <h4 style={{ margin: '0 0 0.5rem 0', color: 'var(--accent)', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Warranty Tracking</h4>
+                                    
+                                    {job.warranty_details && (
+                                        <div style={{ marginBottom: '0.75rem', fontSize: '0.85rem' }}>
+                                            <span style={{ color: 'var(--text-secondary)', display: 'block', fontSize: '0.75rem' }}>Warranty Details</span>
+                                            <strong>{job.warranty_details}</strong>
+                                        </div>
+                                    )}
+
+                                    <div>
+                                        <label style={{ fontSize: '0.8rem', color: 'var(--text-primary)', display: 'block', marginBottom: '4px' }}>Warranty Status</label>
+                                        {isDelivered ? (
+                                            <strong style={{ display: 'block', fontSize: '0.95rem', color: 'var(--accent)' }}>
+                                                {job.warranty_status || 'Packed'}
+                                            </strong>
+                                        ) : (
+                                            <select
+                                                value={job.warranty_status || 'Packed'}
+                                                onChange={handleWarrantyStatusChange}
+                                                style={{
+                                                    width: '100%',
+                                                    padding: '0.4rem',
+                                                    background: 'var(--panel-bg)',
+                                                    border: '1px solid var(--border-color)',
+                                                    color: 'var(--text-primary)',
+                                                    borderRadius: '4px',
+                                                    fontSize: '0.9rem',
+                                                    cursor: 'pointer',
+                                                    margin: 0
+                                                }}
+                                            >
+                                                <option value="Packed">Packed</option>
+                                                <option value="Sent">Sent</option>
+                                                <option value="Delivered">Delivered</option>
+                                                <option value="Item Returned">Item Returned</option>
+                                                <option value="Warranty Rejected">Warranty Rejected</option>
+                                            </select>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
 
@@ -580,7 +715,17 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                                     </div>
                                     <div style={{ marginBottom: '0.75rem', fontSize: '0.9rem' }}>
                                         <span style={{ color: '#35a7e6', display: 'block', fontSize: '0.8rem' }}>Spares Used</span>
-                                        <strong>{invoice.spares || 'None'}</strong>
+                                        {sparesList.length > 0 ? (
+                                            <div style={{ marginTop: '4px' }}>
+                                                {sparesList.map((s, idx) => (
+                                                    <div key={idx} style={{ display: 'inline-block', background: '#f2f2f2', padding: '2px 8px', borderRadius: '4px', marginRight: '6px', marginBottom: '4px', fontSize: '0.85rem', border: '1px solid var(--border-color)' }}>
+                                                        {s.name} (₹{s.cost})
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        ) : (
+                                            <strong>None</strong>
+                                        )}
                                     </div>
                                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', fontSize: '0.9rem', alignItems: 'end' }}>
                                         <div>
@@ -597,7 +742,7 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                                 <>
                                     <h3 style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem', margin: '0 0 1rem 0', color: '#35a7e6' }}>Billing & Warranty</h3>
                                     
-                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '0.75rem' }}>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.75rem', marginBottom: '0.75rem' }}>
                                         <div>
                                             <label style={{ fontSize: '0.8rem', color: 'var(--text-primary)', display: 'block', marginBottom: '4px' }}>Service Charge (₹)</label>
                                             <input 
@@ -612,23 +757,59 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                                             <label style={{ fontSize: '0.8rem', color: 'var(--text-primary)', display: 'block', marginBottom: '4px' }}>Spare Cost (₹)</label>
                                             <input 
                                                 type="number" 
-                                                value={invoice.part_costs || ''} 
-                                                onChange={e => setInvoice(prev => ({ ...prev, part_costs: e.target.value }))}
-                                                placeholder="0"
-                                                style={{ width: '100%', padding: '0.4rem', background: 'var(--panel-bg)', border: '1px solid var(--border-color)', color: 'var(--text-primary)', borderRadius: '4px', margin: 0 }}
+                                                disabled
+                                                value={invoice.part_costs || 0} 
+                                                style={{ width: '100%', padding: '0.4rem', background: '#f2f2f2', border: '1px solid var(--border-color)', color: 'var(--text-primary)', borderRadius: '4px', margin: 0, cursor: 'not-allowed' }}
+                                            />
+                                        </div>
+                                        <div>
+                                            <label style={{ fontSize: '0.8rem', color: 'var(--text-primary)', display: 'block', marginBottom: '4px' }}>Total Bill (₹)</label>
+                                            <input 
+                                                type="number" 
+                                                disabled
+                                                value={(parseFloat(invoice.service_fees) || 0) + (parseFloat(invoice.part_costs) || 0)} 
+                                                style={{ width: '100%', padding: '0.4rem', background: '#f2f2f2', border: '1px solid var(--border-color)', color: 'var(--accent)', borderRadius: '4px', margin: 0, cursor: 'not-allowed', fontWeight: 'bold' }}
                                             />
                                         </div>
                                     </div>
 
+                                    {/* Multiple Spares List */}
                                     <div style={{ marginBottom: '0.75rem' }}>
                                         <label style={{ fontSize: '0.8rem', color: 'var(--text-primary)', display: 'block', marginBottom: '4px' }}>Spares Used</label>
-                                        <input 
-                                            type="text" 
-                                            value={invoice.spares || ''} 
-                                            onChange={e => setInvoice(prev => ({ ...prev, spares: e.target.value }))}
-                                            placeholder="e.g. 500GB SSD, Keyboard"
-                                            style={{ width: '100%', padding: '0.4rem', background: 'var(--panel-bg)', border: '1px solid var(--border-color)', color: 'var(--text-primary)', borderRadius: '4px', margin: 0 }}
-                                        />
+                                        
+                                        {sparesList.map((spare, index) => (
+                                            <div key={index} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#f6f3eb', padding: '4px 8px', borderRadius: '4px', marginBottom: '4px', fontSize: '0.85rem', border: '1px solid var(--border-color)' }}>
+                                                <span>{spare.name}</span>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                    <strong>₹{spare.cost}</strong>
+                                                    <button type="button" onClick={() => handleRemoveSpare(index)} style={{ background: 'transparent', border: 'none', color: 'var(--danger)', cursor: 'pointer', padding: '0 4px', fontSize: '1rem', fontWeight: 'bold' }}>✕</button>
+                                                </div>
+                                            </div>
+                                        ))}
+
+                                        <div style={{ display: 'flex', gap: '6px', marginTop: '8px' }}>
+                                            <input 
+                                                type="text" 
+                                                value={newSpareName}
+                                                onChange={e => setNewSpareName(e.target.value)}
+                                                placeholder="Part name..."
+                                                style={{ flex: 2, padding: '0.4rem', background: 'var(--panel-bg)', border: '1px solid var(--border-color)', color: 'var(--text-primary)', borderRadius: '4px', margin: 0 }}
+                                            />
+                                            <input 
+                                                type="number" 
+                                                value={newSpareCost}
+                                                onChange={e => setNewSpareCost(e.target.value)}
+                                                placeholder="Cost..."
+                                                style={{ flex: 1, padding: '0.4rem', background: 'var(--panel-bg)', border: '1px solid var(--border-color)', color: 'var(--text-primary)', borderRadius: '4px', margin: 0 }}
+                                            />
+                                            <button 
+                                                type="button" 
+                                                onClick={handleAddSpare}
+                                                style={{ background: 'var(--accent)', color: 'black', padding: '0 12px', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.9rem' }}
+                                            >
+                                                Add
+                                            </button>
+                                        </div>
                                     </div>
 
                                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '0.5rem', alignItems: 'end' }}>

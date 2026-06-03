@@ -389,7 +389,21 @@ export default function Requests() {
                                     <tr>
                                         <td style={{ padding: '0.5rem' }}>
                                             <strong>Spare Parts Charge</strong>
-                                            {printInvoiceData.invoice.spares && <div style={{ fontSize: '0.8rem', color: '#555', marginTop: '2px' }}>Spares used: {printInvoiceData.invoice.spares}</div>}
+                                            {printInvoiceData.invoice.spares && (
+                                                <div style={{ fontSize: '0.8rem', color: '#555', marginTop: '2px' }}>
+                                                    Spares used: {(() => {
+                                                        const sparesStr = printInvoiceData.invoice.spares;
+                                                        if (sparesStr.startsWith('[')) {
+                                                            try {
+                                                                return JSON.parse(sparesStr).map(s => `${s.name} (₹${s.cost})`).join(', ');
+                                                            } catch (e) {
+                                                                return sparesStr;
+                                                            }
+                                                        }
+                                                        return sparesStr;
+                                                    })()}
+                                                </div>
+                                            )}
                                             {printInvoiceData.invoice.warranty && <div style={{ fontSize: '0.8rem', color: '#555', marginTop: '2px' }}>Warranty: {printInvoiceData.invoice.warranty}</div>}
                                         </td>
                                         <td style={{ textAlign: 'right', padding: '0.5rem', fontWeight: 'bold' }}>₹{printInvoiceData.invoice.part_costs || 0}</td>
