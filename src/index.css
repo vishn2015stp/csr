@@ -317,64 +317,141 @@ button:disabled {
 }
 
 /* Receipt Printing Spec */
+/* A4 Print Layout Specification */
 @media print {
+  @page {
+    size: A4 portrait;
+    margin: 20mm;
+  }
+
   body {
     background-color: #fff !important;
     color: #000 !important;
+    font-family: Arial, sans-serif !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 
   .sidebar,
-  .non-print {
+  .non-print,
+  button,
+  .mobile-header {
     display: none !important;
   }
 
+  /* Reset outer overlay for print */
+  div[style*="position: fixed"] {
+    position: static !important;
+    background: transparent !important;
+    display: block !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    z-index: auto !important;
+  }
+
+  div[style*="background: white"],
+  div[style*="background: var(--panel-bg)"] {
+    background: transparent !important;
+    box-shadow: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+  }
+
   .main-content {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    overflow: visible;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    overflow: visible !important;
   }
 
   .container {
-    padding: 0;
-    margin: 0;
-    max-width: auto;
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: 100% !important;
   }
 
-  /* Target 80mm generic receipt printer */
+  .print-receipt,
+  .invoice-print-area {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 auto !important;
+    font-family: Arial, sans-serif !important;
+    font-size: 11pt !important;
+    color: #000 !important;
+    line-height: 1.6 !important;
+  }
+
+  /* Intake slip grid layout on A4 */
   .print-receipt {
-    width: 70mm;
-    margin: 0;
-    text-align: left;
-    font-family: 'Courier New', Courier, monospace;
-    font-size: 10pt;
-    color: #000;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+  }
+
+  .print-receipt .print-header {
+    grid-column: span 2;
+    text-align: center !important;
+    border-bottom: 2px solid #000 !important;
+    padding-bottom: 15px !important;
+    margin-bottom: 25px !important;
+  }
+
+  .print-receipt .print-header h2 {
+    font-size: 24pt !important;
+    font-weight: 800 !important;
+    margin: 0 0 10px 0 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
   }
 
   .print-receipt p {
-    margin: 4px 0;
+    margin: 4px 0 !important;
+    font-size: 11pt !important;
   }
 
-  .print-header {
-    text-align: center;
-    border-bottom: 1px dashed #000;
-    padding-bottom: 15px;
-    margin-bottom: 15px;
+  .print-receipt br {
+    display: none;
   }
 
-  .print-header h2 {
-    margin: 0 0 5px 0;
-    color: #000;
-    font-size: 14pt;
-    font-weight: bold;
+  .print-receipt .print-terms {
+    grid-column: span 2;
+    margin-top: 40px !important;
+    border-top: 1px dashed #000 !important;
+    padding-top: 20px !important;
+    font-size: 10pt !important;
+    text-align: center !important;
+    color: #444 !important;
   }
 
-  .print-terms {
-    margin-top: 20px;
-    border-top: 1px dashed #000;
-    padding-top: 15px;
-    font-size: 8pt;
-    text-align: center;
+  /* Invoice print elements adjustments */
+  .invoice-print-area h1 {
+    font-size: 24pt !important;
+    font-weight: 800 !important;
+    margin: 0 0 10px 0 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+  }
+
+  table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    margin-top: 25px !important;
+  }
+
+  th {
+    background-color: #f2f2f2 !important;
+    font-weight: bold !important;
+    border-bottom: 2px solid #000 !important;
+    padding: 10px 8px !important;
+  }
+
+  td {
+    border-bottom: 1px solid #ddd !important;
+    padding: 12px 8px !important;
   }
 }
 
