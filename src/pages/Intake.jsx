@@ -116,11 +116,11 @@ export default function Intake() {
 
             const complaintId = uuidv4();
             const now = new Date().toISOString();
-            const finalCsrNumber = formData.csrNumber.trim() || Math.floor(100000 + Math.random() * 900000).toString();
+            const finalCsrNumber = formData.csrNumber.trim() || null;
             
             const isIntaken = formData.serviceMode === 'On Center' ? 1 : 0;
             
-            await api.createComplaint({
+            const created = await api.createComplaint({
                 id: complaintId,
                 csr_number: finalCsrNumber,
                 customer_id: customerId,
@@ -135,11 +135,11 @@ export default function Intake() {
                 warranty_details: formData.isWarranty ? formData.warrantyDetails : '',
                 warranty_status: formData.isWarranty ? 'Packed' : null
             });
-
+ 
             setSuccessData({
                 id: complaintId,
                 date: new Date(now).toLocaleString(),
-                csrNumber: finalCsrNumber,
+                csrNumber: created.csr_number,
                 customerName: formData.name,
                 customerPhone: formData.phone,
                 itemName: formData.itemName || 'Onsite Service Request',

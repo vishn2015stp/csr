@@ -12,7 +12,7 @@ export default function Sidebar({ isOpen, closeSidebar }) {
     }
 
     return (
-        <aside className={`sidebar ${isOpen ? 'open' : ''}`} style={{ display: 'flex', flexDirection: 'column' }}>
+        <aside className={`sidebar ${isOpen ? 'open' : 'closed'}`} style={{ display: 'flex', flexDirection: 'column' }}>
             <div className="sidebar-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <img src="/logo.png" alt="Logo" style={{ height: '32px', width: '32px', borderRadius: '6px', objectFit: 'cover' }} />

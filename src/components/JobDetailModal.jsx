@@ -73,12 +73,36 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                 updates.status = 'Intaken';
             }
 
+            // Detect and log edited fields
+            const changes = [];
+            if ((job.item_name || '').trim() !== (editItemName || '').trim()) {
+                changes.push(`Item Name from "${job.item_name || '—'}" to "${editItemName}"`);
+            }
+            if ((job.serial_no || '').trim() !== (editSerialNo || '').trim()) {
+                changes.push(`Serial No from "${job.serial_no || '—'}" to "${editSerialNo}"`);
+            }
+            if ((job.issue || '').trim() !== (editIssue || '').trim()) {
+                changes.push(`Issue Description from "${job.issue || '—'}" to "${editIssue}"`);
+            }
+            if (job.is_device_intaken === 0 && editIsIntaken) {
+                changes.push('Device Intaken from "No" to "Yes"');
+            }
+
             await api.updateComplaint(jobId, updates);
             setJob(prev => ({
                 ...prev,
                 ...updates
             }));
             setIsEditingProduct(false);
+
+            if (changes.length > 0) {
+                await api.createServiceRecord({
+                    complaint_id: jobId,
+                    technician: user?.username || 'Unknown',
+                    issues: `Edited request details: ${changes.join(', ')}`,
+                    resolution_status: 'Details Updated'
+                });
+            }
 
             if (justIntaken) {
                 await api.createStatusLog({
@@ -93,10 +117,10 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                     issues: `Device intaken for service (Status: Intaken)`,
                     resolution_status: 'Intaken'
                 });
-
-                const sLogs = await api.getServiceRecords(jobId);
-                setLogs(sLogs);
             }
+
+            const sLogs = await api.getServiceRecords(jobId);
+            setLogs(sLogs);
 
             if (onRefresh) onRefresh();
             alert("Product details updated successfully!");

@@ -185,6 +185,9 @@ export default function Settings() {
     const [editUserRole, setEditUserRole] = useState('STAFF')
     const [editUserActive, setEditUserActive] = useState(true)
 
+    // Top-level Settings Tabs State (Print Layout vs. User Management vs. Security/Change Password)
+    const [activeSettingsTab, setActiveSettingsTab] = useState(isAdmin ? 'print' : 'password');
+
     const handleChangePassword = async (e) => {
         e.preventDefault();
         setPasswordMessage({ text: '', type: '' });
@@ -323,13 +326,69 @@ export default function Settings() {
 
     return (
         <div className="container" style={{ maxWidth: '1400px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
                 <h1 style={{ margin: 0 }}>Settings</h1>
                 {isAdmin && (
                     <button onClick={handleBackup} disabled={loadingConfig} style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'var(--panel-bg)', color: 'var(--text-primary)', border: '1px solid var(--border-color)', padding: '0.5rem 1rem', borderRadius: '6px', fontSize: '0.85rem', cursor: 'pointer' }}>
                         <DownloadCloud size={16} color="var(--accent)" /> Backup Database
                     </button>
                 )}
+            </div>
+
+            {/* Top-level settings tabs */}
+            <div style={{ display: 'flex', gap: '0.5rem', borderBottom: '1px solid var(--border-color)', marginBottom: '1.5rem', overflowX: 'auto', paddingBottom: '2px' }}>
+                {isAdmin && (
+                    <button 
+                        onClick={() => setActiveSettingsTab('print')} 
+                        style={{
+                            background: 'transparent',
+                            border: 'none',
+                            padding: '0.75rem 1rem',
+                            borderBottom: activeSettingsTab === 'print' ? '3px solid var(--accent)' : '3px solid transparent',
+                            color: activeSettingsTab === 'print' ? 'var(--accent)' : 'var(--text-secondary)',
+                            fontWeight: 'bold',
+                            cursor: 'pointer',
+                            borderRadius: 0,
+                            margin: 0
+                        }}
+                    >
+                        Print Layout
+                    </button>
+                )}
+                {isAdmin && (
+                    <button 
+                        onClick={() => setActiveSettingsTab('users')} 
+                        style={{
+                            background: 'transparent',
+                            border: 'none',
+                            padding: '0.75rem 1rem',
+                            borderBottom: activeSettingsTab === 'users' ? '3px solid var(--accent)' : '3px solid transparent',
+                            color: activeSettingsTab === 'users' ? 'var(--accent)' : 'var(--text-secondary)',
+                            fontWeight: 'bold',
+                            cursor: 'pointer',
+                            borderRadius: 0,
+                            margin: 0
+                        }}
+                    >
+                        User Management
+                    </button>
+                )}
+                <button 
+                    onClick={() => setActiveSettingsTab('password')} 
+                    style={{
+                        background: 'transparent',
+                        border: 'none',
+                        padding: '0.75rem 1rem',
+                        borderBottom: activeSettingsTab === 'password' ? '3px solid var(--accent)' : '3px solid transparent',
+                        color: activeSettingsTab === 'password' ? 'var(--accent)' : 'var(--text-secondary)',
+                        fontWeight: 'bold',
+                        cursor: 'pointer',
+                        borderRadius: 0,
+                        margin: 0
+                    }}
+                >
+                    Change Password
+                </button>
             </div>
 
             {message.text && (
@@ -344,7 +403,7 @@ export default function Settings() {
             )}
 
             {/* ── PRINT LAYOUT CARD ── */}
-            {isAdmin && (
+            {activeSettingsTab === 'print' && isAdmin && (
                 <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
                     {/* Card header */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '1.25rem 1.5rem', borderBottom: '1px solid var(--border-color)', background: '#f6f3eb' }}>
@@ -436,7 +495,7 @@ export default function Settings() {
             )}
             
             {/* ── USER MANAGEMENT CARD ── */}
-            {isAdmin && (
+            {activeSettingsTab === 'users' && isAdmin && (
                 <div className="card" style={{ padding: 0, overflow: 'hidden', marginTop: '2rem' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '1.25rem 1.5rem', borderBottom: '1px solid var(--border-color)', background: '#f6f3eb' }}>
                         <Users size={22} color="var(--accent)" />
@@ -658,7 +717,8 @@ export default function Settings() {
             )}
 
             {/* ── CHANGE PASSWORD CARD ── */}
-            <div className="card" style={{ padding: 0, overflow: 'hidden', marginTop: '2rem' }}>
+            {activeSettingsTab === 'password' && (
+                <div className="card" style={{ padding: 0, overflow: 'hidden', marginTop: '2rem' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '1.25rem 1.5rem', borderBottom: '1px solid var(--border-color)', background: '#f6f3eb' }}>
                     <Lock size={22} color="var(--accent)" />
                     <div>
@@ -732,7 +792,8 @@ export default function Settings() {
                         </button>
                     </form>
                 </div>
-            </div>
+                </div>
+            )}
         </div>
     )
 }

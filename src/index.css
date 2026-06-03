@@ -26,7 +26,8 @@ body {
 
 #root {
   display: flex;
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
 }
 
 /* Global utility classes */
@@ -158,39 +159,54 @@ button:disabled {
   border-right: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  z-index: 2000;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+.sidebar.closed {
+  transform: translateX(-250px);
 }
 
 @media (max-width: 768px) {
   .sidebar {
-    position: fixed;
-    top: 0;
-    left: -260px;
-    height: 100vh;
+    transform: translateX(-260px);
     width: 260px;
-    z-index: 2000;
-    transition: left 0.3s ease;
-    border-right: 1px solid var(--border-color);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .sidebar.open {
-    left: 0;
+    transform: translateX(0);
   }
 
-  /* Override the flex row adjustments from earlier build */
-  #root {
-    flex-direction: column;
+  .sidebar.closed {
+    transform: translateX(-260px);
   }
 }
 
-/* Mobile Header Wrapper */
-.mobile-header {
+/* Global App Header */
+.app-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 1.5rem;
+  padding: 0 1.5rem;
   background-color: var(--panel-bg);
   border-bottom: 1px solid var(--border-color);
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 250px;
+  height: 60px;
   z-index: 900;
+  transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.app-header.full-width {
+  left: 0;
 }
 
 /* Mobile Overlay Shader */
@@ -198,10 +214,10 @@ button:disabled {
   position: fixed;
   top: 0; 
   left: 0; 
-  right: 0; 
   bottom: 0;
-  background: rgba(0,0,0,0.6);
-  z-index: 1999;
+  right: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 1900;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.3s ease;
@@ -213,14 +229,18 @@ button:disabled {
 }
 
 @media (min-width: 769px) {
-  .mobile-header {
-    display: none;
-  }
   .mobile-overlay {
     display: none;
   }
   .mobile-close-btn {
     display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .app-header {
+    left: 0 !important;
+    width: 100% !important;
   }
 }
 
@@ -278,7 +298,35 @@ button:disabled {
 
 .main-content {
   flex: 1;
-  overflow-y: auto;
+  margin-top: 60px;
+  margin-left: 250px;
+  height: calc(100vh - 60px);
+  overflow: hidden;
+  transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background-color: var(--bg-color);
+  position: relative;
+}
+
+.main-content.full-width {
+  margin-left: 0;
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    margin-left: 0 !important;
+    height: calc(100vh - 60px);
+  }
+}
+
+@media (min-width: 769px) {
+  /* Scroll page container layouts internally for desktop single-screen UX */
+  .container {
+    height: 100%;
+    overflow-y: auto;
+    padding: 1.5rem 2rem !important;
+    display: flex;
+    flex-direction: column;
+  }
 }
 
 /* Status Badges */

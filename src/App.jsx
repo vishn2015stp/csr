@@ -18,7 +18,7 @@ function ProtectedRoute({ children }) {
 
 function App() {
   const { user, loading } = useAuth();
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 768);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -35,20 +35,27 @@ function App() {
 
   return (
     <>
-      <div className="mobile-header">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--accent)', fontWeight: 'bold', fontSize: '1.25rem' }}>
-          <img src="/logo.png" alt="Logo" style={{ height: '28px', width: '28px', borderRadius: '4px', objectFit: 'cover' }} /> Hyper-CSR
+      <header className={`app-header ${isSidebarOpen ? '' : 'full-width'}`}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} style={{ background: 'transparent', padding: '0.25rem', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', margin: 0 }}>
+            <Menu size={24} color="var(--text-primary)" />
+          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--accent)', fontWeight: 'bold', fontSize: '1.25rem' }}>
+            <img src="/logo.png" alt="Logo" style={{ height: '28px', width: '28px', borderRadius: '4px', objectFit: 'cover' }} /> Hyper-CSR
+          </div>
         </div>
-        <button onClick={() => setIsSidebarOpen(true)} style={{ background: 'transparent', padding: '0.25rem', border: 'none', cursor: 'pointer' }}>
-          <Menu size={28} color="var(--text-primary)" />
-        </button>
-      </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <div style={{ background: '#f6f3eb', padding: '0.4rem 0.8rem', borderRadius: '4px', fontSize: '0.85rem', border: '1px solid var(--border-color)', fontWeight: 'bold' }}>
+            User: <span style={{ color: '#35a7e6' }}>{user?.username}</span>
+          </div>
+        </div>
+      </header>
 
       <Sidebar isOpen={isSidebarOpen} closeSidebar={() => setIsSidebarOpen(false)} />
       
       <div className={`mobile-overlay ${isSidebarOpen ? 'show' : ''}`} onClick={() => setIsSidebarOpen(false)}></div>
 
-      <main className="main-content">
+      <main className={`main-content ${isSidebarOpen ? '' : 'full-width'}`}>
         <Routes>
           <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/intake" element={<ProtectedRoute><Intake /></ProtectedRoute>} />

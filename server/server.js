@@ -284,13 +284,35 @@ app.post('/api/complaints', async (req, res) => {
         finalIsDeviceIntaken = finalServiceMode === 'Onsite' ? 0 : 1;
     }
 
+    let finalCsrNumber = csr_number;
+    if (!finalCsrNumber || !finalCsrNumber.trim()) {
+        try {
+            const maxCsrRes = await db.query(`
+                SELECT csr_number 
+                FROM complaints 
+                WHERE csr_number ~ '^[0-9]+$' 
+                ORDER BY CAST(csr_number AS INTEGER) DESC 
+                LIMIT 1
+            `);
+            let nextCsr = 100001; // default starting point
+            if (maxCsrRes.rows.length > 0) {
+                const maxVal = parseInt(maxCsrRes.rows[0].csr_number, 10);
+                nextCsr = maxVal + 1;
+            }
+            finalCsrNumber = nextCsr.toString();
+        } catch (err) {
+            console.error("Error generating sequential CSR number:", err.message);
+            finalCsrNumber = Math.floor(100000 + Math.random() * 900000).toString(); // fallback
+        }
+    }
+
     try {
         await db.query(`
             INSERT INTO complaints 
             (id, customer_id, item_name, serial_no, issue, status, csr_number, flag_ok, flag_r, flag_w, flag_p, created_at, service_type, service_mode, is_device_intaken, warranty_details, warranty_status)
             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
         `, [
-            id, customer_id, item_name, serial_no, issue, status || 'Pending', csr_number, 
+            id, customer_id, item_name, serial_no, issue, status || 'Pending', finalCsrNumber, 
             !!flag_ok, !!flag_r, !!flag_w, !!flag_p, ts, finalServiceType, finalServiceMode, finalIsDeviceIntaken,
             warranty_details || null, warranty_status || null
         ]);
