@@ -340,19 +340,27 @@ app.get('/api/invoices', async (req, res) => {
 // =============== ANALYTICS / DASHBOARD ===============
 app.get('/api/dashboard', async (req, res) => {
     try {
-        const totalRes = await db.query('SELECT COUNT(*) as count FROM complaints');
-        const pendingRes = await db.query("SELECT COUNT(*) as count FROM complaints WHERE status = 'Pending'");
-        const repairingRes = await db.query("SELECT COUNT(*) as count FROM complaints WHERE status = 'Repairing'");
-        const readyRes = await db.query("SELECT COUNT(*) as count FROM complaints WHERE status = 'Ready'");
-        const deliveredRes = await db.query("SELECT COUNT(*) as count FROM complaints WHERE status = 'Delivered'");
-
-        let query = `
-            SELECT c.*, cust.name as "customerName", cust.phone as "customerPhone" 
-            FROM complaints c 
-            LEFT JOIN customers cust ON c.customer_id = cust.id
-        `;
-        const complaintsRes = await db.query(query);
-        const logsRes = await db.query('SELECT * FROM status_logs');
+        const [
+            totalRes,
+            pendingRes,
+            repairingRes,
+            readyRes,
+            deliveredRes,
+            complaintsRes,
+            logsRes
+        ] = await Promise.all([
+            db.query('SELECT COUNT(*) as count FROM complaints'),
+            db.query("SELECT COUNT(*) as count FROM complaints WHERE status = 'Pending'"),
+            db.query("SELECT COUNT(*) as count FROM complaints WHERE status = 'Repairing'"),
+            db.query("SELECT COUNT(*) as count FROM complaints WHERE status = 'Ready'"),
+            db.query("SELECT COUNT(*) as count FROM complaints WHERE status = 'Delivered'"),
+            db.query(`
+                SELECT c.*, cust.name as "customerName", cust.phone as "customerPhone" 
+                FROM complaints c 
+                LEFT JOIN customers cust ON c.customer_id = cust.id
+            `),
+            db.query('SELECT * FROM status_logs')
+        ]);
 
         res.json({
             total: parseInt(totalRes.rows[0].count, 10),
