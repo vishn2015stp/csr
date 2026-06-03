@@ -27,7 +27,7 @@ export default function Dashboard() {
         const complaints = statsData.complaints || [];
         setAllComplaints(complaints);
 
-        const pending = complaints.filter(c => c.status !== 'Delivered');
+        const pending = complaints.filter(c => c.status !== 'Delivered' && c.status !== 'Completed');
         const onSite = pending.filter(c => c.service_type === 'On-Site' || c.service_mode === 'Onsite');
 
         const statusCounts = {};
@@ -67,12 +67,18 @@ export default function Dashboard() {
         : allComplaints;
 
     // Derived stats lists
-    const filteredPending = filteredComplaints.filter(c => c.status !== 'Delivered');
+    const filteredPending = filteredComplaints.filter(c => c.status !== 'Delivered' && c.status !== 'Completed');
     const filteredPendingWorks = filteredPending.filter(c => c.service_type !== 'On-Site' && c.service_mode !== 'Onsite');
     const filteredPendingOnSite = filteredPending.filter(c => c.service_type === 'On-Site' || c.service_mode === 'Onsite');
     
-    // For recent requests, if searching, show all matching. Otherwise, show the top 8.
-    const sortedFiltered = [...filteredComplaints].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    // Calculate onsite stats for the header badge
+    const activeOnsiteRequests = filteredComplaints.filter(c => (c.service_type === 'On-Site' || c.service_mode === 'Onsite') && c.status !== 'Delivered');
+    const completedOnsiteCount = activeOnsiteRequests.filter(c => c.status === 'Completed').length;
+    const totalOnsiteCount = activeOnsiteRequests.length;
+    
+    // For recent requests, if searching, show all matching. Otherwise, show the top 8 (excluding delivered/completed).
+    const activeComplaints = filteredComplaints.filter(c => c.status !== 'Delivered' && c.status !== 'Completed');
+    const sortedFiltered = [...activeComplaints].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
     const displayedRecentRequests = query ? sortedFiltered : sortedFiltered.slice(0, 8);
 
     const WidgetHeader = ({ title, icon: Icon }) => (
@@ -420,31 +426,6 @@ export default function Dashboard() {
 
 
 
-                    <div style={widgetStyle}>
-                        <WidgetHeader title="Pending Field Tasks (On-Site)" icon={AlertCircle} />
-                        <ul style={{ listStyle: 'none', padding: 0, margin: 0, fontSize: '0.9rem', maxHeight: '300px', overflowY: 'auto' }}>
-                            {filteredPendingOnSite.map(work => (
-                                <li
-                                    key={work.id}
-                                    onClick={() => setViewingJob(work.id)}
-                                    style={{ display: 'flex', justifyContent: 'space-between', padding: '0.75rem 1rem', background: '#3b4252', marginBottom: '0.5rem', borderRadius: '4px', borderLeft: `3px solid var(--danger)`, cursor: 'pointer' }}>
-                                    <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                        <strong style={{ color: '#eceff4', fontSize: '1rem' }}>{work.item_name}</strong>
-                                        <span style={{ fontSize: '0.8rem', color: '#88c0d0', marginTop: '2px' }}>{work.customerName} - {work.customerPhone}</span>
-                                    </div>
-                                    <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                                        <div style={{ color: '#d8dee9', fontWeight: 'bold', fontSize: '0.85rem' }}>{work.status}</div>
-                                    </div>
-                                </li>
-                            ))}
-                            {filteredPendingOnSite.length === 0 && (
-                                <li style={{ padding: '2rem 1rem', textAlign: 'center', color: '#4c566a', border: '1px dashed #4c566a', borderRadius: '4px' }}>
-                                    No pending on-site requests.
-                                </li>
-                            )}
-                        </ul>
-                    </div>
-
                     {/* Diagnostics / Pending Tasks Widget */}
                     <div style={widgetStyle}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #3b4252', paddingBottom: '0.75rem', marginBottom: '1rem' }}>
@@ -502,6 +483,52 @@ export default function Dashboard() {
                             {filteredPendingWorks.length === 0 && (
                                 <li style={{ padding: '2rem 1rem', textAlign: 'center', color: '#4c566a', border: '1px dashed #4c566a', borderRadius: '4px' }}>
                                     All diagnostic queues are clear.
+                                </li>
+                            )}
+                        </ul>
+                    </div>
+
+                    <div style={widgetStyle}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #3b4252', paddingBottom: '0.75rem', marginBottom: '1rem' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', color: '#eceff4' }}>
+                                <AlertCircle size={18} style={{ marginRight: '8px', color: '#88c0d0' }} />
+                                <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '500' }}>Pending Field Tasks (On-Site)</h3>
+                            </div>
+                            <div style={{
+                                background: 'rgba(163, 190, 140, 0.1)',
+                                color: '#a3be8c',
+                                border: '1px solid rgba(163, 190, 140, 0.3)',
+                                borderRadius: '16px',
+                                padding: '3px 10px',
+                                fontSize: '0.8rem',
+                                fontWeight: 'bold'
+                            }}>
+                                {completedOnsiteCount}/{totalOnsiteCount}
+                            </div>
+                        </div>
+                        <ul style={{ listStyle: 'none', padding: 0, margin: 0, fontSize: '0.9rem', maxHeight: '300px', overflowY: 'auto' }}>
+                            {filteredPendingOnSite.map(work => {
+                                let borderLeftColor = 'var(--danger)'; // Pending
+                                if (work.status === 'In Progress') borderLeftColor = '#88c0d0'; // Blue
+                                
+                                return (
+                                    <li
+                                        key={work.id}
+                                        onClick={() => setViewingJob(work.id)}
+                                        style={{ display: 'flex', justifyContent: 'space-between', padding: '0.75rem 1rem', background: '#3b4252', marginBottom: '0.5rem', borderRadius: '4px', borderLeft: `3px solid ${borderLeftColor}`, cursor: 'pointer' }}>
+                                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                            <strong style={{ color: '#eceff4', fontSize: '1rem' }}>{work.item_name}</strong>
+                                            <span style={{ fontSize: '0.8rem', color: '#88c0d0', marginTop: '2px' }}>{work.customerName} - {work.customerPhone}</span>
+                                        </div>
+                                        <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                                            <div style={{ color: '#d8dee9', fontWeight: 'bold', fontSize: '0.85rem' }}>{work.status}</div>
+                                        </div>
+                                    </li>
+                                );
+                            })}
+                            {filteredPendingOnSite.length === 0 && (
+                                <li style={{ padding: '2rem 1rem', textAlign: 'center', color: '#4c566a', border: '1px dashed #4c566a', borderRadius: '4px' }}>
+                                    No pending on-site requests.
                                 </li>
                             )}
                         </ul>
