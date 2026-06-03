@@ -200,6 +200,7 @@ export default function Dashboard() {
                                         else if (work.status === 'Delivered' || work.status === 'Completed') statusColor = '#a3be8c';
                                         else if (work.status === 'Ready for Delivery' || work.status === 'Ready') statusColor = '#8fbcbb';
                                         else if (work.status === 'In Progress') statusColor = '#88c0d0';
+                                        else if (work.status === 'Intaken') statusColor = '#b48ead';
                                         else statusColor = '#ebcb8b';
                                         
                                         return (
@@ -353,6 +354,7 @@ export default function Dashboard() {
                                         else if (item.status === 'Delivered' || item.status === 'Completed') statusColor = '#a3be8c';
                                         else if (item.status === 'Ready for Delivery' || item.status === 'Ready') statusColor = '#8fbcbb';
                                         else if (item.status === 'In Progress') statusColor = '#88c0d0';
+                                        else if (item.status === 'Intaken') statusColor = '#b48ead';
                                         else statusColor = '#ebcb8b';
 
                                         return (
@@ -527,6 +529,7 @@ export default function Dashboard() {
                                     else if (req.status === 'Delivered' || req.status === 'Completed') statusColor = '#a3be8c';
                                     else if (req.status === 'Ready for Delivery' || req.status === 'Ready') statusColor = '#8fbcbb';
                                     else if (req.status === 'In Progress') statusColor = '#88c0d0';
+                                    else if (req.status === 'Intaken') statusColor = '#b48ead';
                                     else statusColor = '#ebcb8b';
                                     return (
                                         <tr

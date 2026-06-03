@@ -63,12 +63,37 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                 issue: editIssue,
                 is_device_intaken: job.is_device_intaken === 1 ? 1 : (editIsIntaken ? 1 : 0)
             };
+
+            const justIntaken = job.is_device_intaken === 0 && updates.is_device_intaken === 1;
+            if (justIntaken) {
+                updates.status = 'Intaken';
+            }
+
             await api.updateComplaint(jobId, updates);
             setJob(prev => ({
                 ...prev,
                 ...updates
             }));
             setIsEditingProduct(false);
+
+            if (justIntaken) {
+                await api.createStatusLog({
+                    complaint_id: jobId,
+                    status: 'Intaken',
+                    technician: user?.username || 'Unknown'
+                });
+
+                await api.createServiceRecord({
+                    complaint_id: jobId,
+                    technician: user?.username || 'Unknown',
+                    issues: `Device intaken for service (Status: Intaken)`,
+                    resolution_status: 'Intaken'
+                });
+
+                const sLogs = await api.getServiceRecords(jobId);
+                setLogs(sLogs);
+            }
+
             if (onRefresh) onRefresh();
             alert("Product details updated successfully!");
         } catch (err) {
@@ -79,16 +104,35 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
     const handleQuickIntake = async () => {
         try {
             const updates = {
-                is_device_intaken: 1
+                is_device_intaken: 1,
+                status: 'Intaken'
             };
             await api.updateComplaint(jobId, updates);
             setJob(prev => ({
                 ...prev,
-                is_device_intaken: 1
+                is_device_intaken: 1,
+                status: 'Intaken'
             }));
             setEditIsIntaken(true);
+
+            await api.createStatusLog({
+                complaint_id: jobId,
+                status: 'Intaken',
+                technician: user?.username || 'Unknown'
+            });
+
+            await api.createServiceRecord({
+                complaint_id: jobId,
+                technician: user?.username || 'Unknown',
+                issues: `Device intaken for service (Status: Intaken)`,
+                resolution_status: 'Intaken'
+            });
+
+            const sLogs = await api.getServiceRecords(jobId);
+            setLogs(sLogs);
+
             if (onRefresh) onRefresh();
-            alert("Device marked as Taken for Service!");
+            alert("Device marked as Taken for Service! Status updated to Intaken.");
         } catch (err) {
             alert("Failed to update status: " + err.message);
         }
@@ -469,6 +513,7 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                                         ) : (
                                             <>
                                                 <option value="Pending">Pending</option>
+                                                <option value="Intaken">Intaken</option>
                                                 <option value="Waiting for Spare">Waiting for Spare</option>
                                                 <option value="Replaced">Replaced</option>
                                                 <option value="Send to Service Center">Send to Service Center</option>
