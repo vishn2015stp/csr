@@ -27,10 +27,6 @@ export default function Sidebar({ isOpen, closeSidebar }) {
                     <LayoutDashboard size={20} />
                     Dashboard
                 </NavLink>
-                <NavLink to="/intake" onClick={closeSidebar} className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>
-                    <ClipboardList size={20} />
-                    Service Request
-                </NavLink>
                 <NavLink to="/requests" onClick={closeSidebar} className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>
                     <History size={20} />
                     All Requests

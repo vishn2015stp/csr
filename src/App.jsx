@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { Routes, Route, Navigate } from 'react-router-dom'
-import { Menu } from 'lucide-react'
+import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom'
+import { Menu, Plus } from 'lucide-react'
 import Sidebar from './components/Sidebar'
 import Intake from './pages/Intake'
 import Settings from './pages/Settings'
@@ -19,6 +19,8 @@ function ProtectedRoute({ children }) {
 function App() {
   const { user, loading } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   if (loading) return null;
 
@@ -55,6 +57,13 @@ function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
+
+      {location.pathname !== '/intake' && (
+        <button onClick={() => navigate('/intake')} className="floating-add-btn" title="Add New Service Request">
+          <Plus size={20} />
+          <span>Add New</span>
+        </button>
+      )}
     </>
   )
 }
