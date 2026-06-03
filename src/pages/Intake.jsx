@@ -166,7 +166,7 @@ export default function Intake() {
                             <input type="tel" name="phone" required value={formData.phone} onChange={handleChange} placeholder="e.g. 555-0100" />
                             
                             {matchedCustomers.length > 0 && (
-                                <div style={{ background: '#3b4252', padding: '0.75rem', borderRadius: '4px', marginBottom: '1.25rem', border: '1px solid #88c0d0' }}>
+                                <div style={{ background: '#3b4252', padding: '0.75rem', borderRadius: '4px', marginBottom: '1.25rem', border: '1px solid #35a7e6' }}>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem', borderBottom: '1px solid #4c566a', paddingBottom: '0.25rem' }}>
                                         <span style={{ fontSize: '0.85rem', color: '#eceff4', fontWeight: 'bold' }}>Previous customer records found:</span>
                                         <button type="button" onClick={() => setMatchedCustomers([])} style={{ background: '#bf616a', color: 'white', padding: '2px 6px', fontSize: '0.7rem', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Dismiss</button>
@@ -176,10 +176,10 @@ export default function Intake() {
                                             <div key={cust.id || idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#2e3440', padding: '0.5rem', borderRadius: '4px', fontSize: '0.8rem' }}>
                                                 <div style={{ color: '#eceff4', flex: 1, paddingRight: '10px' }}>
                                                     <strong>{cust.name}</strong>
-                                                    {cust.email && <span style={{ color: '#88c0d0', marginLeft: '6px' }}>({cust.email})</span>}
+                                                    {cust.email && <span style={{ color: '#35a7e6', marginLeft: '6px' }}>({cust.email})</span>}
                                                     {cust.address && <div style={{ color: '#d8dee9', fontSize: '0.75rem', marginTop: '2px' }}>{cust.address}</div>}
                                                 </div>
-                                                <button type="button" onClick={() => handleAutofill(cust)} style={{ background: '#88c0d0', color: 'black', padding: '3px 8px', fontSize: '0.75rem', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', whiteSpace: 'nowrap' }}>Autofill</button>
+                                                <button type="button" onClick={() => handleAutofill(cust)} style={{ background: '#35a7e6', color: 'black', padding: '3px 8px', fontSize: '0.75rem', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', whiteSpace: 'nowrap' }}>Autofill</button>
                                             </div>
                                         ))}
                                     </div>

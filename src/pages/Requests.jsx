@@ -113,7 +113,7 @@ export default function Requests() {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
                     <h1 style={{ margin: 0, fontSize: '1.8rem', color: '#eceff4' }}>Service Request Directory</h1>
                     <div style={{ background: '#3b4252', padding: '0.5rem 1rem', borderRadius: '4px', fontSize: '0.9rem', border: '1px solid #4c566a' }}>
-                        Total Records: <span style={{ color: '#88c0d0', fontWeight: 'bold' }}>{filteredRequests.length}</span>
+                        Total Records: <span style={{ color: '#35a7e6', fontWeight: 'bold' }}>{filteredRequests.length}</span>
                     </div>
                 </div>
 
@@ -131,7 +131,7 @@ export default function Requests() {
                             padding: '0.5rem 1rem',
                             gap: '10px',
                         }}>
-                            <Search size={18} color="#88c0d0" />
+                            <Search size={18} color="#35a7e6" />
                             <input
                                 type="text"
                                 value={searchQuery}
@@ -149,7 +149,7 @@ export default function Requests() {
                                 }}
                             />
                             {searchQuery && (
-                                <button onClick={() => setSearchQuery('')} style={{ background: 'transparent', border: 'none', color: '#88c0d0', cursor: 'pointer', display: 'flex' }}>
+                                <button onClick={() => setSearchQuery('')} style={{ background: 'transparent', border: 'none', color: '#35a7e6', cursor: 'pointer', display: 'flex' }}>
                                     <X size={16} />
                                 </button>
                             )}
@@ -216,7 +216,7 @@ export default function Requests() {
                         <table style={{ width: '100%', fontSize: '0.9rem', borderCollapse: 'collapse', minWidth: '900px' }}>
                             <thead>
                                 <tr style={{ background: '#3b4252', textAlign: 'left' }}>
-                                    <th style={{ padding: '0.75rem 1rem', borderRadius: '4px 0 0 4px', fontWeight: '600', color: '#88c0d0' }}>CSR #</th>
+                                    <th style={{ padding: '0.75rem 1rem', borderRadius: '4px 0 0 4px', fontWeight: '600', color: '#35a7e6' }}>CSR #</th>
                                     <th style={{ padding: '0.75rem 1rem', fontWeight: '600' }}>Customer</th>
                                     <th style={{ padding: '0.75rem 1rem', fontWeight: '600' }}>Contact Phone</th>
                                     <th style={{ padding: '0.75rem 1rem', fontWeight: '600' }}>Device</th>
@@ -231,7 +231,7 @@ export default function Requests() {
                                      if (req.status === 'Pending') statusColor = '#bf616a';
                                      else if (req.status === 'Delivered' || req.status === 'Completed') statusColor = '#a3be8c';
                                      else if (req.status === 'Ready for Delivery' || req.status === 'Ready') statusColor = '#8fbcbb';
-                                     else if (req.status === 'In Progress') statusColor = '#88c0d0';
+                                     else if (req.status === 'In Progress') statusColor = '#35a7e6';
                                      else if (req.status === 'Intaken') statusColor = '#b48ead';
                                      else statusColor = '#ebcb8b';
                                     
@@ -240,7 +240,7 @@ export default function Requests() {
                                             key={req.id}
                                             style={{ borderBottom: '1px solid #3b4252', transition: 'background 0.15s' }}
                                         >
-                                            <td style={{ padding: '0.85rem 1rem', fontWeight: 'bold', color: '#88c0d0' }}>#{req.csr_number || req.id.split('-')[0].toUpperCase()}</td>
+                                            <td style={{ padding: '0.85rem 1rem', fontWeight: 'bold', color: '#35a7e6' }}>#{req.csr_number || req.id.split('-')[0].toUpperCase()}</td>
                                             <td style={{ padding: '0.85rem 1rem', color: '#eceff4', fontWeight: '500' }}>{req.customerName || '—'}</td>
                                             <td style={{ padding: '0.85rem 1rem', color: '#d8dee9' }}>{req.customerPhone || '—'}</td>
                                             <td style={{ padding: '0.85rem 1rem', color: '#eceff4' }}>{req.item_name}</td>
@@ -258,7 +258,7 @@ export default function Requests() {
                                                     {req.status}
                                                 </span>
                                             </td>
-                                            <td style={{ padding: '0.85rem 1rem', color: '#88c0d0', fontSize: '0.85rem' }}>
+                                            <td style={{ padding: '0.85rem 1rem', color: '#35a7e6', fontSize: '0.85rem' }}>
                                                 {new Date(req.created_at).toLocaleDateString()}
                                             </td>
                                             <td style={{ padding: '0.85rem 1rem', textAlign: 'right' }}>
@@ -273,7 +273,7 @@ export default function Requests() {
                                                     <button 
                                                         onClick={() => handlePrintIntake(req)}
                                                         title="Print Intake Slip"
-                                                        style={{ background: '#88c0d0', color: '#2e3440', padding: '0.35rem 0.6rem', borderRadius: '4px', cursor: 'pointer', border: 'none', display: 'flex', alignItems: 'center' }}
+                                                        style={{ background: '#35a7e6', color: '#2e3440', padding: '0.35rem 0.6rem', borderRadius: '4px', cursor: 'pointer', border: 'none', display: 'flex', alignItems: 'center' }}
                                                     >
                                                         <Printer size={15} />
                                                     </button>

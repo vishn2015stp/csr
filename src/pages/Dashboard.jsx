@@ -83,7 +83,7 @@ export default function Dashboard() {
 
     const WidgetHeader = ({ title, icon: Icon }) => (
         <div style={{ display: 'flex', alignItems: 'center', borderBottom: '1px solid #3b4252', paddingBottom: '0.75rem', marginBottom: '1rem', color: '#eceff4' }}>
-            <Icon size={18} style={{ marginRight: '8px', color: '#88c0d0' }} />
+            <Icon size={18} style={{ marginRight: '8px', color: '#35a7e6' }} />
             <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '500' }}>{title}</h3>
         </div>
     );
@@ -111,7 +111,7 @@ export default function Dashboard() {
                             <h2 style={{ margin: 0, fontSize: '1.8rem', color: '#eceff4', fontWeight: 'bold' }}>
                                 {isOnsite ? 'Detailed Pending On-Site Queue' : 'Detailed Pending In-Shop Queue'}
                             </h2>
-                            <p style={{ margin: '4px 0 0 0', color: '#88c0d0', fontSize: '0.95rem' }}>
+                            <p style={{ margin: '4px 0 0 0', color: '#35a7e6', fontSize: '0.95rem' }}>
                                 {isOnsite 
                                     ? `Currently showing ${readyCount} in progress out of ${totalCount} total pending field tasks`
                                     : `Currently showing ${readyCount} ready for delivery out of ${totalCount} total pending in-shop devices`}
@@ -129,7 +129,7 @@ export default function Dashboard() {
                                     gap: '10px',
                                     width: '100%',
                                 }}>
-                                    <Search size={16} color="#88c0d0" />
+                                    <Search size={16} color="#35a7e6" />
                                     <input
                                         type="text"
                                         value={searchQuery}
@@ -152,7 +152,7 @@ export default function Dashboard() {
                                             style={{
                                                 background: 'transparent',
                                                 border: 'none',
-                                                color: '#88c0d0',
+                                                color: '#35a7e6',
                                                 cursor: 'pointer',
                                                 padding: '2px',
                                                 display: 'flex',
@@ -168,8 +168,8 @@ export default function Dashboard() {
                                 onClick={() => setShowDetailedTable(false)}
                                 style={{
                                     background: 'transparent',
-                                    border: '1px solid #88c0d0',
-                                    color: '#88c0d0',
+                                    border: '1px solid #35a7e6',
+                                    color: '#35a7e6',
                                     padding: '0.6rem 1.2rem',
                                     borderRadius: '24px',
                                     cursor: 'pointer',
@@ -181,7 +181,7 @@ export default function Dashboard() {
                                     flexShrink: 0
                                 }}
                                 onMouseEnter={e => {
-                                    e.currentTarget.style.background = 'rgba(136, 192, 208, 0.1)';
+                                    e.currentTarget.style.background = 'rgba(53, 167, 230, 0.1)';
                                 }}
                                 onMouseLeave={e => {
                                     e.currentTarget.style.background = 'transparent';
@@ -197,7 +197,7 @@ export default function Dashboard() {
                             <table style={{ width: '100%', fontSize: '0.95rem', borderCollapse: 'collapse', minWidth: '800px' }}>
                                 <thead>
                                     <tr style={{ background: '#3b4252', textAlign: 'left' }}>
-                                        <th style={{ padding: '0.75rem 1rem', borderRadius: '4px 0 0 4px', fontWeight: '600', color: '#88c0d0' }}>CSR #</th>
+                                        <th style={{ padding: '0.75rem 1rem', borderRadius: '4px 0 0 4px', fontWeight: '600', color: '#35a7e6' }}>CSR #</th>
                                         <th style={{ padding: '0.75rem 1rem', fontWeight: '600' }}>Customer</th>
                                         <th style={{ padding: '0.75rem 1rem', fontWeight: '600' }}>Phone</th>
                                         <th style={{ padding: '0.75rem 1rem', fontWeight: '600' }}>Device / Item</th>
@@ -213,7 +213,7 @@ export default function Dashboard() {
                                         if (work.status === 'Pending') statusColor = '#bf616a';
                                         else if (work.status === 'Delivered' || work.status === 'Completed') statusColor = '#a3be8c';
                                         else if (work.status === 'Ready for Delivery' || work.status === 'Ready') statusColor = '#8fbcbb';
-                                        else if (work.status === 'In Progress') statusColor = '#88c0d0';
+                                        else if (work.status === 'In Progress') statusColor = '#35a7e6';
                                         else if (work.status === 'Intaken') statusColor = '#b48ead';
                                         else statusColor = '#ebcb8b';
                                         
@@ -224,7 +224,7 @@ export default function Dashboard() {
                                                 onMouseEnter={e => e.currentTarget.style.background = '#3b4252'}
                                                 onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
                                             >
-                                                <td style={{ padding: '1rem', fontWeight: 'bold', color: '#88c0d0' }}>#{work.csr_number || work.id.split('-')[0].toUpperCase()}</td>
+                                                <td style={{ padding: '1rem', fontWeight: 'bold', color: '#35a7e6' }}>#{work.csr_number || work.id.split('-')[0].toUpperCase()}</td>
                                                 <td style={{ padding: '1rem', color: '#eceff4', fontWeight: '500' }}>{work.customerName || '—'}</td>
                                                 <td style={{ padding: '1rem', color: '#d8dee9' }}>{work.customerPhone || '—'}</td>
                                                 <td style={{ padding: '1rem', color: '#eceff4' }}>{work.item_name || '—'}</td>
@@ -243,14 +243,14 @@ export default function Dashboard() {
                                                         {work.status}
                                                     </span>
                                                 </td>
-                                                <td style={{ padding: '1rem', fontSize: '0.85rem', color: '#88c0d0' }}>
+                                                <td style={{ padding: '1rem', fontSize: '0.85rem', color: '#35a7e6' }}>
                                                     {new Date(work.created_at).toLocaleDateString()}
                                                 </td>
                                                 <td style={{ padding: '1rem', textAlign: 'right' }}>
                                                     <button 
                                                         onClick={() => setViewingJob(work.id)}
                                                         style={{
-                                                            background: '#88c0d0',
+                                                            background: '#35a7e6',
                                                             color: '#2e3440',
                                                             border: 'none',
                                                             padding: '0.4rem 0.8rem',
@@ -262,7 +262,7 @@ export default function Dashboard() {
                                                             margin: 0
                                                         }}
                                                         onMouseEnter={e => e.currentTarget.style.background = '#8fbcbb'}
-                                                        onMouseLeave={e => e.currentTarget.style.background = '#88c0d0'}
+                                                        onMouseLeave={e => e.currentTarget.style.background = '#35a7e6'}
                                                     >
                                                         Details
                                                     </button>
@@ -300,17 +300,17 @@ export default function Dashboard() {
                     <div style={{ position: 'relative', width: '100%', maxWidth: '500px', zIndex: 1000 }}>
                         <div style={{
                             background: '#2e3440',
-                            border: isSearchFocused ? '1px solid #88c0d0' : '1px solid #3b4252',
+                            border: isSearchFocused ? '1px solid #35a7e6' : '1px solid #3b4252',
                             borderRadius: '24px',
                             display: 'flex',
                             alignItems: 'center',
                             padding: '0.6rem 1.2rem',
                             gap: '10px',
                             width: '100%',
-                            boxShadow: isSearchFocused ? '0 0 10px rgba(136, 192, 208, 0.3)' : '0 4px 6px rgba(0,0,0,0.15)',
+                            boxShadow: isSearchFocused ? '0 0 10px rgba(53, 167, 230, 0.3)' : '0 4px 6px rgba(0,0,0,0.15)',
                             transition: 'all 0.2s ease-in-out'
                         }}>
-                            <Search size={18} color={isSearchFocused ? '#88c0d0' : '#4c566a'} />
+                            <Search size={18} color={isSearchFocused ? '#35a7e6' : '#4c566a'} />
                             <input
                                 type="text"
                                 value={searchQuery}
@@ -333,7 +333,7 @@ export default function Dashboard() {
                                     style={{
                                         background: 'transparent',
                                         border: 'none',
-                                        color: '#88c0d0',
+                                        color: '#35a7e6',
                                         cursor: 'pointer',
                                         padding: '2px',
                                         display: 'flex',
@@ -367,7 +367,7 @@ export default function Dashboard() {
                                         if (item.status === 'Pending') statusColor = '#bf616a';
                                         else if (item.status === 'Delivered' || item.status === 'Completed') statusColor = '#a3be8c';
                                         else if (item.status === 'Ready for Delivery' || item.status === 'Ready') statusColor = '#8fbcbb';
-                                        else if (item.status === 'In Progress') statusColor = '#88c0d0';
+                                        else if (item.status === 'In Progress') statusColor = '#35a7e6';
                                         else if (item.status === 'Intaken') statusColor = '#b48ead';
                                         else statusColor = '#ebcb8b';
 
@@ -392,7 +392,7 @@ export default function Dashboard() {
                                             >
                                                 <div style={{ display: 'flex', flexDirection: 'column' }}>
                                                     <div>
-                                                        <span style={{ color: '#88c0d0', fontWeight: 'bold', marginRight: '8px' }}>#{item.csr_number || item.id.split('-')[0].toUpperCase()}</span>
+                                                        <span style={{ color: '#35a7e6', fontWeight: 'bold', marginRight: '8px' }}>#{item.csr_number || item.id.split('-')[0].toUpperCase()}</span>
                                                         <strong style={{ color: '#eceff4' }}>{item.item_name}</strong>
                                                     </div>
                                                     <div style={{ fontSize: '0.8rem', color: '#d8dee9', marginTop: '2px' }}>
@@ -424,7 +424,7 @@ export default function Dashboard() {
                     </div>
                 </div>
                 <div style={{ background: '#3b4252', padding: '0.5rem 1rem', borderRadius: '4px', fontSize: '0.9rem', border: '1px solid #4c566a', flexShrink: 0 }}>
-                    User: <span style={{ color: '#88c0d0', fontWeight: 'bold' }}>{user?.username}</span> | Host: Hyper-CSR
+                    User: <span style={{ color: '#35a7e6', fontWeight: 'bold' }}>{user?.username}</span> | Host: Hyper-CSR
                 </div>
             </div>
 
@@ -438,7 +438,7 @@ export default function Dashboard() {
                     <div style={widgetStyle}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #3b4252', paddingBottom: '0.75rem', marginBottom: '1rem' }}>
                             <div style={{ display: 'flex', alignItems: 'center', color: '#eceff4' }}>
-                                <Activity size={18} style={{ marginRight: '8px', color: '#88c0d0' }} />
+                                <Activity size={18} style={{ marginRight: '8px', color: '#35a7e6' }} />
                                 <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '500' }}>Pending In-Shop Work</h3>
                             </div>
                             <button 
@@ -448,9 +448,9 @@ export default function Dashboard() {
                                 }}
                                 title="View detailed table"
                                 style={{
-                                    background: 'rgba(136, 192, 208, 0.1)',
-                                    color: '#88c0d0',
-                                    border: '1px solid rgba(136, 192, 208, 0.3)',
+                                    background: 'rgba(53, 167, 230, 0.1)',
+                                    color: '#35a7e6',
+                                    border: '1px solid rgba(53, 167, 230, 0.3)',
                                     borderRadius: '16px',
                                     padding: '3px 10px',
                                     fontSize: '0.8rem',
@@ -463,12 +463,12 @@ export default function Dashboard() {
                                     margin: 0
                                 }}
                                 onMouseEnter={e => {
-                                    e.currentTarget.style.background = 'rgba(136, 192, 208, 0.2)';
-                                    e.currentTarget.style.borderColor = '#88c0d0';
+                                    e.currentTarget.style.background = 'rgba(53, 167, 230, 0.2)';
+                                    e.currentTarget.style.borderColor = '#35a7e6';
                                 }}
                                 onMouseLeave={e => {
-                                    e.currentTarget.style.background = 'rgba(136, 192, 208, 0.1)';
-                                    e.currentTarget.style.borderColor = 'rgba(136, 192, 208, 0.3)';
+                                    e.currentTarget.style.background = 'rgba(53, 167, 230, 0.1)';
+                                    e.currentTarget.style.borderColor = 'rgba(53, 167, 230, 0.3)';
                                 }}
                             >
                                 <span>{filteredPendingWorks.filter(w => w.status === 'Ready for Delivery' || w.status === 'Ready').length}/{filteredPendingWorks.length}</span>
@@ -483,7 +483,7 @@ export default function Dashboard() {
                                     style={{ display: 'flex', justifyContent: 'space-between', padding: '0.75rem 1rem', background: '#3b4252', marginBottom: '0.5rem', borderRadius: '4px', borderLeft: `3px solid ${work.status === 'Ready for Delivery' ? '#8fbcbb' : '#ebcb8b'}`, cursor: 'pointer' }}>
                                     <div style={{ display: 'flex', flexDirection: 'column' }}>
                                         <strong style={{ color: '#eceff4', fontSize: '1rem' }}>{work.item_name}</strong>
-                                        <span style={{ fontSize: '0.8rem', color: '#88c0d0', marginTop: '2px' }}>S/N: {work.serial_no}</span>
+                                        <span style={{ fontSize: '0.8rem', color: '#35a7e6', marginTop: '2px' }}>S/N: {work.serial_no}</span>
                                     </div>
                                     <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                                         <div style={{ color: '#d8dee9', fontWeight: 'bold', fontSize: '0.85rem' }}>{work.status}</div>
@@ -502,7 +502,7 @@ export default function Dashboard() {
                     <div style={widgetStyle}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #3b4252', paddingBottom: '0.75rem', marginBottom: '1rem' }}>
                             <div style={{ display: 'flex', alignItems: 'center', color: '#eceff4' }}>
-                                <AlertCircle size={18} style={{ marginRight: '8px', color: '#88c0d0' }} />
+                                <AlertCircle size={18} style={{ marginRight: '8px', color: '#35a7e6' }} />
                                 <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '500' }}>Pending Field Tasks (On-Site)</h3>
                             </div>
                             <button 
@@ -512,9 +512,9 @@ export default function Dashboard() {
                                 }}
                                 title="View detailed table"
                                 style={{
-                                    background: 'rgba(136, 192, 208, 0.1)',
-                                    color: '#88c0d0',
-                                    border: '1px solid rgba(136, 192, 208, 0.3)',
+                                    background: 'rgba(53, 167, 230, 0.1)',
+                                    color: '#35a7e6',
+                                    border: '1px solid rgba(53, 167, 230, 0.3)',
                                     borderRadius: '16px',
                                     padding: '3px 10px',
                                     fontSize: '0.8rem',
@@ -527,12 +527,12 @@ export default function Dashboard() {
                                     margin: 0
                                 }}
                                 onMouseEnter={e => {
-                                    e.currentTarget.style.background = 'rgba(136, 192, 208, 0.2)';
-                                    e.currentTarget.style.borderColor = '#88c0d0';
+                                    e.currentTarget.style.background = 'rgba(53, 167, 230, 0.2)';
+                                    e.currentTarget.style.borderColor = '#35a7e6';
                                 }}
                                 onMouseLeave={e => {
-                                    e.currentTarget.style.background = 'rgba(136, 192, 208, 0.1)';
-                                    e.currentTarget.style.borderColor = 'rgba(136, 192, 208, 0.3)';
+                                    e.currentTarget.style.background = 'rgba(53, 167, 230, 0.1)';
+                                    e.currentTarget.style.borderColor = 'rgba(53, 167, 230, 0.3)';
                                 }}
                             >
                                 <span>{readyOnsiteCount}/{totalOnsiteCount}</span>
@@ -542,7 +542,7 @@ export default function Dashboard() {
                         <ul style={{ listStyle: 'none', padding: 0, margin: 0, fontSize: '0.9rem', maxHeight: '300px', overflowY: 'auto' }}>
                             {filteredPendingOnSite.map(work => {
                                 let borderLeftColor = 'var(--danger)'; // Pending
-                                if (work.status === 'In Progress') borderLeftColor = '#88c0d0'; // Blue
+                                if (work.status === 'In Progress') borderLeftColor = '#35a7e6'; // Blue
                                 
                                 return (
                                     <li
@@ -551,7 +551,7 @@ export default function Dashboard() {
                                         style={{ display: 'flex', justifyContent: 'space-between', padding: '0.75rem 1rem', background: '#3b4252', marginBottom: '0.5rem', borderRadius: '4px', borderLeft: `3px solid ${borderLeftColor}`, cursor: 'pointer' }}>
                                         <div style={{ display: 'flex', flexDirection: 'column' }}>
                                             <strong style={{ color: '#eceff4', fontSize: '1rem' }}>{work.item_name}</strong>
-                                            <span style={{ fontSize: '0.8rem', color: '#88c0d0', marginTop: '2px' }}>{work.customerName} - {work.customerPhone}</span>
+                                            <span style={{ fontSize: '0.8rem', color: '#35a7e6', marginTop: '2px' }}>{work.customerName} - {work.customerPhone}</span>
                                         </div>
                                         <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                                             <div style={{ color: '#d8dee9', fontWeight: 'bold', fontSize: '0.85rem' }}>{work.status}</div>
@@ -575,7 +575,7 @@ export default function Dashboard() {
                         <table style={{ width: '100%', fontSize: '0.9rem', borderCollapse: 'collapse', minWidth: '500px' }}>
                             <thead>
                                 <tr style={{ background: '#3b4252', textAlign: 'left' }}>
-                                    <th style={{ padding: '0.5rem 0.75rem', borderRadius: '4px 0 0 4px', fontWeight: '600', color: '#88c0d0' }}>CSR #</th>
+                                    <th style={{ padding: '0.5rem 0.75rem', borderRadius: '4px 0 0 4px', fontWeight: '600', color: '#35a7e6' }}>CSR #</th>
                                     <th style={{ padding: '0.5rem 0.75rem', fontWeight: '600' }}>Customer</th>
                                     <th style={{ padding: '0.5rem 0.75rem', fontWeight: '600' }}>Item</th>
                                     <th style={{ padding: '0.5rem 0.75rem', fontWeight: '600' }}>Status</th>
@@ -588,7 +588,7 @@ export default function Dashboard() {
                                     if (req.status === 'Pending') statusColor = '#bf616a';
                                     else if (req.status === 'Delivered' || req.status === 'Completed') statusColor = '#a3be8c';
                                     else if (req.status === 'Ready for Delivery' || req.status === 'Ready') statusColor = '#8fbcbb';
-                                    else if (req.status === 'In Progress') statusColor = '#88c0d0';
+                                    else if (req.status === 'In Progress') statusColor = '#35a7e6';
                                     else if (req.status === 'Intaken') statusColor = '#b48ead';
                                     else statusColor = '#ebcb8b';
                                     return (
@@ -599,7 +599,7 @@ export default function Dashboard() {
                                             onMouseEnter={e => e.currentTarget.style.background = '#3b4252'}
                                             onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
                                         >
-                                            <td style={{ padding: '0.75rem', fontWeight: 'bold', color: '#88c0d0' }}>#{req.csr_number || req.id.split('-')[0].toUpperCase()}</td>
+                                            <td style={{ padding: '0.75rem', fontWeight: 'bold', color: '#35a7e6' }}>#{req.csr_number || req.id.split('-')[0].toUpperCase()}</td>
                                             <td style={{ padding: '0.75rem', color: '#eceff4' }}>{req.customerName || '—'}</td>
                                             <td style={{ padding: '0.75rem' }}>{req.item_name}</td>
                                             <td style={{ padding: '0.75rem' }}>
@@ -607,7 +607,7 @@ export default function Dashboard() {
                                                     {req.status}
                                                 </span>
                                             </td>
-                                            <td style={{ padding: '0.75rem', textAlign: 'right', fontSize: '0.8rem', color: '#88c0d0' }}>
+                                            <td style={{ padding: '0.75rem', textAlign: 'right', fontSize: '0.8rem', color: '#35a7e6' }}>
                                                 {new Date(req.created_at).toLocaleString()}
                                             </td>
                                         </tr>

@@ -326,12 +326,12 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                     <div>
                         <div style={{ background: '#3b4252', padding: '1rem', borderRadius: '4px', marginBottom: '1.5rem' }}>
                             <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: '0.5rem', fontSize: '0.9rem' }}>
-                                <strong style={{ color: '#88c0d0' }}>Tracking ID:</strong> <span>{job.csr_number || job.id.split('-')[0].toUpperCase()}</span>
-                                <strong style={{ color: '#88c0d0' }}>Date Rcvd:</strong> <span>{new Date(job.created_at).toLocaleDateString()}</span>
-                                <strong style={{ color: '#88c0d0' }}>Customer:</strong> <span>{customer.name}</span>
-                                <strong style={{ color: '#88c0d0' }}>Mobile:</strong> <span>{customer.phone}</span>
-                                {customer.address && <><strong style={{ color: '#88c0d0' }}>Address:</strong> <span>{customer.address}</span></>}
-                                {customer.location && (job.service_mode || 'On Center') !== 'On Center' && <><strong style={{ color: '#88c0d0' }}>Location:</strong> <span>{customer.location}</span></>}
+                                <strong style={{ color: '#35a7e6' }}>Tracking ID:</strong> <span>{job.csr_number || job.id.split('-')[0].toUpperCase()}</span>
+                                <strong style={{ color: '#35a7e6' }}>Date Rcvd:</strong> <span>{new Date(job.created_at).toLocaleDateString()}</span>
+                                <strong style={{ color: '#35a7e6' }}>Customer:</strong> <span>{customer.name}</span>
+                                <strong style={{ color: '#35a7e6' }}>Mobile:</strong> <span>{customer.phone}</span>
+                                {customer.address && <><strong style={{ color: '#35a7e6' }}>Address:</strong> <span>{customer.address}</span></>}
+                                {customer.location && (job.service_mode || 'On Center') !== 'On Center' && <><strong style={{ color: '#35a7e6' }}>Location:</strong> <span>{customer.location}</span></>}
                             </div>
                         </div>
 
@@ -413,7 +413,7 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                                         onClick={handleSaveProduct} 
                                         style={{ 
                                             padding: '0.5rem', 
-                                            background: '#88c0d0', 
+                                            background: '#35a7e6', 
                                             color: '#2e3440', 
                                             fontWeight: 'bold', 
                                             border: 'none', 
@@ -430,7 +430,7 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
                                         <div>
                                             <strong style={{ fontSize: '1.1rem', color: '#eceff4' }}>{job.item_name}</strong>
-                                            {job.serial_no && <div style={{ fontSize: '0.85rem', color: '#88c0d0', marginTop: '2px' }}>S/N: {job.serial_no}</div>}
+                                            {job.serial_no && <div style={{ fontSize: '0.85rem', color: '#35a7e6', marginTop: '2px' }}>S/N: {job.serial_no}</div>}
                                         </div>
                                         <div>
                                             {job.is_device_intaken === 1 ? (
@@ -536,7 +536,7 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                             <div style={{ flex: 1, overflowY: 'auto', marginBottom: '1rem', maxHeight: '200px' }}>
                                 {logs.map(lg => (
                                     <div key={lg.id} style={{ background: '#2e3440', padding: '0.5rem', marginBottom: '0.5rem', borderRadius: '4px', fontSize: '0.85rem' }}>
-                                        <div style={{ color: '#88c0d0', marginBottom: '2px' }}>{new Date(lg.created_at).toLocaleString()} - {lg.technician}</div>
+                                        <div style={{ color: '#35a7e6', marginBottom: '2px' }}>{new Date(lg.created_at).toLocaleString()} - {lg.technician}</div>
                                         <div>{lg.issues}</div>
                                     </div>
                                 ))}
@@ -546,7 +546,7 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                             {!isDelivered && (
                                 <div style={{ display: 'flex', gap: '0.5rem' }}>
                                     <input type="text" value={newLog} onChange={e => setNewLog(e.target.value)} placeholder="Add a log entry..." style={{ flex: 1, padding: '0.5rem', background: '#2e3440', border: '1px solid #4c566a', color: '#eceff4', borderRadius: '4px' }} />
-                                    <button onClick={handleAddLog} style={{ padding: '0.5rem 1rem', background: '#88c0d0', color: 'black', border: 'none', borderRadius: '4px', cursor: 'pointer' }}><Save size={16} /></button>
+                                    <button onClick={handleAddLog} style={{ padding: '0.5rem 1rem', background: '#35a7e6', color: 'black', border: 'none', borderRadius: '4px', cursor: 'pointer' }}><Save size={16} /></button>
                                 </div>
                             )}
                         </div>
@@ -557,32 +557,32 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                                     <h3 style={{ borderBottom: '1px solid #4c566a', paddingBottom: '0.5rem', margin: '0 0 1rem 0', color: '#a3be8c' }}>Billing & Warranty (Locked)</h3>
                                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '0.75rem', fontSize: '0.9rem' }}>
                                         <div>
-                                            <span style={{ color: '#88c0d0', display: 'block', fontSize: '0.8rem' }}>Service Charge</span>
+                                            <span style={{ color: '#35a7e6', display: 'block', fontSize: '0.8rem' }}>Service Charge</span>
                                             <strong style={{ fontSize: '1.1rem' }}>₹{invoice.service_fees || 0}</strong>
                                         </div>
                                         <div>
-                                            <span style={{ color: '#88c0d0', display: 'block', fontSize: '0.8rem' }}>Spare Cost</span>
+                                            <span style={{ color: '#35a7e6', display: 'block', fontSize: '0.8rem' }}>Spare Cost</span>
                                             <strong style={{ fontSize: '1.1rem' }}>₹{invoice.part_costs || 0}</strong>
                                         </div>
                                     </div>
                                     <div style={{ marginBottom: '0.75rem', fontSize: '0.9rem' }}>
-                                        <span style={{ color: '#88c0d0', display: 'block', fontSize: '0.8rem' }}>Spares Used</span>
+                                        <span style={{ color: '#35a7e6', display: 'block', fontSize: '0.8rem' }}>Spares Used</span>
                                         <strong>{invoice.spares || 'None'}</strong>
                                     </div>
                                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', fontSize: '0.9rem', alignItems: 'end' }}>
                                         <div>
-                                            <span style={{ color: '#88c0d0', display: 'block', fontSize: '0.8rem' }}>Warranty Period</span>
+                                            <span style={{ color: '#35a7e6', display: 'block', fontSize: '0.8rem' }}>Warranty Period</span>
                                             <strong>{invoice.warranty || 'No warranty'}</strong>
                                         </div>
                                         <div style={{ textAlign: 'right' }}>
-                                            <span style={{ color: '#88c0d0', display: 'block', fontSize: '0.8rem' }}>Total Amount</span>
+                                            <span style={{ color: '#35a7e6', display: 'block', fontSize: '0.8rem' }}>Total Amount</span>
                                             <strong style={{ fontSize: '1.25rem', color: '#a3be8c' }}>₹{invoice.total || (parseFloat(invoice.service_fees || 0) + parseFloat(invoice.part_costs || 0))}</strong>
                                         </div>
                                     </div>
                                 </>
                             ) : (
                                 <>
-                                    <h3 style={{ borderBottom: '1px solid #4c566a', paddingBottom: '0.5rem', margin: '0 0 1rem 0', color: '#88c0d0' }}>Billing & Warranty</h3>
+                                    <h3 style={{ borderBottom: '1px solid #4c566a', paddingBottom: '0.5rem', margin: '0 0 1rem 0', color: '#35a7e6' }}>Billing & Warranty</h3>
                                     
                                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '0.75rem' }}>
                                         <div>
@@ -634,7 +634,7 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                                             style={{ 
                                                 width: '100%', 
                                                 padding: '0.5rem', 
-                                                background: '#88c0d0', 
+                                                background: '#35a7e6', 
                                                 color: '#2e3440', 
                                                 fontWeight: 'bold', 
                                                 border: 'none', 

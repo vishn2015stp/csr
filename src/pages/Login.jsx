@@ -22,7 +22,7 @@ export default function Login() {
     return (
         <div className="login-container">
             <form onSubmit={handleSubmit} className="login-card">
-                <h2 style={{ textAlign: 'center', marginBottom: '2rem', color: '#ff4d4d' }}>Hyper-CSR</h2>
+                <h2 style={{ textAlign: 'center', marginBottom: '2rem', color: '#35a7e6' }}>Hyper-CSR</h2>
                 {error && <p style={{ color: '#ff6b6b', background: 'rgba(255,0,0,0.1)', padding: '0.5rem', borderRadius: '4px', textAlign: 'center' }}>{error}</p>}
                 <div style={{ marginBottom: '1.5rem' }}>
                     <label style={{ display: 'block', marginBottom: '0.5rem', color: '#ccc' }}>Username</label>
@@ -32,7 +32,25 @@ export default function Login() {
                     <label style={{ display: 'block', marginBottom: '0.5rem', color: '#ccc' }}>Password</label>
                     <input type="password" value={password} onChange={e => setPassword(e.target.value)} style={{ width: '100%', padding: '0.75rem', borderRadius: '6px', border: '1px solid #444', background: '#222', color: 'white', boxSizing: 'border-box' }} required />
                 </div>
-                <button type="submit" style={{ width: '100%', padding: '0.75rem', borderRadius: '6px', background: '#e53e3e', color: 'white', border: 'none', fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer' }}>Login</button>
+                <button 
+                    type="submit" 
+                    style={{ 
+                        width: '100%', 
+                        padding: '0.75rem', 
+                        borderRadius: '6px', 
+                        background: '#35a7e6', 
+                        color: 'white', 
+                        border: 'none', 
+                        fontWeight: 'bold', 
+                        fontSize: '1rem', 
+                        cursor: 'pointer',
+                        transition: 'background 0.2s'
+                    }}
+                    onMouseEnter={e => e.currentTarget.style.background = '#1d8fcc'}
+                    onMouseLeave={e => e.currentTarget.style.background = '#35a7e6'}
+                >
+                    Login
+                </button>
             </form>
         </div>
     );

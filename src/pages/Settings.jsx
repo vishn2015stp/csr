@@ -398,7 +398,7 @@ export default function Settings() {
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '2rem', padding: '1.5rem' }}>
                     {/* User List Panel */}
                     <div style={{ flex: '1 1 45%', minWidth: '300px' }}>
-                        <h3 style={{ fontSize: '0.85rem', color: '#88c0d0', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '1rem' }}>Active Accounts</h3>
+                        <h3 style={{ fontSize: '0.85rem', color: '#35a7e6', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '1rem' }}>Active Accounts</h3>
                         <div className="table-responsive">
                             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
                                 <thead>
@@ -445,8 +445,8 @@ export default function Settings() {
                     </div>
 
                     {/* Create User Form Panel */}
-                    <div style={{ flex: '1 1 45%', minWidth: '300px', background: '#1a1a2e', padding: '1.5rem', borderRadius: '8px', border: '1px solid #333' }}>
-                        <h3 style={{ fontSize: '0.85rem', color: '#bb86fc', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '1rem', marginTop: 0 }}>Create User Account</h3>
+                    <div style={{ flex: '1 1 45%', minWidth: '300px', background: '#1e1e1e', padding: '1.5rem', borderRadius: '8px', border: '1px solid #333' }}>
+                        <h3 style={{ fontSize: '0.85rem', color: '#35a7e6', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '1rem', marginTop: 0 }}>Create User Account</h3>
                         <form onSubmit={handleCreateUser}>
                             <div style={{ marginBottom: '1rem' }}>
                                 <label style={{ fontSize: '0.8rem', color: '#aaa', display: 'block', marginBottom: '4px' }}>Username</label>
