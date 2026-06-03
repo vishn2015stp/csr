@@ -28,7 +28,7 @@ export default function Dashboard() {
         setAllComplaints(complaints);
 
         const pending = complaints.filter(c => c.status !== 'Delivered');
-        const onSite = pending.filter(c => c.service_type === 'On-Site');
+        const onSite = pending.filter(c => c.service_type === 'On-Site' || c.service_mode === 'Onsite');
 
         const statusCounts = {};
         complaints.forEach(c => {
@@ -37,7 +37,7 @@ export default function Dashboard() {
 
         setStats({
             totalProducts: statsData.total || 0,
-            pendingWorks: pending.filter(c => c.service_type !== 'On-Site'),
+            pendingWorks: pending.filter(c => c.service_type !== 'On-Site' && c.service_mode !== 'Onsite'),
             pendingOnSite: onSite,
             productStatus: statusCounts
         });
@@ -68,8 +68,8 @@ export default function Dashboard() {
 
     // Derived stats lists
     const filteredPending = filteredComplaints.filter(c => c.status !== 'Delivered');
-    const filteredPendingWorks = filteredPending.filter(c => c.service_type !== 'On-Site');
-    const filteredPendingOnSite = filteredPending.filter(c => c.service_type === 'On-Site');
+    const filteredPendingWorks = filteredPending.filter(c => c.service_type !== 'On-Site' && c.service_mode !== 'Onsite');
+    const filteredPendingOnSite = filteredPending.filter(c => c.service_type === 'On-Site' || c.service_mode === 'Onsite');
     
     // For recent requests, if searching, show all matching. Otherwise, show the top 8.
     const sortedFiltered = [...filteredComplaints].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
