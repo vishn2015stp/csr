@@ -234,7 +234,7 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                                 <strong style={{ color: '#88c0d0' }}>Customer:</strong> <span>{customer.name}</span>
                                 <strong style={{ color: '#88c0d0' }}>Mobile:</strong> <span>{customer.phone}</span>
                                 {customer.address && <><strong style={{ color: '#88c0d0' }}>Address:</strong> <span>{customer.address}</span></>}
-                                {customer.location && <><strong style={{ color: '#88c0d0' }}>Location:</strong> <span>{customer.location}</span></>}
+                                {customer.location && (job.service_mode || 'On Center') !== 'On Center' && <><strong style={{ color: '#88c0d0' }}>Location:</strong> <span>{customer.location}</span></>}
                             </div>
                         </div>
 

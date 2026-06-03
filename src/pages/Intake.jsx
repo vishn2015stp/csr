@@ -97,7 +97,7 @@ export default function Intake() {
                     phone: formData.phone,
                     email: formData.email,
                     address: formData.address,
-                    location: formData.location
+                    location: formData.serviceMode === 'On Center' ? (existingCust.location || '') : formData.location
                 });
             } else {
                 customerId = uuidv4();
@@ -107,7 +107,7 @@ export default function Intake() {
                     phone: formData.phone,
                     email: formData.email,
                     address: formData.address,
-                    location: formData.location,
+                    location: formData.serviceMode === 'On Center' ? '' : formData.location,
                     created_at: new Date().toISOString()
                 });
             }
