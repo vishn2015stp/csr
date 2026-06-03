@@ -2,7 +2,7 @@ require('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env'
 const express = require('express');
 const cors = require('cors');
 const db = require('./db.js');
-const { v4: uuidv4 } = require('uuid');
+const { randomUUID: uuidv4 } = require('crypto');
 const path = require('path');
 
 const app = express();
