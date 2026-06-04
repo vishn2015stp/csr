@@ -151,9 +151,6 @@ function ensureInitialized() {
                         crypto.randomUUID(), 'admin', 'password123', 'ADMIN'
                     ]);
                     console.log('Default admin user created.');
-                } else {
-                    await pool.query('UPDATE users SET password = $1 WHERE username = $2', ['password123', 'admin']);
-                    console.log('Default admin user password verified.');
                 }
                 
                 console.log("Supabase database schema checked and initialized.");
