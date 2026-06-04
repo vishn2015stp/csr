@@ -105,7 +105,7 @@ export default function Dashboard() {
         const totalCount = dataList.length;
         return (
             <div className="dashboard-container">
-                <div style={{ padding: '2rem 1rem' }}>
+            <div style={{ padding: '1.5rem 1rem 1rem 1rem' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
                         <div>
                             <h2 style={{ margin: 0, fontSize: '1.8rem', color: 'var(--text-primary)', fontWeight: 'bold' }}>

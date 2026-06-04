@@ -106,7 +106,7 @@ export default function Requests() {
     };
 
     return (
-        <div className="container" style={{ padding: '2rem 1rem' }}>
+        <div className="container">
             
             {/* Standard non-print content */}
             <div className="non-print">

@@ -32,7 +32,7 @@ body {
 @media (min-width: 769px) {
   #root {
     height: 100vh;
-    overflow: hidden;
+    overflow: hidden; /* sidebar stays fixed; main-content handles its own scroll */
   }
 }
 
@@ -311,6 +311,7 @@ button:disabled {
   background-color: var(--bg-color);
   position: relative;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
 @media (min-width: 769px) {
@@ -318,20 +319,16 @@ button:disabled {
     margin-left: 250px;
     height: calc(100vh - 60px);
     min-height: unset;
-    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: hidden;
   }
 
   .main-content.full-width {
     margin-left: 0;
   }
 
-  /* Scroll page container layouts internally for desktop single-screen UX */
   .container {
-    height: 100%;
-    overflow-y: auto;
     padding: 1.5rem 2rem !important;
-    display: flex;
-    flex-direction: column;
   }
 }
 
@@ -545,11 +542,10 @@ button:disabled {
 
 /* Dashboard responsiveness improvements */
 .dashboard-container {
-  padding: 0 1rem 2rem 1rem;
+  padding: 0 0 2rem 0;
   background: var(--bg-color);
   color: var(--text-primary);
-  min-height: calc(100vh - 40px);
-  margin: -2rem;
+  min-height: 100%;
   display: flow-root;
 }
 
@@ -558,7 +554,7 @@ button:disabled {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.5rem;
-  margin-top: 2rem;
+  margin-top: 1.5rem;
   padding: 0 1rem;
 }
 
@@ -578,7 +574,7 @@ button:disabled {
 @media (max-width: 768px) {
   .dashboard-container {
     margin: 0;
-    padding: 1rem;
+    padding: 0 0 2rem 0;
     min-height: auto;
   }
   
@@ -587,7 +583,7 @@ button:disabled {
     align-items: stretch;
     gap: 1rem;
     margin-top: 1rem;
-    padding: 0;
+    padding: 0 1rem;
   }
   
   .dashboard-grid-overview {
