@@ -353,7 +353,12 @@ app.get('/api/complaints', async (req, res) => {
 
 app.get('/api/complaints/:id', async (req, res) => {
     try {
-        const result = await db.query('SELECT * FROM complaints WHERE id = $1', [req.params.id]);
+        const result = await db.query(`
+            SELECT c.*, cust.name as "customerName", cust.phone as "customerPhone", cust.address as "customerAddress", cust.email as "customerEmail"
+            FROM complaints c
+            LEFT JOIN customers cust ON c.customer_id = cust.id
+            WHERE c.id = $1
+        `, [req.params.id]);
         res.json(result.rows[0] || null);
     } catch (err) {
         res.status(500).json({ error: err.message });
