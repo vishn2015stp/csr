@@ -170,8 +170,14 @@ button:disabled {
   left: 0;
   height: 100vh;
   z-index: 2000;
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
+  /* Hidden by default on all screen sizes */
+  transform: translateX(-250px);
+}
+
+.sidebar.open {
+  transform: translateX(0);
 }
 
 .sidebar.closed {
@@ -194,7 +200,7 @@ button:disabled {
   }
 }
 
-/* Global App Header */
+/* Global App Header - always full width on desktop (sidebar overlays) */
 .app-header {
   display: flex;
   justify-content: space-between;
@@ -205,17 +211,16 @@ button:disabled {
   position: fixed;
   top: 0;
   right: 0;
-  left: 250px;
+  left: 0;
   height: 60px;
   z-index: 900;
-  transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .app-header.full-width {
   left: 0;
 }
 
-/* Mobile Overlay Shader */
+/* Overlay - works on both mobile and desktop */
 .mobile-overlay {
   position: fixed;
   top: 0; 
@@ -234,13 +239,8 @@ button:disabled {
   pointer-events: auto;
 }
 
-@media (min-width: 769px) {
-  .mobile-overlay {
-    display: none;
-  }
-  .mobile-close-btn {
-    display: none;
-  }
+.mobile-close-btn {
+  display: none;
 }
 
 @media (max-width: 768px) {
@@ -316,7 +316,7 @@ button:disabled {
 
 @media (min-width: 769px) {
   .main-content {
-    margin-left: 250px;
+    margin-left: 0;
     height: calc(100vh - 60px);
     min-height: unset;
     overflow-y: auto;

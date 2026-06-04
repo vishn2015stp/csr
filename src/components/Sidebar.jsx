@@ -11,11 +11,9 @@ export default function Sidebar({ isOpen, closeSidebar }) {
         navigate('/login');
     }
 
-    // Only close sidebar when user taps a link on mobile
+    // Close sidebar when user clicks a nav link (overlay mode on all screens)
     const handleNavClick = () => {
-        if (window.innerWidth <= 768) {
-            closeSidebar();
-        }
+        closeSidebar();
     };
 
     return (

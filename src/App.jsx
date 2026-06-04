@@ -18,7 +18,7 @@ function ProtectedRoute({ children }) {
 
 function App() {
   const { user, loading } = useAuth();
-  const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 768);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -35,7 +35,7 @@ function App() {
 
   return (
     <>
-      <header className={`app-header ${isSidebarOpen ? '' : 'full-width'}`}>
+      <header className="app-header">
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} style={{ background: 'transparent', padding: '0.25rem', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', margin: 0 }}>
             <Menu size={24} color="var(--text-primary)" />
@@ -54,11 +54,11 @@ function App() {
       <Sidebar isOpen={isSidebarOpen} closeSidebar={() => setIsSidebarOpen(false)} />
       
       <div 
-        className={`mobile-overlay ${isSidebarOpen && window.innerWidth <= 768 ? 'show' : ''}`} 
+        className={`mobile-overlay ${isSidebarOpen ? 'show' : ''}`} 
         onClick={() => setIsSidebarOpen(false)}
       />
 
-      <main className={`main-content ${isSidebarOpen ? '' : 'full-width'}`}>
+      <main className="main-content">
         <Routes>
           <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/intake" element={<ProtectedRoute><Intake /></ProtectedRoute>} />
