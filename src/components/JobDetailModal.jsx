@@ -171,7 +171,12 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
             alert("This job is already completed/delivered and cannot be edited.");
             return;
         }
-        const newStatus = e.target.value;
+        let newStatus = e.target.value;
+        
+        if (newStatus === 'Delivered' && job.status === 'Return') {
+            newStatus = 'Returned';
+        }
+
         if (newStatus === 'Delivered' || newStatus === 'Completed' || newStatus === 'Returned') {
             const confirmMsg = newStatus === 'Completed'
                 ? "Are you sure you want to mark this request as Completed? Once marked as Completed, you will no longer be able to edit this request or its billing."
