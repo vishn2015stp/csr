@@ -385,7 +385,7 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                                 <p><strong>Product:</strong> {job.item_name}</p>
                             </div>
                             <div style={{ textAlign: 'right' }}>
-                                <p><strong>Date:</strong> {new Date().toLocaleDateString()}</p>
+                                <p><strong>Date:</strong> {new Date().toLocaleDateString('en-GB').replace(/\//g, '-')}</p>
                                 <p><strong>Phone:</strong> {customer.phone}</p>
                             </div>
                         </div>
@@ -457,7 +457,7 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                         <div style={{ background: '#f6f3eb', padding: '1rem', borderRadius: '4px', marginBottom: '1.5rem' }}>
                             <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: '0.5rem', fontSize: '0.9rem' }}>
                                 <strong style={{ color: '#35a7e6' }}>Tracking ID:</strong> <span>{job.csr_number || job.id.split('-')[0].toUpperCase()}</span>
-                                <strong style={{ color: '#35a7e6' }}>Date Rcvd:</strong> <span>{new Date(job.created_at).toLocaleDateString()}</span>
+                                <strong style={{ color: '#35a7e6' }}>Date Rcvd:</strong> <span>{new Date(job.created_at).toLocaleDateString('en-GB').replace(/\//g, '-')}</span>
                                 <strong style={{ color: '#35a7e6' }}>Customer:</strong> <span>{customer.name}</span>
                                 <strong style={{ color: '#35a7e6' }}>Mobile:</strong> <span>{customer.phone}</span>
                                 {customer.address && <><strong style={{ color: '#35a7e6' }}>Address:</strong> <span>{customer.address}</span></>}
@@ -714,7 +714,7 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                             <div style={{ flex: 1, overflowY: 'auto', marginBottom: '1rem', maxHeight: '200px' }}>
                                 {logs.map(lg => (
                                     <div key={lg.id} style={{ background: 'var(--panel-bg)', padding: '0.5rem', marginBottom: '0.5rem', borderRadius: '4px', fontSize: '0.85rem' }}>
-                                        <div style={{ color: '#35a7e6', marginBottom: '2px' }}>{new Date(lg.created_at).toLocaleString()} - {lg.technician}</div>
+                                        <div style={{ color: '#35a7e6', marginBottom: '2px' }}>{new Date(lg.created_at).toLocaleString('en-GB').replace(/\//g, '-')} - {lg.technician}</div>
                                         <div>{lg.issues}</div>
                                     </div>
                                 ))}

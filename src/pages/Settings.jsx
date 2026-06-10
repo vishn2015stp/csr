@@ -46,7 +46,7 @@ function Toggle({ label, description, checked, onChange }) {
 }
 
 function IntakePreview({ config }) {
-    const today = new Date().toLocaleString();
+    const today = new Date().toLocaleString('en-GB').replace(/\//g, '-');
     return (
         <div style={{
             background: '#fff', color: '#000',
@@ -91,7 +91,7 @@ function IntakePreview({ config }) {
 }
 
 function InvoicePreview({ config }) {
-    const today = new Date().toLocaleDateString();
+    const today = new Date().toLocaleDateString('en-GB').replace(/\//g, '-');
     return (
         <div style={{
             background: '#fff', color: '#000',

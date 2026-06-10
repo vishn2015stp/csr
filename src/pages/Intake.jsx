@@ -138,7 +138,7 @@ export default function Intake() {
  
             setSuccessData({
                 id: complaintId,
-                date: new Date(now).toLocaleString(),
+                date: new Date(now).toLocaleString('en-GB').replace(/\//g, '-'),
                 csrNumber: created.csr_number,
                 customerName: formData.name,
                 customerPhone: formData.phone,

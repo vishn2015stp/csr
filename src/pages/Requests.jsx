@@ -66,7 +66,7 @@ export default function Requests() {
     const handlePrintIntake = async (req) => {
         // Find or build intake print payload
         setPrintIntakeData({
-            date: new Date(req.created_at).toLocaleString(),
+            date: new Date(req.created_at).toLocaleString('en-GB').replace(/\//g, '-'),
             csrNumber: req.csr_number || req.id.split('-')[0].toUpperCase(),
             customerName: req.customerName,
             customerPhone: req.customerPhone,
@@ -262,7 +262,7 @@ export default function Requests() {
                                                 </span>
                                             </td>
                                             <td style={{ padding: '0.85rem 1rem', color: '#35a7e6', fontSize: '0.85rem' }}>
-                                                {new Date(req.created_at).toLocaleDateString()}
+                                                {new Date(req.created_at).toLocaleDateString('en-GB').replace(/\//g, '-')}
                                             </td>
                                             <td style={{ padding: '0.85rem 1rem', textAlign: 'right' }}>
                                                 <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
@@ -370,7 +370,7 @@ export default function Requests() {
                                     <p style={{ margin: '4px 0' }}><strong>Product:</strong> {printInvoiceData.job.item_name}</p>
                                 </div>
                                 <div style={{ textAlign: 'right' }}>
-                                    <p style={{ margin: '4px 0' }}><strong>Date:</strong> {new Date().toLocaleDateString()}</p>
+                                    <p style={{ margin: '4px 0' }}><strong>Date:</strong> {new Date().toLocaleDateString('en-GB').replace(/\//g, '-')}</p>
                                     <p style={{ margin: '4px 0' }}><strong>Phone:</strong> {printInvoiceData.customer.phone}</p>
                                 </div>
                             </div>

@@ -244,7 +244,7 @@ export default function Dashboard() {
                                                     </span>
                                                 </td>
                                                 <td style={{ padding: '1rem', fontSize: '0.85rem', color: '#35a7e6' }}>
-                                                    {new Date(work.created_at).toLocaleDateString()}
+                                                    {new Date(work.created_at).toLocaleDateString('en-GB').replace(/\//g, '-')}
                                                 </td>
                                                 <td style={{ padding: '1rem', textAlign: 'right' }}>
                                                     <button 
@@ -608,7 +608,7 @@ export default function Dashboard() {
                                                 </span>
                                             </td>
                                             <td style={{ padding: '0.75rem', textAlign: 'right', fontSize: '0.8rem', color: '#35a7e6' }}>
-                                                {new Date(req.created_at).toLocaleString()}
+                                                {new Date(req.created_at).toLocaleString('en-GB').replace(/\//g, '-')}
                                             </td>
                                         </tr>
                                     );
