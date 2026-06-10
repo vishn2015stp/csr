@@ -29,7 +29,7 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
     const [newSpareName, setNewSpareName] = useState('');
     const [newSpareCost, setNewSpareCost] = useState('');
 
-    const isDelivered = job?.status?.trim().toLowerCase() === 'delivered' || job?.status?.trim().toLowerCase() === 'completed';
+    const isDelivered = job?.status?.trim().toLowerCase() === 'delivered' || job?.status?.trim().toLowerCase() === 'completed' || job?.status?.trim().toLowerCase() === 'returned';
 
     useEffect(() => {
         const load = async () => {
@@ -172,10 +172,10 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
             return;
         }
         const newStatus = e.target.value;
-        if (newStatus === 'Delivered' || newStatus === 'Completed') {
+        if (newStatus === 'Delivered' || newStatus === 'Completed' || newStatus === 'Returned') {
             const confirmMsg = newStatus === 'Completed'
                 ? "Are you sure you want to mark this request as Completed? Once marked as Completed, you will no longer be able to edit this request or its billing."
-                : "Are you sure you want to mark this request as Delivered? Once marked as Delivered, you will no longer be able to edit this request or its billing.";
+                : `Are you sure you want to mark this request as ${newStatus}? Once marked as ${newStatus}, you will no longer be able to edit this request or its billing.`;
             const confirmAction = window.confirm(confirmMsg);
             if (!confirmAction) {
                 e.target.value = job.status;
@@ -333,21 +333,21 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                 alert("Verification failed. Action cancelled.");
                 return;
             }
-            await api.updateComplaint(jobId, { flag_r: true, status: 'Delivered' });
-            setJob(prev => ({ ...prev, status: 'Delivered' }));
+            await api.updateComplaint(jobId, { flag_r: true, status: 'Returned' });
+            setJob(prev => ({ ...prev, status: 'Returned' }));
 
             // Log completion timestamp
             await api.createStatusLog({
                 complaint_id: jobId,
-                status: 'Delivered',
+                status: 'Returned',
                 technician: user?.username || 'Unknown'
             });
 
             await api.createServiceRecord({
                 complaint_id: jobId,
                 technician: user?.username || 'Unknown',
-                issues: `Device returned to customer (Status: Delivered)`,
-                resolution_status: 'Delivered'
+                issues: `Device returned to customer (Status: Returned)`,
+                resolution_status: 'Returned'
             });
 
             const sLogs = await api.getServiceRecords(jobId);
@@ -611,7 +611,7 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                                         textAlign: 'center',
                                         textTransform: 'uppercase'
                                     }}>
-                                        {job.status === 'Completed' ? 'Completed (Locked)' : 'Delivered (Locked)'}
+                                        {job.status === 'Completed' ? 'Completed (Locked)' : job.status === 'Returned' ? 'Returned (Locked)' : 'Delivered (Locked)'}
                                     </div>
                                 ) : (
                                     <select
@@ -644,6 +644,7 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                                                 <option value="Replaced">Replaced</option>
                                                 <option value="Send to Service Center">Send to Service Center</option>
                                                 <option value="Ready">Ready</option>
+                                                <option value="Return">Return</option>
                                                 <option value="Warranty">Warranty</option>
                                                 <option value="Delivered">Delivered</option>
                                             </>

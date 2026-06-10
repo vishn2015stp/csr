@@ -182,7 +182,10 @@ export default function Requests() {
                             <option value="Send to Service Center">Send to Service Center</option>
                             <option value="Ready">Ready</option>
                             <option value="Completed">Completed</option>
+                            <option value="Return">Return</option>
+                            <option value="Warranty">Warranty</option>
                             <option value="Delivered">Delivered</option>
+                            <option value="Returned">Returned</option>
                         </select>
                     </div>
 
@@ -229,7 +232,7 @@ export default function Requests() {
                                 {filteredRequests.map(req => {
                                      let statusColor = 'var(--text-primary)';
                                      if (req.status === 'Pending') statusColor = '#bf616a';
-                                     else if (req.status === 'Delivered' || req.status === 'Completed') statusColor = '#a3be8c';
+                                     else if (req.status === 'Delivered' || req.status === 'Completed' || req.status === 'Returned') statusColor = '#a3be8c';
                                      else if (req.status === 'Ready for Delivery' || req.status === 'Ready') statusColor = '#8fbcbb';
                                      else if (req.status === 'In Progress') statusColor = '#35a7e6';
                                      else if (req.status === 'Intaken') statusColor = '#b48ead';

@@ -28,7 +28,7 @@ export default function Dashboard() {
         const complaints = statsData.complaints || [];
         setAllComplaints(complaints);
 
-        const pending = complaints.filter(c => c.status !== 'Delivered' && c.status !== 'Completed');
+        const pending = complaints.filter(c => c.status !== 'Delivered' && c.status !== 'Completed' && c.status !== 'Returned');
         const onSite = pending.filter(c => c.service_type === 'On-Site' || c.service_mode === 'Onsite');
 
         const statusCounts = {};
@@ -68,7 +68,7 @@ export default function Dashboard() {
         : allComplaints;
 
     // Derived stats lists
-    const filteredPending = filteredComplaints.filter(c => c.status !== 'Delivered' && c.status !== 'Completed');
+    const filteredPending = filteredComplaints.filter(c => c.status !== 'Delivered' && c.status !== 'Completed' && c.status !== 'Returned');
     const filteredPendingWorks = filteredPending.filter(c => c.service_type !== 'On-Site' && c.service_mode !== 'Onsite');
     const filteredPendingOnSite = filteredPending.filter(c => c.service_type === 'On-Site' || c.service_mode === 'Onsite');
     
@@ -77,7 +77,7 @@ export default function Dashboard() {
     const totalOnsiteCount = filteredPendingOnSite.length;
     
     // For recent requests, if searching, show all matching. Otherwise, show the top 8 (excluding delivered/completed).
-    const activeComplaints = filteredComplaints.filter(c => c.status !== 'Delivered' && c.status !== 'Completed');
+    const activeComplaints = filteredComplaints.filter(c => c.status !== 'Delivered' && c.status !== 'Completed' && c.status !== 'Returned');
     const sortedFiltered = [...activeComplaints].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
     const displayedRecentRequests = query ? sortedFiltered : sortedFiltered.slice(0, 8);
 
@@ -211,7 +211,7 @@ export default function Dashboard() {
                                     {dataList.map(work => {
                                         let statusColor = 'var(--text-primary)';
                                         if (work.status === 'Pending') statusColor = '#bf616a';
-                                        else if (work.status === 'Delivered' || work.status === 'Completed') statusColor = '#a3be8c';
+                                        else if (work.status === 'Delivered' || work.status === 'Completed' || work.status === 'Returned') statusColor = '#a3be8c';
                                         else if (work.status === 'Ready for Delivery' || work.status === 'Ready') statusColor = '#8fbcbb';
                                         else if (work.status === 'In Progress') statusColor = '#35a7e6';
                                         else if (work.status === 'Intaken') statusColor = '#b48ead';
@@ -365,7 +365,7 @@ export default function Dashboard() {
                                     filteredComplaints.map(item => {
                                         let statusColor = 'var(--text-primary)';
                                         if (item.status === 'Pending') statusColor = '#bf616a';
-                                        else if (item.status === 'Delivered' || item.status === 'Completed') statusColor = '#a3be8c';
+                                        else if (item.status === 'Delivered' || item.status === 'Completed' || item.status === 'Returned') statusColor = '#a3be8c';
                                         else if (item.status === 'Ready for Delivery' || item.status === 'Ready') statusColor = '#8fbcbb';
                                         else if (item.status === 'In Progress') statusColor = '#35a7e6';
                                         else if (item.status === 'Intaken') statusColor = '#b48ead';
@@ -586,7 +586,7 @@ export default function Dashboard() {
                                 {displayedRecentRequests.map(req => {
                                     let statusColor = 'var(--text-primary)';
                                     if (req.status === 'Pending') statusColor = '#bf616a';
-                                    else if (req.status === 'Delivered' || req.status === 'Completed') statusColor = '#a3be8c';
+                                    else if (req.status === 'Delivered' || req.status === 'Completed' || req.status === 'Returned') statusColor = '#a3be8c';
                                     else if (req.status === 'Ready for Delivery' || req.status === 'Ready') statusColor = '#8fbcbb';
                                     else if (req.status === 'In Progress') statusColor = '#35a7e6';
                                     else if (req.status === 'Intaken') statusColor = '#b48ead';
