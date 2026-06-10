@@ -126,6 +126,17 @@ function ensureInitialized() {
                 try {
                     await pool.query("ALTER TABLE complaints ADD COLUMN IF NOT EXISTS service_mode TEXT DEFAULT 'On Center';");
                     await pool.query("ALTER TABLE complaints ADD COLUMN IF NOT EXISTS is_device_intaken INTEGER DEFAULT 1;");
+                    await pool.query("ALTER TABLE complaints ADD COLUMN IF NOT EXISTS created_by TEXT;");
+                    
+                    // Backfill created_by from status_logs for existing records
+                    await pool.query(`
+                        UPDATE complaints c
+                        SET created_by = sl.technician
+                        FROM status_logs sl
+                        WHERE c.id = sl.complaint_id 
+                        AND sl.status = 'Pending (Request Created)'
+                        AND c.created_by IS NULL;
+                    `);
                 } catch (err) {
                     console.error("Error adding service request fields:", err.message);
                 }

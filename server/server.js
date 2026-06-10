@@ -272,7 +272,7 @@ app.get('/api/customers/:id', async (req, res) => {
 app.post('/api/complaints', async (req, res) => {
     const id = req.body.id || uuidv4();
     const {
-        customer_id, item_name, serial_no, issue, status, csr_number, flag_ok, flag_r, flag_w, flag_p, created_at, service_type, service_mode, is_device_intaken, warranty_details, warranty_status
+        customer_id, item_name, serial_no, issue, status, csr_number, flag_ok, flag_r, flag_w, flag_p, created_at, service_type, service_mode, is_device_intaken, warranty_details, warranty_status, created_by
     } = req.body;
     const ts = created_at || new Date().toISOString();
     const finalServiceType = service_type || 'In-Shop';
@@ -309,12 +309,12 @@ app.post('/api/complaints', async (req, res) => {
     try {
         await db.query(`
             INSERT INTO complaints 
-            (id, customer_id, item_name, serial_no, issue, status, csr_number, flag_ok, flag_r, flag_w, flag_p, created_at, service_type, service_mode, is_device_intaken, warranty_details, warranty_status)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
+            (id, customer_id, item_name, serial_no, issue, status, csr_number, flag_ok, flag_r, flag_w, flag_p, created_at, service_type, service_mode, is_device_intaken, warranty_details, warranty_status, created_by)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)
         `, [
             id, customer_id, item_name, serial_no, issue, status || 'Pending', finalCsrNumber, 
             !!flag_ok, !!flag_r, !!flag_w, !!flag_p, ts, finalServiceType, finalServiceMode, finalIsDeviceIntaken,
-            warranty_details || null, warranty_status || null
+            warranty_details || null, warranty_status || null, created_by || 'admin'
         ]);
 
         // Audit Log: Record request creation event and user in status_logs
