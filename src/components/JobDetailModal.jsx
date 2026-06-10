@@ -458,6 +458,7 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                             <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: '0.5rem', fontSize: '0.9rem' }}>
                                 <strong style={{ color: '#35a7e6' }}>Tracking ID:</strong> <span>{job.csr_number || job.id.split('-')[0].toUpperCase()}</span>
                                 <strong style={{ color: '#35a7e6' }}>Date Rcvd:</strong> <span>{new Date(job.created_at).toLocaleDateString('en-GB').replace(/\//g, '-')}</span>
+                                <strong style={{ color: '#35a7e6' }}>Created By:</strong> <span style={{ textTransform: 'capitalize' }}>{job.created_by || 'Admin'}</span>
                                 <strong style={{ color: '#35a7e6' }}>Customer:</strong> <span>{customer.name}</span>
                                 <strong style={{ color: '#35a7e6' }}>Mobile:</strong> <span>{customer.phone}</span>
                                 {customer.address && <><strong style={{ color: '#35a7e6' }}>Address:</strong> <span>{customer.address}</span></>}

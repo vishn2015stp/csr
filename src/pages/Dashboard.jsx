@@ -579,6 +579,7 @@ export default function Dashboard() {
                                     <th style={{ padding: '0.5rem 0.75rem', fontWeight: '600' }}>Customer</th>
                                     <th style={{ padding: '0.5rem 0.75rem', fontWeight: '600' }}>Item</th>
                                     <th style={{ padding: '0.5rem 0.75rem', fontWeight: '600' }}>Status</th>
+                                    <th style={{ padding: '0.5rem 0.75rem', fontWeight: '600' }}>Logged By</th>
                                     <th style={{ padding: '0.5rem 0.75rem', textAlign: 'right', borderRadius: '0 4px 4px 0', fontWeight: '600' }}>Date</th>
                                 </tr>
                             </thead>
@@ -607,6 +608,9 @@ export default function Dashboard() {
                                                     {req.status}
                                                 </span>
                                             </td>
+                                            <td style={{ padding: '0.75rem', color: 'var(--text-secondary)', fontSize: '0.8rem', textTransform: 'capitalize' }}>
+                                                {req.created_by || 'Admin'}
+                                            </td>
                                             <td style={{ padding: '0.75rem', textAlign: 'right', fontSize: '0.8rem', color: '#35a7e6' }}>
                                                 {new Date(req.created_at).toLocaleString('en-GB').replace(/\//g, '-')}
                                             </td>
@@ -615,7 +619,7 @@ export default function Dashboard() {
                                 })}
                                 {displayedRecentRequests.length === 0 && (
                                     <tr>
-                                        <td colSpan="5" style={{ padding: '2rem', textAlign: 'center', color: '#4c566a' }}>No service requests logged yet.</td>
+                                        <td colSpan="6" style={{ padding: '2rem', textAlign: 'center', color: '#4c566a' }}>No service requests logged yet.</td>
                                     </tr>
                                 )}
                             </tbody>

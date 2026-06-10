@@ -225,6 +225,7 @@ export default function Requests() {
                                     <th style={{ padding: '0.75rem 1rem', fontWeight: '600' }}>Device</th>
                                     <th style={{ padding: '0.75rem 1rem', fontWeight: '600' }}>Status</th>
                                     <th style={{ padding: '0.75rem 1rem', fontWeight: '600' }}>Logged Date</th>
+                                    <th style={{ padding: '0.75rem 1rem', fontWeight: '600' }}>Logged By</th>
                                     <th style={{ padding: '0.75rem 1rem', textAlign: 'right', borderRadius: '0 4px 4px 0', fontWeight: '600' }}>Actions</th>
                                 </tr>
                             </thead>
@@ -264,6 +265,9 @@ export default function Requests() {
                                             <td style={{ padding: '0.85rem 1rem', color: '#35a7e6', fontSize: '0.85rem' }}>
                                                 {new Date(req.created_at).toLocaleDateString('en-GB').replace(/\//g, '-')}
                                             </td>
+                                            <td style={{ padding: '0.85rem 1rem', color: 'var(--text-secondary)', fontSize: '0.85rem', textTransform: 'capitalize' }}>
+                                                {req.created_by || 'Admin'}
+                                            </td>
                                             <td style={{ padding: '0.85rem 1rem', textAlign: 'right' }}>
                                                 <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
                                                     <button 
@@ -294,9 +298,7 @@ export default function Requests() {
                                 })}
                                 {filteredRequests.length === 0 && (
                                     <tr>
-                                        <td colSpan="7" style={{ padding: '3rem', textAlign: 'center', color: '#4c566a' }}>
-                                            No matching service request records found.
-                                        </td>
+                                        <td colSpan="8" style={{ padding: '2rem', textAlign: 'center', color: '#4c566a' }}>No requests match the current filters.</td>
                                     </tr>
                                 )}
                             </tbody>
