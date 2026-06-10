@@ -173,7 +173,7 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
         }
         let newStatus = e.target.value;
         
-        if (newStatus === 'Delivered' && job.status === 'Return') {
+        if (newStatus === 'Delivered' && job?.status?.trim().toLowerCase() === 'return') {
             newStatus = 'Returned';
         }
 
@@ -883,11 +883,6 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                             <button onClick={() => setShowInvoice(true)} style={{ background: '#4c566a', color: '#fff', padding: '1rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
                                 <Printer size={20} /> Generate & Print Invoice
                             </button>
-                            {job.is_device_intaken === 1 && !isDelivered && (
-                                <button onClick={markAsReturned} style={{ background: '#a3be8c', color: 'black', padding: '1rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
-                                    <ArrowLeftRight size={20} /> Mark as Returned to Customer
-                                </button>
-                            )}
                         </div>
                     </div>
 
