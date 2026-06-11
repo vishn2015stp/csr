@@ -97,8 +97,8 @@ class _JobDetailScreenState extends State<JobDetailScreen> with SingleTickerProv
 
   Future<void> _addServiceRecord() async {
     final techCtrl = TextEditingController();
-    final issuesCtrl = TextEditingController();
-    final resolutionCtrl = TextEditingController();
+    final workCtrl = TextEditingController();
+    final partsCtrl = TextEditingController();
 
     final confirmed = await showDialog<bool>(
       context: context,
@@ -116,16 +116,16 @@ class _JobDetailScreenState extends State<JobDetailScreen> with SingleTickerProv
             ),
             const SizedBox(height: 10),
             TextField(
-              controller: issuesCtrl,
+              controller: workCtrl,
               style: const TextStyle(color: kTextPrimary),
-              decoration: const InputDecoration(labelText: 'Issues Found'),
+              decoration: const InputDecoration(labelText: 'Work Done'),
               maxLines: 3,
             ),
             const SizedBox(height: 10),
             TextField(
-              controller: resolutionCtrl,
+              controller: partsCtrl,
               style: const TextStyle(color: kTextPrimary),
-              decoration: const InputDecoration(labelText: 'Resolution Status'),
+              decoration: const InputDecoration(labelText: 'Parts Used'),
             ),
           ],
         ),
@@ -140,20 +140,16 @@ class _JobDetailScreenState extends State<JobDetailScreen> with SingleTickerProv
       await _api.createServiceRecord({
         'complaint_id': _complaint!.id,
         'technician': techCtrl.text,
-        'issues': issuesCtrl.text,
-        'resolution_status': resolutionCtrl.text,
+        'work_done': workCtrl.text,
+        'parts_used': partsCtrl.text,
       });
       await _load();
     }
   }
 
   Future<void> _addInvoice() async {
-    final receiptCtrl = TextEditingController();
-    final serviceFeesCtrl = TextEditingController();
-    final partCostsCtrl = TextEditingController();
-    final totalCtrl = TextEditingController();
-    final sparesCtrl = TextEditingController();
-    final warrantyCtrl = TextEditingController();
+    final amtCtrl = TextEditingController();
+    final descCtrl = TextEditingController();
 
     final confirmed = await showDialog<bool>(
       context: context,
@@ -161,50 +157,23 @@ class _JobDetailScreenState extends State<JobDetailScreen> with SingleTickerProv
         backgroundColor: kPanelDark,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         title: const Text('Add Invoice', style: TextStyle(color: kTextPrimary)),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: receiptCtrl,
-                style: const TextStyle(color: kTextPrimary),
-                decoration: const InputDecoration(labelText: 'Receipt Number'),
-              ),
-              const SizedBox(height: 10),
-              TextField(
-                controller: serviceFeesCtrl,
-                style: const TextStyle(color: kTextPrimary),
-                decoration: const InputDecoration(labelText: 'Service Fees (₹)'),
-                keyboardType: TextInputType.number,
-              ),
-              const SizedBox(height: 10),
-              TextField(
-                controller: partCostsCtrl,
-                style: const TextStyle(color: kTextPrimary),
-                decoration: const InputDecoration(labelText: 'Part Costs (₹)'),
-                keyboardType: TextInputType.number,
-              ),
-              const SizedBox(height: 10),
-              TextField(
-                controller: totalCtrl,
-                style: const TextStyle(color: kTextPrimary),
-                decoration: const InputDecoration(labelText: 'Total (₹)'),
-                keyboardType: TextInputType.number,
-              ),
-              const SizedBox(height: 10),
-              TextField(
-                controller: sparesCtrl,
-                style: const TextStyle(color: kTextPrimary),
-                decoration: const InputDecoration(labelText: 'Spares Used'),
-              ),
-              const SizedBox(height: 10),
-              TextField(
-                controller: warrantyCtrl,
-                style: const TextStyle(color: kTextPrimary),
-                decoration: const InputDecoration(labelText: 'Warranty'),
-              ),
-            ],
-          ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: amtCtrl,
+              style: const TextStyle(color: kTextPrimary),
+              decoration: const InputDecoration(labelText: 'Amount (₹)'),
+              keyboardType: TextInputType.number,
+            ),
+            const SizedBox(height: 10),
+            TextField(
+              controller: descCtrl,
+              style: const TextStyle(color: kTextPrimary),
+              decoration: const InputDecoration(labelText: 'Description'),
+              maxLines: 2,
+            ),
+          ],
         ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
@@ -216,12 +185,8 @@ class _JobDetailScreenState extends State<JobDetailScreen> with SingleTickerProv
     if (confirmed == true && _complaint != null) {
       await _api.createInvoice({
         'complaint_id': _complaint!.id,
-        'receipt_number': receiptCtrl.text,
-        'service_fees': double.tryParse(serviceFeesCtrl.text) ?? 0,
-        'part_costs': double.tryParse(partCostsCtrl.text) ?? 0,
-        'total': double.tryParse(totalCtrl.text) ?? 0,
-        'spares': sparesCtrl.text,
-        'warranty': warrantyCtrl.text,
+        'amount': double.tryParse(amtCtrl.text) ?? 0,
+        'description': descCtrl.text,
       });
       await _load();
     }
@@ -325,8 +290,8 @@ class _InfoTab extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(complaint.itemName ?? '—', style: const TextStyle(color: kTextPrimary, fontSize: 18, fontWeight: FontWeight.bold)),
-                      if (complaint.serialNo != null)
-                        Text('S/N: ${complaint.serialNo}', style: const TextStyle(color: kTextSecondary, fontSize: 13)),
+                      if (complaint.brand != null || complaint.model != null)
+                        Text('${complaint.brand ?? ''} ${complaint.model ?? ''}'.trim(), style: const TextStyle(color: kTextSecondary, fontSize: 13)),
                     ],
                   ),
                 ),
@@ -341,29 +306,33 @@ class _InfoTab extends StatelessWidget {
             icon: Icons.computer_rounded,
             children: [
               _InfoRow('Item', complaint.itemName),
+              _InfoRow('Brand', complaint.brand),
+              _InfoRow('Model', complaint.model),
               _InfoRow('Serial No.', complaint.serialNo),
               _InfoRow('Service', [
-                complaint.serviceMode,
-                if (complaint.serviceType != null && complaint.serviceType != complaint.serviceMode) complaint.serviceType,
+                complaint.serviceType,
+                if (complaint.serviceMode != null && complaint.serviceMode != complaint.serviceType) complaint.serviceMode,
               ].whereType<String>().join(' · ')),
+              if (complaint.password != null && complaint.password!.isNotEmpty)
+                _InfoRow('Device Password', complaint.password),
             ],
           ),
           const SizedBox(height: 12),
 
           _InfoCard(
-            title: 'Issue Description',
+            title: 'Problem Description',
             icon: Icons.bug_report_rounded,
             children: [
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 4),
                 child: Text(
-                  complaint.issue ?? 'No description provided.',
+                  complaint.problemDescription ?? 'No description provided.',
                   style: const TextStyle(color: kTextPrimary, fontSize: 14, height: 1.5),
                 ),
               ),
-              if (complaint.warrantyDetails != null && complaint.warrantyDetails!.isNotEmpty) ...[
+              if (complaint.accessories != null && complaint.accessories!.isNotEmpty) ...[
                 const Divider(color: kBorderColor),
-                _InfoRow('Warranty', complaint.warrantyDetails),
+                _InfoRow('Accessories', complaint.accessories),
               ],
             ],
           ),
@@ -509,17 +478,17 @@ class _ServiceTab extends StatelessWidget {
                               Text(_fmt(r.createdAt!), style: const TextStyle(color: kTextSecondary, fontSize: 11)),
                           ],
                         ),
-                        if (r.issues != null) ...[
+                        if (r.workDone != null) ...[
                           const SizedBox(height: 8),
-                          Text(r.issues!, style: const TextStyle(color: kTextPrimary, fontSize: 13)),
+                          Text(r.workDone!, style: const TextStyle(color: kTextPrimary, fontSize: 13)),
                         ],
-                        if (r.resolutionStatus != null && r.resolutionStatus!.isNotEmpty) ...[
+                        if (r.partsUsed != null && r.partsUsed!.isNotEmpty) ...[
                           const SizedBox(height: 6),
                           Row(
                             children: [
-                              const Icon(Icons.check_circle_outline, color: kTextSecondary, size: 13),
+                              const Icon(Icons.hardware_rounded, color: kTextSecondary, size: 13),
                               const SizedBox(width: 4),
-                              Text('Resolution: ${r.resolutionStatus}', style: const TextStyle(color: kTextSecondary, fontSize: 12)),
+                              Text('Parts: ${r.partsUsed}', style: const TextStyle(color: kTextSecondary, fontSize: 12)),
                             ],
                           ),
                         ],
@@ -611,7 +580,7 @@ class _InvoiceTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final total = invoices.fold(0.0, (sum, inv) => sum + (inv.total ?? 0));
+    final total = invoices.fold(0.0, (sum, inv) => sum + (inv.amount ?? 0));
 
     return Scaffold(
       backgroundColor: kBgDark,
@@ -660,23 +629,9 @@ class _InvoiceTab extends StatelessWidget {
                         margin: const EdgeInsets.only(bottom: 8),
                         child: ListTile(
                           leading: const Icon(Icons.receipt_long_rounded, color: kAccent),
-                          title: Text('₹${(inv.total ?? 0).toStringAsFixed(2)}',
+                          title: Text('₹${(inv.amount ?? 0).toStringAsFixed(2)}',
                               style: const TextStyle(color: kTextPrimary, fontWeight: FontWeight.bold)),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              if (inv.receiptNumber != null && inv.receiptNumber!.isNotEmpty)
-                                Text('Receipt: ${inv.receiptNumber}', style: const TextStyle(color: kTextSecondary, fontSize: 12)),
-                              if (inv.serviceFees != null && inv.serviceFees! > 0)
-                                Text('Service Fees: ₹${inv.serviceFees!.toStringAsFixed(2)}', style: const TextStyle(color: kTextSecondary, fontSize: 12)),
-                              if (inv.partCosts != null && inv.partCosts! > 0)
-                                Text('Part Costs: ₹${inv.partCosts!.toStringAsFixed(2)}', style: const TextStyle(color: kTextSecondary, fontSize: 12)),
-                              if (inv.spares != null && inv.spares!.isNotEmpty)
-                                Text('Spares: ${inv.spares}', style: const TextStyle(color: kTextSecondary, fontSize: 12)),
-                              if (inv.warranty != null && inv.warranty!.isNotEmpty)
-                                Text('Warranty: ${inv.warranty}', style: const TextStyle(color: kTextSecondary, fontSize: 12)),
-                            ],
-                          ),
+                          subtitle: Text(inv.description ?? '—', style: const TextStyle(color: kTextSecondary)),
                           trailing: inv.createdAt != null
                               ? Text(_fmt(inv.createdAt!), style: const TextStyle(color: kTextSecondary, fontSize: 11))
                               : null,

@@ -55,7 +55,7 @@ function ensureInitialized() {
                         serial_no TEXT,
                         issue TEXT NOT NULL,
                         status TEXT NOT NULL DEFAULT 'Pending',
-                        csr_number TEXT UNIQUE NOT NULL,
+                        csr_number TEXT,
                         flag_ok BOOLEAN DEFAULT FALSE,
                         flag_r BOOLEAN DEFAULT FALSE,
                         flag_w BOOLEAN DEFAULT FALSE,
@@ -153,47 +153,6 @@ function ensureInitialized() {
                     await pool.query("ALTER TABLE invoices ADD COLUMN IF NOT EXISTS warranty TEXT;");
                 } catch (err) {
                     console.error("Error adding invoice billing columns:", err.message);
-                }
-
-                // Ensure csr_number is UNIQUE and NOT NULL
-                try {
-                    // Backfill any NULL csr_number values
-                    await pool.query(`
-                        UPDATE complaints 
-                        SET csr_number = CAST(100000 + FLOOR(RANDOM() * 900000) AS TEXT) || '-' || SUBSTRING(REPLACE(gen_random_uuid()::TEXT, '-', ''), 1, 4)
-                        WHERE csr_number IS NULL OR csr_number = ''
-                    `);
-                    // Deduplicate csr_number values
-                    await pool.query(`
-                        UPDATE complaints c
-                        SET csr_number = c.id
-                        WHERE csr_number IN (
-                            SELECT csr_number FROM (
-                                SELECT csr_number FROM complaints GROUP BY csr_number HAVING COUNT(*) > 1
-                            ) dup
-                        )
-                    `);
-                    // Add NOT NULL constraint if not already set
-                    await pool.query("ALTER TABLE complaints ALTER COLUMN csr_number SET NOT NULL;");
-                } catch (err) {
-                    console.error("Error setting csr_number NOT NULL:", err.message);
-                }
-
-                try {
-                    // Add UNIQUE constraint if not already present
-                    await pool.query(`
-                        DO $$
-                        BEGIN
-                            IF NOT EXISTS (
-                                SELECT 1 FROM pg_constraint 
-                                WHERE conname = 'complaints_csr_number_key'
-                            ) THEN
-                                ALTER TABLE complaints ADD CONSTRAINT complaints_csr_number_key UNIQUE (csr_number);
-                            END IF;
-                        END $$;
-                    `);
-                } catch (err) {
-                    console.error("Error adding UNIQUE constraint on csr_number:", err.message);
                 }
 
                 // Initialize default admin

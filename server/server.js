@@ -306,35 +306,16 @@ app.post('/api/complaints', async (req, res) => {
         }
     }
 
-    // Retry loop to handle csr_number UNIQUE collisions under concurrency
-    let inserted = false;
-    let attempts = 0;
-    while (!inserted && attempts < 5) {
-        try {
-            await db.query(`
-                INSERT INTO complaints 
-                (id, customer_id, item_name, serial_no, issue, status, csr_number, flag_ok, flag_r, flag_w, flag_p, created_at, service_type, service_mode, is_device_intaken, warranty_details, warranty_status, created_by)
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)
-            `, [
-                id, customer_id, item_name, serial_no, issue, status || 'Pending', finalCsrNumber, 
-                !!flag_ok, !!flag_r, !!flag_w, !!flag_p, ts, finalServiceType, finalServiceMode, finalIsDeviceIntaken,
-                warranty_details || null, warranty_status || null, created_by || 'admin'
-            ]);
-            inserted = true;
-        } catch (err) {
-            if (err.code === '23505' && err.constraint === 'complaints_csr_number_key') {
-                // UNIQUE violation on csr_number — generate a new one and retry
-                const nextCsr = parseInt(finalCsrNumber, 10) + 1 + Math.floor(Math.random() * 100);
-                finalCsrNumber = nextCsr.toString();
-                attempts++;
-            } else {
-                throw err; // re-throw non-unique violations
-            }
-        }
-    }
-    if (!inserted) {
-        return res.status(500).json({ error: 'Failed to generate unique CSR number. Please try again.' });
-    }
+    try {
+        await db.query(`
+            INSERT INTO complaints 
+            (id, customer_id, item_name, serial_no, issue, status, csr_number, flag_ok, flag_r, flag_w, flag_p, created_at, service_type, service_mode, is_device_intaken, warranty_details, warranty_status, created_by)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)
+        `, [
+            id, customer_id, item_name, serial_no, issue, status || 'Pending', finalCsrNumber, 
+            !!flag_ok, !!flag_r, !!flag_w, !!flag_p, ts, finalServiceType, finalServiceMode, finalIsDeviceIntaken,
+            warranty_details || null, warranty_status || null, created_by || 'admin'
+        ]);
 
         // Audit Log: Record request creation event and user in status_logs
         if (req.body.created_by) {
