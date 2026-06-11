@@ -2,11 +2,11 @@ const API_URL = '/api';
 
 export const api = {
     // ---- USERS ----
-    async login(username, password, force = false) {
+    async login(username, password, force = false, platform = 'browser') {
         const res = await fetch(`${API_URL}/users/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password, force })
+            body: JSON.stringify({ username, password, force, platform })
         });
         const data = await res.json();
         if (!res.ok) {
@@ -14,18 +14,18 @@ export const api = {
         }
         return data;
     },
-    async getUser(id, sessionId = null) {
-        const url = sessionId ? `${API_URL}/users/${id}?sessionId=${sessionId}` : `${API_URL}/users/${id}`;
+    async getUser(id, sessionId = null, platform = 'browser') {
+        const url = sessionId ? `${API_URL}/users/${id}?sessionId=${sessionId}&platform=${platform}` : `${API_URL}/users/${id}`;
         const res = await fetch(url);
         if (!res.ok) return null;
         return res.json();
     },
-    async logout(userId) {
+    async logout(userId, platform = 'browser') {
         try {
             await fetch(`${API_URL}/users/logout`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userId })
+                body: JSON.stringify({ userId, platform })
             });
         } catch (e) {
             console.error("Logout API error:", e);

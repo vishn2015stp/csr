@@ -13,7 +13,7 @@ class ApiService {
     final res = await http.post(
       Uri.parse('$_baseUrl/users/login'),
       headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'username': username, 'password': password, 'force': force}),
+      body: jsonEncode({'username': username, 'password': password, 'force': force, 'platform': 'app'}),
     );
     final data = jsonDecode(res.body) as Map<String, dynamic>;
     if (!res.statusCode.toString().startsWith('2')) {
@@ -24,7 +24,7 @@ class ApiService {
 
   Future<UserModel?> getUser(String userId, {String? sessionId}) async {
     final url = sessionId != null
-        ? '$_baseUrl/users/$userId?sessionId=$sessionId'
+        ? '$_baseUrl/users/$userId?sessionId=$sessionId&platform=app'
         : '$_baseUrl/users/$userId';
     final res = await http.get(Uri.parse(url));
     if (res.statusCode != 200) return null;
@@ -35,7 +35,7 @@ class ApiService {
     await http.post(
       Uri.parse('$_baseUrl/users/logout'),
       headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'userId': userId}),
+      body: jsonEncode({'userId': userId, 'platform': 'app'}),
     );
   }
 

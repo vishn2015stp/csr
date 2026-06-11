@@ -29,7 +29,7 @@ app.use(async (req, res, next) => {
 
 // =============== USERS ===============
 app.post('/api/users/login', async (req, res) => {
-    const { username, password, force } = req.body;
+    const { username, password, force, platform = 'browser' } = req.body;
     try {
         const result = await db.query('SELECT * FROM users WHERE username = $1', [username]);
         const user = result.rows[0];
@@ -46,19 +46,24 @@ app.post('/api/users/login', async (req, res) => {
         }
 
         // If user already has a session and login is not forced, alert client
-        if (user.session_id && !force) {
+        const existingSession = platform === 'app' ? user.app_session_id : user.session_id;
+        if (existingSession && !force) {
             return res.json({ 
                 success: false, 
                 alreadyLoggedIn: true, 
-                message: 'This user is already logged in on another device. Do you want to log out the other device and continue here?' 
+                message: `This user is already logged in on another ${platform === 'app' ? 'device (App)' : 'computer (Browser)'}. Do you want to log out the other device and continue here?` 
             });
         }
 
         // Generate a new unique session ID
         const newSessionId = uuidv4();
-        await db.query('UPDATE users SET session_id = $1 WHERE id = $2', [newSessionId, user.id]);
+        if (platform === 'app') {
+            await db.query('UPDATE users SET app_session_id = $1 WHERE id = $2', [newSessionId, user.id]);
+        } else {
+            await db.query('UPDATE users SET session_id = $1 WHERE id = $2', [newSessionId, user.id]);
+        }
 
-        const userObj = { ...user, password: undefined, session_id: newSessionId };
+        const userObj = { ...user, password: undefined, session_id: platform === 'browser' ? newSessionId : user.session_id, app_session_id: platform === 'app' ? newSessionId : user.app_session_id };
         res.json({ success: true, user: userObj, sessionId: newSessionId });
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -66,10 +71,14 @@ app.post('/api/users/login', async (req, res) => {
 });
 
 app.post('/api/users/logout', async (req, res) => {
-    const { userId } = req.body;
+    const { userId, platform = 'browser' } = req.body;
     try {
         if (userId) {
-            await db.query('UPDATE users SET session_id = NULL WHERE id = $1', [userId]);
+            if (platform === 'app') {
+                await db.query('UPDATE users SET app_session_id = NULL WHERE id = $1', [userId]);
+            } else {
+                await db.query('UPDATE users SET session_id = NULL WHERE id = $1', [userId]);
+            }
         }
         res.json({ success: true });
     } catch (err) {
@@ -96,13 +105,16 @@ app.post('/api/users/change-password', async (req, res) => {
 });
 
 app.get('/api/users/:id', async (req, res) => {
-    const { sessionId } = req.query;
+    const { sessionId, platform = 'browser' } = req.query;
     try {
         const result = await db.query('SELECT * FROM users WHERE id = $1', [req.params.id]);
         const user = result.rows[0];
         if (user) {
-            if (sessionId && user.session_id !== sessionId) {
-                return res.status(401).json({ error: 'Session terminated. Access denied.' });
+            if (sessionId) {
+                const currentSession = platform === 'app' ? user.app_session_id : user.session_id;
+                if (currentSession !== sessionId) {
+                    return res.status(401).json({ error: 'Session terminated. Access denied.' });
+                }
             }
             res.json(user);
         } else {
@@ -131,7 +143,7 @@ app.put('/api/users/:id', async (req, res) => {
 
         // Security override: if deactivated, terminate session
         if (is_active === false) {
-            await db.query('UPDATE users SET session_id = NULL WHERE id = $1', [id]);
+            await db.query('UPDATE users SET session_id = NULL, app_session_id = NULL WHERE id = $1', [id]);
         }
 
         res.json({ success: true });

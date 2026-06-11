@@ -100,6 +100,7 @@ function ensureInitialized() {
                 // Safely add columns if they don't exist
                 try {
                     await pool.query("ALTER TABLE users ADD COLUMN IF NOT EXISTS session_id TEXT;");
+                    await pool.query("ALTER TABLE users ADD COLUMN IF NOT EXISTS app_session_id TEXT;");
                 } catch (err) {
                     console.error("Error adding session_id to users:", err.message);
                 }
