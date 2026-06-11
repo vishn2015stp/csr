@@ -140,8 +140,8 @@ class _JobDetailScreenState extends State<JobDetailScreen> with SingleTickerProv
       await _api.createServiceRecord({
         'complaint_id': _complaint!.id,
         'technician': techCtrl.text,
-        'work_done': workCtrl.text,
-        'parts_used': partsCtrl.text,
+        'issues': workCtrl.text,
+        'resolution_status': partsCtrl.text,
       });
       await _load();
     }
@@ -185,8 +185,8 @@ class _JobDetailScreenState extends State<JobDetailScreen> with SingleTickerProv
     if (confirmed == true && _complaint != null) {
       await _api.createInvoice({
         'complaint_id': _complaint!.id,
-        'amount': double.tryParse(amtCtrl.text) ?? 0,
-        'description': descCtrl.text,
+        'total': double.tryParse(amtCtrl.text) ?? 0,
+        'receipt_number': descCtrl.text,
       });
       await _load();
     }
@@ -478,17 +478,17 @@ class _ServiceTab extends StatelessWidget {
                               Text(_fmt(r.createdAt!), style: const TextStyle(color: kTextSecondary, fontSize: 11)),
                           ],
                         ),
-                        if (r.workDone != null) ...[
+                        if (r.issues != null && r.issues!.isNotEmpty) ...[
                           const SizedBox(height: 8),
-                          Text(r.workDone!, style: const TextStyle(color: kTextPrimary, fontSize: 13)),
+                          Text(r.issues!, style: const TextStyle(color: kTextPrimary, fontSize: 13)),
                         ],
-                        if (r.partsUsed != null && r.partsUsed!.isNotEmpty) ...[
+                        if (r.resolutionStatus != null && r.resolutionStatus!.isNotEmpty) ...[
                           const SizedBox(height: 6),
                           Row(
                             children: [
                               const Icon(Icons.hardware_rounded, color: kTextSecondary, size: 13),
                               const SizedBox(width: 4),
-                              Text('Parts: ${r.partsUsed}', style: const TextStyle(color: kTextSecondary, fontSize: 12)),
+                              Text('Resolution/Parts: ${r.resolutionStatus}', style: const TextStyle(color: kTextSecondary, fontSize: 12)),
                             ],
                           ),
                         ],
@@ -578,9 +578,8 @@ class _InvoiceTab extends StatelessWidget {
 
   const _InvoiceTab({required this.invoices, required this.onAdd});
 
-  @override
   Widget build(BuildContext context) {
-    final total = invoices.fold(0.0, (sum, inv) => sum + (inv.amount ?? 0));
+    final total = invoices.fold(0.0, (sum, inv) => sum + (inv.total ?? 0));
 
     return Scaffold(
       backgroundColor: kBgDark,
@@ -629,9 +628,9 @@ class _InvoiceTab extends StatelessWidget {
                         margin: const EdgeInsets.only(bottom: 8),
                         child: ListTile(
                           leading: const Icon(Icons.receipt_long_rounded, color: kAccent),
-                          title: Text('₹${(inv.amount ?? 0).toStringAsFixed(2)}',
+                          title: Text('₹${(inv.total ?? 0).toStringAsFixed(2)}',
                               style: const TextStyle(color: kTextPrimary, fontWeight: FontWeight.bold)),
-                          subtitle: Text(inv.description ?? '—', style: const TextStyle(color: kTextSecondary)),
+                          subtitle: Text(inv.receiptNumber ?? '—', style: const TextStyle(color: kTextSecondary)),
                           trailing: inv.createdAt != null
                               ? Text(_fmt(inv.createdAt!), style: const TextStyle(color: kTextSecondary, fontSize: 11))
                               : null,
