@@ -63,6 +63,10 @@ export const api = {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(complaint)
         });
+        if (!res.ok) {
+            const err = await res.json();
+            throw new Error(err.error || 'Failed to create request');
+        }
         return res.json();
     },
     async getComplaints(orderDesc = false) {
