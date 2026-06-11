@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/user.dart';
@@ -24,21 +25,18 @@ class AuthProvider extends ChangeNotifier {
   Future<void> _init() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final userId = prefs.getString('userId');
+      final userJson = prefs.getString('userJson');
       final sessionId = prefs.getString('sessionId');
-      if (userId != null) {
-        final u = await _api.getUser(userId, sessionId: sessionId);
-        if (u != null) {
-          _user = u;
-          _sessionId = sessionId;
-          _startSessionTimer();
-        } else {
-          await _clearSession(prefs);
-        }
+      
+      if (userJson != null) {
+        _user = UserModel.fromJson(jsonDecode(userJson));
+        _sessionId = sessionId;
+        _startSessionTimer();
+        // Fire off a background check immediately
+        _checkSession();
       }
     } catch (e) {
       debugPrint('Auth init error: $e');
-      await _clearSessionPrefs();
     } finally {
       _loading = false;
       notifyListeners();
@@ -54,6 +52,7 @@ class AuthProvider extends ChangeNotifier {
 
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('userId', _user!.id);
+        await prefs.setString('userJson', jsonEncode(data['user']));
         if (_sessionId != null) await prefs.setString('sessionId', _sessionId!);
 
         _startSessionTimer();
@@ -107,6 +106,7 @@ class AuthProvider extends ChangeNotifier {
 
   Future<void> _clearSession(SharedPreferences prefs) async {
     await prefs.remove('userId');
+    await prefs.remove('userJson');
     await prefs.remove('sessionId');
   }
 
