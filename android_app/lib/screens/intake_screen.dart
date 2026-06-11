@@ -22,6 +22,7 @@ class _IntakeScreenState extends State<IntakeScreen> {
   final _nameCtrl = TextEditingController();
   final _addressCtrl = TextEditingController();
   final _emailCtrl = TextEditingController();
+  final _locationCtrl = TextEditingController();
   Customer? _foundCustomer;
   bool _lookingUp = false;
 
@@ -30,11 +31,14 @@ class _IntakeScreenState extends State<IntakeScreen> {
   final _brandCtrl = TextEditingController();
   final _modelCtrl = TextEditingController();
   final _serialCtrl = TextEditingController();
-  final _problemCtrl = TextEditingController();
+  final _issueCtrl = TextEditingController();
   final _passwordCtrl = TextEditingController();
   final _accessoriesCtrl = TextEditingController();
+  final _csrNumberCtrl = TextEditingController();
 
   String _serviceType = 'In-Shop';
+  bool _isWarranty = false;
+  final _warrantyDetailsCtrl = TextEditingController();
   bool _submitting = false;
   String? _error;
   bool _success = false;
@@ -42,9 +46,10 @@ class _IntakeScreenState extends State<IntakeScreen> {
   @override
   void dispose() {
     _phoneCtrl.dispose(); _nameCtrl.dispose(); _addressCtrl.dispose();
-    _emailCtrl.dispose(); _itemNameCtrl.dispose(); _brandCtrl.dispose();
-    _modelCtrl.dispose(); _serialCtrl.dispose(); _problemCtrl.dispose();
-    _passwordCtrl.dispose(); _accessoriesCtrl.dispose();
+    _emailCtrl.dispose(); _locationCtrl.dispose(); _itemNameCtrl.dispose();
+    _brandCtrl.dispose(); _modelCtrl.dispose(); _serialCtrl.dispose();
+    _issueCtrl.dispose(); _passwordCtrl.dispose(); _accessoriesCtrl.dispose();
+    _csrNumberCtrl.dispose(); _warrantyDetailsCtrl.dispose();
     super.dispose();
   }
 
@@ -53,13 +58,24 @@ class _IntakeScreenState extends State<IntakeScreen> {
     if (phone.isEmpty) return;
     setState(() { _lookingUp = true; _foundCustomer = null; });
     try {
-      // Search by fetching all complaints and extracting unique customers
-      // We'll try finding by phone via customers endpoint (if supported)
-      // For now, we pre-fill empty fields
-      setState(() => _lookingUp = false);
+      final customers = await _api.getCustomers();
+      final match = customers.cast<Customer?>().firstWhere(
+        (c) => c?.phone == phone,
+        orElse: () => null,
+      );
+      if (match != null) {
+        setState(() {
+          _foundCustomer = match;
+          _nameCtrl.text = match.name ?? '';
+          _addressCtrl.text = match.address ?? '';
+          _emailCtrl.text = match.email ?? '';
+          _locationCtrl.text = match.location ?? '';
+        });
+      }
     } catch (_) {
-      setState(() => _lookingUp = false);
+      // Silently fail if lookup errors
     }
+    setState(() => _lookingUp = false);
   }
 
   Future<void> _submit() async {
@@ -75,6 +91,7 @@ class _IntakeScreenState extends State<IntakeScreen> {
         'phone': _phoneCtrl.text.trim(),
         'address': _addressCtrl.text.trim(),
         'email': _emailCtrl.text.trim(),
+        'location': _locationCtrl.text.trim(),
       };
 
       Customer customer;
@@ -84,6 +101,8 @@ class _IntakeScreenState extends State<IntakeScreen> {
         customer = await _api.createCustomer(customerData);
       }
 
+      final isDeviceIntaken = _serviceType == 'On-Site' ? 0 : 1;
+
       // Create complaint
       await _api.createComplaint({
         'customer_id': customer.id,
@@ -91,19 +110,23 @@ class _IntakeScreenState extends State<IntakeScreen> {
         'brand': _brandCtrl.text.trim(),
         'model': _modelCtrl.text.trim(),
         'serial_no': _serialCtrl.text.trim(),
-        'problem_description': _problemCtrl.text.trim(),
+        'issue': _issueCtrl.text.trim(),
         'password': _passwordCtrl.text.trim(),
         'accessories': _accessoriesCtrl.text.trim(),
+        'csr_number': _csrNumberCtrl.text.trim().isNotEmpty ? _csrNumberCtrl.text.trim() : null,
         'service_type': _serviceType,
-        'status': 'Intaken',
+        'status': _isWarranty ? 'Warranty' : 'Pending',
+        'is_device_intaken': isDeviceIntaken,
         'assigned_to': auth.user?.username,
+        'warranty_details': _isWarranty ? _warrantyDetailsCtrl.text.trim() : null,
+        'warranty_status': _isWarranty ? 'Pending' : null,
       });
 
       setState(() { _submitting = false; _success = true; });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('✓ Service request created successfully'),
+            content: Text('Service request created successfully'),
             backgroundColor: kStatusDelivered,
           ),
         );
@@ -119,10 +142,14 @@ class _IntakeScreenState extends State<IntakeScreen> {
 
   void _resetForm() {
     _phoneCtrl.clear(); _nameCtrl.clear(); _addressCtrl.clear();
-    _emailCtrl.clear(); _itemNameCtrl.clear(); _brandCtrl.clear();
-    _modelCtrl.clear(); _serialCtrl.clear(); _problemCtrl.clear();
-    _passwordCtrl.clear(); _accessoriesCtrl.clear();
-    setState(() { _foundCustomer = null; _serviceType = 'In-Shop'; _success = false; });
+    _emailCtrl.clear(); _locationCtrl.clear(); _itemNameCtrl.clear();
+    _brandCtrl.clear(); _modelCtrl.clear(); _serialCtrl.clear();
+    _issueCtrl.clear(); _passwordCtrl.clear(); _accessoriesCtrl.clear();
+    _csrNumberCtrl.clear(); _warrantyDetailsCtrl.clear();
+    setState(() {
+      _foundCustomer = null; _serviceType = 'In-Shop';
+      _isWarranty = false; _success = false;
+    });
   }
 
   @override
@@ -174,7 +201,6 @@ class _IntakeScreenState extends State<IntakeScreen> {
                         prefixIcon: Icon(Icons.phone_outlined, size: 18),
                       ),
                       validator: (v) => v == null || v.isEmpty ? 'Required' : null,
-                      onChanged: (_) => setState(() {}),
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -211,6 +237,16 @@ class _IntakeScreenState extends State<IntakeScreen> {
                 maxLines: 2,
               ),
               const SizedBox(height: 12),
+              if (_serviceType == 'On-Site')
+                TextFormField(
+                  controller: _locationCtrl,
+                  style: const TextStyle(color: kTextPrimary),
+                  decoration: const InputDecoration(
+                    labelText: 'Location / Landmark',
+                    prefixIcon: Icon(Icons.map_outlined, size: 18),
+                  ),
+                ),
+              if (_serviceType == 'On-Site') const SizedBox(height: 12),
               TextFormField(
                 controller: _emailCtrl,
                 style: const TextStyle(color: kTextPrimary),
@@ -328,6 +364,15 @@ class _IntakeScreenState extends State<IntakeScreen> {
                   prefixIcon: Icon(Icons.lock_outline, size: 18),
                 ),
               ),
+              const SizedBox(height: 12),
+              TextFormField(
+                controller: _csrNumberCtrl,
+                style: const TextStyle(color: kTextPrimary),
+                decoration: const InputDecoration(
+                  labelText: 'CSR Number (optional - auto-generated if empty)',
+                  prefixIcon: Icon(Icons.tag_rounded, size: 18),
+                ),
+              ),
 
               const SizedBox(height: 24),
 
@@ -336,10 +381,10 @@ class _IntakeScreenState extends State<IntakeScreen> {
               const SizedBox(height: 12),
 
               TextFormField(
-                controller: _problemCtrl,
+                controller: _issueCtrl,
                 style: const TextStyle(color: kTextPrimary),
                 decoration: const InputDecoration(
-                  labelText: 'Problem Description *',
+                  labelText: 'Issue Description *',
                   alignLabelWithHint: true,
                   prefixIcon: Padding(
                     padding: EdgeInsets.only(bottom: 48),
@@ -358,6 +403,47 @@ class _IntakeScreenState extends State<IntakeScreen> {
                   prefixIcon: Icon(Icons.inventory_2_outlined, size: 18),
                 ),
                 maxLines: 2,
+              ),
+
+              const SizedBox(height: 16),
+
+              // ── Warranty Section ──
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: kPanelDark,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: kBorderColor),
+                ),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.verified_rounded, color: kAccent, size: 18),
+                        const SizedBox(width: 8),
+                        const Text('Device Under Warranty', style: TextStyle(color: kTextPrimary, fontSize: 14)),
+                        const Spacer(),
+                        Switch(
+                          value: _isWarranty,
+                          onChanged: (v) => setState(() => _isWarranty = v),
+                          activeColor: kAccent,
+                        ),
+                      ],
+                    ),
+                    if (_isWarranty) ...[
+                      const SizedBox(height: 8),
+                      TextFormField(
+                        controller: _warrantyDetailsCtrl,
+                        style: const TextStyle(color: kTextPrimary),
+                        decoration: const InputDecoration(
+                          labelText: 'Warranty Details',
+                          prefixIcon: Icon(Icons.description_outlined, size: 18),
+                        ),
+                        maxLines: 2,
+                      ),
+                    ],
+                  ],
+                ),
               ),
 
               const SizedBox(height: 32),

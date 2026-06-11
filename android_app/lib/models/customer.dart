@@ -4,8 +4,11 @@ class Customer {
   final String? phone;
   final String? address;
   final String? email;
+  final String? location;
+  final String? serialNo;
+  final String? deliveryDate;
 
-  Customer({required this.id, this.name, this.phone, this.address, this.email});
+  Customer({required this.id, this.name, this.phone, this.address, this.email, this.location, this.serialNo, this.deliveryDate});
 
   factory Customer.fromJson(Map<String, dynamic> json) {
     return Customer(
@@ -14,6 +17,9 @@ class Customer {
       phone: json['phone']?.toString(),
       address: json['address']?.toString(),
       email: json['email']?.toString(),
+      location: json['location']?.toString(),
+      serialNo: json['serial_no']?.toString(),
+      deliveryDate: json['delivery_date']?.toString(),
     );
   }
 }

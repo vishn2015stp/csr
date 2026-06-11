@@ -26,8 +26,14 @@ Color statusColor(String status) {
     case 'Ready':
     case 'Ready for Delivery': return kStatusReady;
     case 'Delivered':
-    case 'Completed': return kStatusDelivered;
+    case 'Completed':
+    case 'Returned': return kStatusDelivered;
     case 'Intaken': return kStatusIntaken;
+    case 'Waiting for Spare':
+    case 'Replaced':
+    case 'Send to Service Center':
+    case 'Return':
+    case 'Warranty': return kStatusOther;
     default: return kStatusOther;
   }
 }

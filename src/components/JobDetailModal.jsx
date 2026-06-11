@@ -22,6 +22,10 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
     const [isEditingProduct, setIsEditingProduct] = useState(false);
     const [editItemName, setEditItemName] = useState('');
     const [editSerialNo, setEditSerialNo] = useState('');
+    const [editBrand, setEditBrand] = useState('');
+    const [editModel, setEditModel] = useState('');
+    const [editPassword, setEditPassword] = useState('');
+    const [editAccessories, setEditAccessories] = useState('');
     const [editIssue, setEditIssue] = useState('');
     const [editIsIntaken, setEditIsIntaken] = useState(false);
 
@@ -40,6 +44,10 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                 setCustomer(c);
                 setEditItemName(j.item_name || '');
                 setEditSerialNo(j.serial_no || '');
+                setEditBrand(j.brand || '');
+                setEditModel(j.model || '');
+                setEditPassword(j.password || '');
+                setEditAccessories(j.accessories || '');
                 setEditIssue(j.issue || '');
                 setEditIsIntaken(j.is_device_intaken === 1);
             }
@@ -64,6 +72,10 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
             const updates = {
                 item_name: editItemName,
                 serial_no: editSerialNo,
+                brand: editBrand || null,
+                model: editModel || null,
+                password: editPassword || null,
+                accessories: editAccessories || null,
                 issue: editIssue,
                 is_device_intaken: job.is_device_intaken === 1 ? 1 : (editIsIntaken ? 1 : 0)
             };
@@ -80,6 +92,18 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
             }
             if ((job.serial_no || '').trim() !== (editSerialNo || '').trim()) {
                 changes.push(`Serial No from "${job.serial_no || '—'}" to "${editSerialNo}"`);
+            }
+            if ((job.brand || '').trim() !== (editBrand || '').trim()) {
+                changes.push(`Brand from "${job.brand || '—'}" to "${editBrand}"`);
+            }
+            if ((job.model || '').trim() !== (editModel || '').trim()) {
+                changes.push(`Model from "${job.model || '—'}" to "${editModel}"`);
+            }
+            if ((job.password || '').trim() !== (editPassword || '').trim()) {
+                changes.push(`Password updated`);
+            }
+            if ((job.accessories || '').trim() !== (editAccessories || '').trim()) {
+                changes.push(`Accessories from "${job.accessories || '—'}" to "${editAccessories}"`);
             }
             if ((job.issue || '').trim() !== (editIssue || '').trim()) {
                 changes.push(`Issue Description from "${job.issue || '—'}" to "${editIssue}"`);
@@ -517,6 +541,42 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                                         />
                                     </div>
                                     <div>
+                                        <label style={{ fontSize: '0.8rem', color: 'var(--text-primary)', display: 'block', marginBottom: '4px' }}>Brand</label>
+                                        <input 
+                                            type="text" 
+                                            value={editBrand} 
+                                            onChange={e => setEditBrand(e.target.value)} 
+                                            style={{ width: '100%', padding: '0.4rem', background: 'var(--panel-bg)', border: '1px solid var(--border-color)', color: 'var(--text-primary)', borderRadius: '4px' }} 
+                                        />
+                                    </div>
+                                    <div>
+                                        <label style={{ fontSize: '0.8rem', color: 'var(--text-primary)', display: 'block', marginBottom: '4px' }}>Model</label>
+                                        <input 
+                                            type="text" 
+                                            value={editModel} 
+                                            onChange={e => setEditModel(e.target.value)} 
+                                            style={{ width: '100%', padding: '0.4rem', background: 'var(--panel-bg)', border: '1px solid var(--border-color)', color: 'var(--text-primary)', borderRadius: '4px' }} 
+                                        />
+                                    </div>
+                                    <div>
+                                        <label style={{ fontSize: '0.8rem', color: 'var(--text-primary)', display: 'block', marginBottom: '4px' }}>Device Password / PIN</label>
+                                        <input 
+                                            type="text" 
+                                            value={editPassword} 
+                                            onChange={e => setEditPassword(e.target.value)} 
+                                            style={{ width: '100%', padding: '0.4rem', background: 'var(--panel-bg)', border: '1px solid var(--border-color)', color: 'var(--text-primary)', borderRadius: '4px' }} 
+                                        />
+                                    </div>
+                                    <div>
+                                        <label style={{ fontSize: '0.8rem', color: 'var(--text-primary)', display: 'block', marginBottom: '4px' }}>Accessories</label>
+                                        <input 
+                                            type="text" 
+                                            value={editAccessories} 
+                                            onChange={e => setEditAccessories(e.target.value)} 
+                                            style={{ width: '100%', padding: '0.4rem', background: 'var(--panel-bg)', border: '1px solid var(--border-color)', color: 'var(--text-primary)', borderRadius: '4px' }} 
+                                        />
+                                    </div>
+                                    <div>
                                         <label style={{ fontSize: '0.8rem', color: 'var(--text-primary)', display: 'block', marginBottom: '4px' }}>Issue Description *</label>
                                         <textarea 
                                             value={editIssue} 
@@ -561,7 +621,11 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
                                         <div>
                                             <strong style={{ fontSize: '1.1rem', color: 'var(--text-primary)' }}>{job.item_name}</strong>
+                                            {job.brand && <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '2px' }}>Brand: {job.brand}</div>}
+                                            {job.model && <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '2px' }}>Model: {job.model}</div>}
                                             {job.serial_no && <div style={{ fontSize: '0.85rem', color: '#35a7e6', marginTop: '2px' }}>S/N: {job.serial_no}</div>}
+                                            {job.password && <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '2px' }}>Password: {job.password}</div>}
+                                            {job.accessories && <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '2px' }}>Accessories: {job.accessories}</div>}
                                         </div>
                                         <div>
                                             {job.is_device_intaken === 1 ? (

@@ -63,7 +63,13 @@ function ensureInitialized() {
                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                         service_type TEXT DEFAULT 'In-Shop',
                         service_mode TEXT DEFAULT 'On Center',
-                        is_device_intaken INTEGER DEFAULT 1
+                        is_device_intaken INTEGER DEFAULT 1,
+                        warranty_details TEXT,
+                        warranty_status TEXT,
+                        brand TEXT,
+                        model TEXT,
+                        password TEXT,
+                        accessories TEXT
                     );
                     CREATE TABLE IF NOT EXISTS service_records (
                         id TEXT PRIMARY KEY,
@@ -154,6 +160,15 @@ function ensureInitialized() {
                     await pool.query("ALTER TABLE invoices ADD COLUMN IF NOT EXISTS warranty TEXT;");
                 } catch (err) {
                     console.error("Error adding invoice billing columns:", err.message);
+                }
+
+                try {
+                    await pool.query("ALTER TABLE complaints ADD COLUMN IF NOT EXISTS brand TEXT;");
+                    await pool.query("ALTER TABLE complaints ADD COLUMN IF NOT EXISTS model TEXT;");
+                    await pool.query("ALTER TABLE complaints ADD COLUMN IF NOT EXISTS password TEXT;");
+                    await pool.query("ALTER TABLE complaints ADD COLUMN IF NOT EXISTS accessories TEXT;");
+                } catch (err) {
+                    console.error("Error adding device detail columns:", err.message);
                 }
 
                 // Initialize default admin

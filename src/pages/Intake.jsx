@@ -7,7 +7,7 @@ export default function Intake() {
     const { user } = useAuth()
     const [formData, setFormData] = useState({
         name: '', phone: '', email: '', address: '', location: '',
-        itemName: '', serialNo: '', issue: '', csrNumber: '', serviceMode: 'On Center',
+        itemName: '', brand: '', model: '', serialNo: '', issue: '', csrNumber: '', password: '', accessories: '', serviceMode: 'On Center',
         isWarranty: false, warrantyDetails: ''
     })
     const [loading, setLoading] = useState(false)
@@ -123,10 +123,14 @@ export default function Intake() {
             const created = await api.createComplaint({
                 id: complaintId,
                 csr_number: finalCsrNumber,
-                customer_id: customerId,
-                item_name: formData.itemName || 'Onsite Service Request',
-                serial_no: formData.serialNo || '—',
-                issue: formData.issue || 'Onsite service request logged.',
+                    customer_id: customerId,
+                    item_name: formData.itemName || 'Onsite Service Request',
+                    brand: formData.brand || null,
+                    model: formData.model || null,
+                    serial_no: formData.serialNo || '—',
+                    password: formData.password || null,
+                    accessories: formData.accessories || null,
+                    issue: formData.issue || 'Onsite service request logged.',
                 status: formData.isWarranty ? 'Warranty' : 'Pending',
                 service_mode: formData.serviceMode,
                 is_device_intaken: isIntaken,
@@ -147,7 +151,7 @@ export default function Intake() {
                 serviceMode: formData.serviceMode,
                 isDeviceIntaken: isIntaken === 1
             })
-            setFormData({ name: '', phone: '', email: '', address: '', location: '', itemName: '', serialNo: '', issue: '', csrNumber: '', serviceMode: 'On Center', isWarranty: false, warrantyDetails: '' })
+            setFormData({ name: '', phone: '', email: '', address: '', location: '', itemName: '', brand: '', model: '', serialNo: '', issue: '', csrNumber: '', password: '', accessories: '', serviceMode: 'On Center', isWarranty: false, warrantyDetails: '' })
             setMatchedCustomers([])
             fetchRecent()
         } catch (err) {
@@ -260,9 +264,21 @@ export default function Intake() {
                             <label>Item Name {formData.serviceMode === 'On Center' ? '*' : '(Optional)'}</label>
                             <input type="text" name="itemName" required={formData.serviceMode === 'On Center'} value={formData.itemName} onChange={handleChange} placeholder="e.g. MacBook Pro 2021" />
                             
+                            <label>Brand</label>
+                            <input type="text" name="brand" value={formData.brand} onChange={handleChange} placeholder="e.g. Apple, Samsung" />
+
+                            <label>Model</label>
+                            <input type="text" name="model" value={formData.model} onChange={handleChange} placeholder="e.g. A2338" />
+
                             <label>Serial Number {formData.serviceMode === 'On Center' ? '*' : '(Optional)'}</label>
                             <input type="text" name="serialNo" required={formData.serviceMode === 'On Center'} value={formData.serialNo} onChange={handleChange} placeholder="e.g. C02..." />
-                            
+
+                            <label>Device Password / PIN</label>
+                            <input type="text" name="password" value={formData.password} onChange={handleChange} placeholder="If applicable" />
+
+                            <label>Accessories</label>
+                            <input type="text" name="accessories" value={formData.accessories} onChange={handleChange} placeholder="e.g. Charger, case" />
+
                             <label>Issue Description {formData.serviceMode === 'On Center' ? '*' : '(Optional)'}</label>
                             <textarea name="issue" required={formData.serviceMode === 'On Center'} value={formData.issue} onChange={handleChange} rows="3" placeholder="Describe the problem..."></textarea>
                         </div>

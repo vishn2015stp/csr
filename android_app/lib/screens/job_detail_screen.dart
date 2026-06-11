@@ -28,9 +28,20 @@ class _JobDetailScreenState extends State<JobDetailScreen> with SingleTickerProv
   bool _loading = true;
   late TabController _tabCtrl;
 
-  static const _statuses = [
-    'Pending', 'Intaken', 'In Progress', 'Ready', 'Ready for Delivery', 'Delivered', 'Completed'
+  static const _allStatuses = [
+    'Pending', 'Intaken', 'In Progress', 'Waiting for Spare', 'Replaced',
+    'Send to Service Center', 'Ready', 'Ready for Delivery', 'Return',
+    'Warranty', 'Delivered', 'Completed', 'Returned'
   ];
+
+  static const _onsiteStatuses = [
+    'Pending', 'In Progress', 'Completed', 'Warranty'
+  ];
+
+  List<String> get _availableStatuses {
+    if (_complaint == null) return _allStatuses;
+    return _complaint!.isOnSite ? _onsiteStatuses : _allStatuses;
+  }
 
   @override
   void initState() {
@@ -76,13 +87,27 @@ class _JobDetailScreenState extends State<JobDetailScreen> with SingleTickerProv
 
   Future<void> _updateStatus(String newStatus) async {
     if (_complaint == null) return;
+
+    // CAPTCHA for final statuses
+    if (newStatus == 'Delivered' || newStatus == 'Completed' || newStatus == 'Returned') {
+      final confirmed = await _showCaptchaDialog(newStatus);
+      if (confirmed != true) return;
+    }
+
     final auth = context.read<AuthProvider>();
     try {
       await _api.updateComplaint(_complaint!.id, {'status': newStatus});
+      // Also create a service record for the status change
       await _api.createStatusLog({
         'complaint_id': _complaint!.id,
         'status': newStatus,
         'changed_by': auth.user?.username ?? 'unknown',
+      });
+      await _api.createServiceRecord({
+        'complaint_id': _complaint!.id,
+        'technician': auth.user?.username ?? 'unknown',
+        'issues': 'Status changed to $newStatus',
+        'resolution_status': '',
       });
       widget.onRefresh?.call();
       await _load();
@@ -95,10 +120,50 @@ class _JobDetailScreenState extends State<JobDetailScreen> with SingleTickerProv
     }
   }
 
+  Future<bool?> _showCaptchaDialog(String status) async {
+    final codeCtrl = TextEditingController();
+    return showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: kPanelDark,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        title: const Text('Confirm Status Change', style: TextStyle(color: kTextPrimary)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'This action will mark the request as completed. Enter the 4-digit confirmation code to proceed.',
+              style: TextStyle(color: kTextSecondary, fontSize: 13),
+            ),
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: codeCtrl,
+              style: const TextStyle(color: kTextPrimary, fontSize: 24, letterSpacing: 8, fontFamily: 'monospace'),
+              textAlign: TextAlign.center,
+              keyboardType: TextInputType.number,
+              maxLength: 4,
+              decoration: const InputDecoration(
+                labelText: 'Confirmation Code',
+                counterText: '',
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, codeCtrl.text.trim() == '1234'),
+            child: const Text('Confirm'),
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<void> _addServiceRecord() async {
     final techCtrl = TextEditingController();
-    final workCtrl = TextEditingController();
-    final partsCtrl = TextEditingController();
+    final issuesCtrl = TextEditingController();
+    final resolutionCtrl = TextEditingController();
 
     final confirmed = await showDialog<bool>(
       context: context,
@@ -116,16 +181,16 @@ class _JobDetailScreenState extends State<JobDetailScreen> with SingleTickerProv
             ),
             const SizedBox(height: 10),
             TextField(
-              controller: workCtrl,
+              controller: issuesCtrl,
               style: const TextStyle(color: kTextPrimary),
-              decoration: const InputDecoration(labelText: 'Work Done'),
+              decoration: const InputDecoration(labelText: 'Issues Found / Work Done'),
               maxLines: 3,
             ),
             const SizedBox(height: 10),
             TextField(
-              controller: partsCtrl,
+              controller: resolutionCtrl,
               style: const TextStyle(color: kTextPrimary),
-              decoration: const InputDecoration(labelText: 'Parts Used'),
+              decoration: const InputDecoration(labelText: 'Resolution / Parts Used'),
             ),
           ],
         ),
@@ -140,16 +205,20 @@ class _JobDetailScreenState extends State<JobDetailScreen> with SingleTickerProv
       await _api.createServiceRecord({
         'complaint_id': _complaint!.id,
         'technician': techCtrl.text,
-        'issues': workCtrl.text,
-        'resolution_status': partsCtrl.text,
+        'issues': issuesCtrl.text,
+        'resolution_status': resolutionCtrl.text,
       });
       await _load();
     }
   }
 
   Future<void> _addInvoice() async {
-    final amtCtrl = TextEditingController();
-    final descCtrl = TextEditingController();
+    final receiptCtrl = TextEditingController();
+    final serviceFeesCtrl = TextEditingController();
+    final partCostsCtrl = TextEditingController();
+    final totalCtrl = TextEditingController();
+    final sparesCtrl = TextEditingController();
+    final warrantyCtrl = TextEditingController();
 
     final confirmed = await showDialog<bool>(
       context: context,
@@ -157,23 +226,50 @@ class _JobDetailScreenState extends State<JobDetailScreen> with SingleTickerProv
         backgroundColor: kPanelDark,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         title: const Text('Add Invoice', style: TextStyle(color: kTextPrimary)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: amtCtrl,
-              style: const TextStyle(color: kTextPrimary),
-              decoration: const InputDecoration(labelText: 'Amount (₹)'),
-              keyboardType: TextInputType.number,
-            ),
-            const SizedBox(height: 10),
-            TextField(
-              controller: descCtrl,
-              style: const TextStyle(color: kTextPrimary),
-              decoration: const InputDecoration(labelText: 'Description'),
-              maxLines: 2,
-            ),
-          ],
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: receiptCtrl,
+                style: const TextStyle(color: kTextPrimary),
+                decoration: const InputDecoration(labelText: 'Receipt Number'),
+              ),
+              const SizedBox(height: 10),
+              TextField(
+                controller: serviceFeesCtrl,
+                style: const TextStyle(color: kTextPrimary),
+                decoration: const InputDecoration(labelText: 'Service Fees (₹)'),
+                keyboardType: TextInputType.number,
+              ),
+              const SizedBox(height: 10),
+              TextField(
+                controller: partCostsCtrl,
+                style: const TextStyle(color: kTextPrimary),
+                decoration: const InputDecoration(labelText: 'Part Costs (₹)'),
+                keyboardType: TextInputType.number,
+              ),
+              const SizedBox(height: 10),
+              TextField(
+                controller: totalCtrl,
+                style: const TextStyle(color: kTextPrimary),
+                decoration: const InputDecoration(labelText: 'Total (₹)'),
+                keyboardType: TextInputType.number,
+              ),
+              const SizedBox(height: 10),
+              TextField(
+                controller: sparesCtrl,
+                style: const TextStyle(color: kTextPrimary),
+                decoration: const InputDecoration(labelText: 'Spares Used'),
+              ),
+              const SizedBox(height: 10),
+              TextField(
+                controller: warrantyCtrl,
+                style: const TextStyle(color: kTextPrimary),
+                decoration: const InputDecoration(labelText: 'Warranty Period'),
+              ),
+            ],
+          ),
         ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
@@ -185,8 +281,12 @@ class _JobDetailScreenState extends State<JobDetailScreen> with SingleTickerProv
     if (confirmed == true && _complaint != null) {
       await _api.createInvoice({
         'complaint_id': _complaint!.id,
-        'total': double.tryParse(amtCtrl.text) ?? 0,
-        'receipt_number': descCtrl.text,
+        'receipt_number': receiptCtrl.text,
+        'service_fees': double.tryParse(serviceFeesCtrl.text) ?? 0,
+        'part_costs': double.tryParse(partCostsCtrl.text) ?? 0,
+        'total': double.tryParse(totalCtrl.text) ?? 0,
+        'spares': sparesCtrl.text,
+        'warranty': warrantyCtrl.text,
       });
       await _load();
     }
@@ -217,13 +317,12 @@ class _JobDetailScreenState extends State<JobDetailScreen> with SingleTickerProv
         backgroundColor: kPanelDark,
         title: Text(c.displayId, style: const TextStyle(color: kAccent, fontWeight: FontWeight.bold)),
         actions: [
-          // Status update
           PopupMenuButton<String>(
             icon: const Icon(Icons.update_rounded, color: kAccent),
             tooltip: 'Update Status',
             color: kPanelDark2,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            itemBuilder: (_) => _statuses.map((s) => PopupMenuItem(
+            itemBuilder: (_) => _availableStatuses.map((s) => PopupMenuItem(
               value: s,
               child: Row(
                 children: [
@@ -313,8 +412,11 @@ class _InfoTab extends StatelessWidget {
                 complaint.serviceType,
                 if (complaint.serviceMode != null && complaint.serviceMode != complaint.serviceType) complaint.serviceMode,
               ].whereType<String>().join(' · ')),
+              _InfoRow('Intaken Status', complaint.isDeviceIntaken == 1 ? 'Yes (Taken for Service)' : complaint.isDeviceIntaken == 0 ? 'No (On-Site)' : null),
               if (complaint.password != null && complaint.password!.isNotEmpty)
                 _InfoRow('Device Password', complaint.password),
+              if (complaint.createdBy != null)
+                _InfoRow('Created By', complaint.createdBy),
             ],
           ),
           const SizedBox(height: 12),
@@ -326,7 +428,7 @@ class _InfoTab extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 4),
                 child: Text(
-                  complaint.problemDescription ?? 'No description provided.',
+                  complaint.issue ?? 'No description provided.',
                   style: const TextStyle(color: kTextPrimary, fontSize: 14, height: 1.5),
                 ),
               ),
@@ -345,9 +447,23 @@ class _InfoTab extends StatelessWidget {
               _InfoRow('Name', customer?.name ?? complaint.customerName),
               _InfoRow('Phone', customer?.phone ?? complaint.customerPhone),
               _InfoRow('Address', customer?.address ?? complaint.customerAddress),
+              _InfoRow('Location', customer?.location),
               _InfoRow('Email', customer?.email),
             ],
           ),
+
+          // Warranty section
+          if (complaint.warrantyDetails != null && complaint.warrantyDetails!.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            _InfoCard(
+              title: 'Warranty',
+              icon: Icons.verified_rounded,
+              children: [
+                _InfoRow('Details', complaint.warrantyDetails),
+                _InfoRow('Status', complaint.warrantyStatus),
+              ],
+            ),
+          ],
 
           const SizedBox(height: 12),
           if (complaint.createdAt != null)
@@ -626,14 +742,45 @@ class _InvoiceTab extends StatelessWidget {
                       final inv = invoices[i];
                       return Card(
                         margin: const EdgeInsets.only(bottom: 8),
-                        child: ListTile(
-                          leading: const Icon(Icons.receipt_long_rounded, color: kAccent),
-                          title: Text('₹${(inv.total ?? 0).toStringAsFixed(2)}',
-                              style: const TextStyle(color: kTextPrimary, fontWeight: FontWeight.bold)),
-                          subtitle: Text(inv.receiptNumber ?? '—', style: const TextStyle(color: kTextSecondary)),
-                          trailing: inv.createdAt != null
-                              ? Text(_fmt(inv.createdAt!), style: const TextStyle(color: kTextSecondary, fontSize: 11))
-                              : null,
+                        child: Padding(
+                          padding: const EdgeInsets.all(14),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  const Icon(Icons.receipt_long_rounded, color: kAccent, size: 18),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text('₹${(inv.total ?? 0).toStringAsFixed(2)}',
+                                        style: const TextStyle(color: kTextPrimary, fontWeight: FontWeight.bold, fontSize: 15)),
+                                  ),
+                                  if (inv.createdAt != null)
+                                    Text(_fmt(inv.createdAt!), style: const TextStyle(color: kTextSecondary, fontSize: 11)),
+                                ],
+                              ),
+                              if (inv.receiptNumber != null && inv.receiptNumber!.isNotEmpty) ...[
+                                const SizedBox(height: 4),
+                                Text('Receipt: ${inv.receiptNumber}', style: const TextStyle(color: kTextSecondary, fontSize: 12)),
+                              ],
+                              if (inv.serviceFees != null && inv.serviceFees! > 0) ...[
+                                const SizedBox(height: 2),
+                                Text('Service Fees: ₹${inv.serviceFees!.toStringAsFixed(2)}', style: const TextStyle(color: kTextSecondary, fontSize: 12)),
+                              ],
+                              if (inv.partCosts != null && inv.partCosts! > 0) ...[
+                                const SizedBox(height: 2),
+                                Text('Part Costs: ₹${inv.partCosts!.toStringAsFixed(2)}', style: const TextStyle(color: kTextSecondary, fontSize: 12)),
+                              ],
+                              if (inv.spares != null && inv.spares!.isNotEmpty) ...[
+                                const SizedBox(height: 2),
+                                Text('Spares: ${inv.spares}', style: const TextStyle(color: kTextSecondary, fontSize: 12)),
+                              ],
+                              if (inv.warranty != null && inv.warranty!.isNotEmpty) ...[
+                                const SizedBox(height: 2),
+                                Text('Warranty: ${inv.warranty}', style: const TextStyle(color: kTextSecondary, fontSize: 12)),
+                              ],
+                            ],
+                          ),
                         ),
                       );
                     },

@@ -402,12 +402,20 @@ class _ComplaintTile extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 4),
-                      Text(
-                        complaint.isOnSite
-                            ? '${complaint.customerName ?? '—'} · ${complaint.customerPhone ?? '—'}'
-                            : 'S/N: ${complaint.serialNo ?? '—'}',
-                        style: const TextStyle(color: kTextSecondary, fontSize: 12),
-                        overflow: TextOverflow.ellipsis,
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              complaint.isOnSite
+                                  ? '${complaint.customerName ?? '—'} · ${complaint.customerPhone ?? '—'}'
+                                  : 'S/N: ${complaint.serialNo ?? '—'}',
+                              style: const TextStyle(color: kTextSecondary, fontSize: 12),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          if (complaint.createdBy != null)
+                            Text(complaint.createdBy!.toUpperCase(), style: const TextStyle(color: kTextSecondary, fontSize: 10)),
+                        ],
                       ),
                     ],
                   ),

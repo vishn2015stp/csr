@@ -19,9 +19,11 @@ class _RequestsScreenState extends State<RequestsScreen> {
   bool _loading = true;
   String _searchQuery = '';
   String _statusFilter = 'All';
+  String _modeFilter = 'All';
   final _searchCtrl = TextEditingController();
 
-  static const _statuses = ['All', 'Pending', 'Intaken', 'In Progress', 'Ready', 'Ready for Delivery', 'Delivered', 'Completed'];
+  static const _statuses = ['All', 'Pending', 'Intaken', 'In Progress', 'Ready', 'Ready for Delivery', 'Delivered', 'Completed', 'Returned'];
+  static const _modes = ['All', 'In-Shop', 'On-Site'];
 
   @override
   void initState() {
@@ -49,13 +51,15 @@ class _RequestsScreenState extends State<RequestsScreen> {
     final q = _searchQuery.trim().toLowerCase();
     return _complaints.where((c) {
       final matchesStatus = _statusFilter == 'All' || c.status == _statusFilter;
+      final matchesMode = _modeFilter == 'All' ||
+          (_modeFilter == 'On-Site' ? c.isOnSite : !c.isOnSite);
       final matchesQuery = q.isEmpty ||
           (c.customerName?.toLowerCase().contains(q) ?? false) ||
           (c.customerPhone?.toLowerCase().contains(q) ?? false) ||
           (c.csrNumber?.toLowerCase().contains(q) ?? false) ||
           (c.itemName?.toLowerCase().contains(q) ?? false) ||
           c.id.toLowerCase().contains(q);
-      return matchesStatus && matchesQuery;
+      return matchesStatus && matchesMode && matchesQuery;
     }).toList();
   }
 
@@ -117,6 +121,39 @@ class _RequestsScreenState extends State<RequestsScreen> {
             ),
           ),
 
+          // Mode filter chips
+          SizedBox(
+            height: 40,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              itemCount: _modes.length,
+              itemBuilder: (_, i) {
+                final m = _modes[i];
+                final isSelected = _modeFilter == m;
+                final color = kAccent;
+                return Padding(
+                  padding: const EdgeInsets.only(right: 6),
+                  child: FilterChip(
+                    label: Text(m, style: const TextStyle(fontSize: 12)),
+                    selected: isSelected,
+                    onSelected: (_) => setState(() => _modeFilter = m),
+                    selectedColor: color.withValues(alpha: 0.2),
+                    checkmarkColor: color,
+                    side: BorderSide(color: isSelected ? color : kBorderColor),
+                    labelStyle: TextStyle(
+                      color: isSelected ? color : kTextSecondary,
+                      fontSize: 12,
+                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                    ),
+                    backgroundColor: kPanelDark,
+                    padding: EdgeInsets.zero,
+                  ),
+                );
+              },
+            ),
+          ),
+
           // Status chips
           SizedBox(
             height: 48,
@@ -131,7 +168,7 @@ class _RequestsScreenState extends State<RequestsScreen> {
                 return Padding(
                   padding: const EdgeInsets.only(right: 6),
                   child: FilterChip(
-                    label: Text(s),
+                    label: Text(s, style: const TextStyle(fontSize: 12)),
                     selected: isSelected,
                     onSelected: (_) => setState(() => _statusFilter = s),
                     selectedColor: color.withValues(alpha: 0.2),
@@ -245,13 +282,21 @@ class _RequestTile extends StatelessWidget {
                   Text(complaint.customerPhone ?? '—', style: const TextStyle(color: kTextSecondary, fontSize: 13)),
                 ],
               ),
-              if (complaint.serialNo != null) ...[
+              if (complaint.serialNo != null || complaint.createdBy != null) ...[
                 const SizedBox(height: 4),
                 Row(
                   children: [
-                    const Icon(Icons.qr_code_rounded, size: 14, color: kTextSecondary),
-                    const SizedBox(width: 4),
-                    Text('S/N: ${complaint.serialNo}', style: const TextStyle(color: kTextSecondary, fontSize: 12, fontFamily: 'monospace')),
+                    if (complaint.serialNo != null) ...[
+                      const Icon(Icons.qr_code_rounded, size: 14, color: kTextSecondary),
+                      const SizedBox(width: 4),
+                      Text('S/N: ${complaint.serialNo}', style: const TextStyle(color: kTextSecondary, fontSize: 12, fontFamily: 'monospace')),
+                      const SizedBox(width: 12),
+                    ],
+                    if (complaint.createdBy != null) ...[
+                      const Icon(Icons.person_rounded, size: 14, color: kTextSecondary),
+                      const SizedBox(width: 4),
+                      Text(complaint.createdBy!.toUpperCase(), style: const TextStyle(color: kTextSecondary, fontSize: 11)),
+                    ],
                     const Spacer(),
                     if (complaint.createdAt != null)
                       Text(
