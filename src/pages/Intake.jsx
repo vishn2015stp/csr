@@ -270,8 +270,8 @@ export default function Intake() {
                             <label>Model</label>
                             <input type="text" name="model" value={formData.model} onChange={handleChange} placeholder="e.g. A2338" />
 
-                            <label>Serial Number {formData.serviceMode === 'On Center' ? '*' : '(Optional)'}</label>
-                            <input type="text" name="serialNo" required={formData.serviceMode === 'On Center'} value={formData.serialNo} onChange={handleChange} placeholder="e.g. C02..." />
+                            <label>Serial Number (Optional)</label>
+                            <input type="text" name="serialNo" value={formData.serialNo} onChange={handleChange} placeholder="e.g. C02..." />
 
                             <label>Device Password / PIN</label>
                             <input type="text" name="password" value={formData.password} onChange={handleChange} placeholder="If applicable" />
