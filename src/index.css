@@ -430,46 +430,7 @@ button:disabled {
     width: 100% !important;
     max-width: 100% !important;
     margin: 0 auto !important;
-    font-family: Arial, sans-serif !important;
-    font-size: 11pt !important;
     color: #000 !important;
-    line-height: 1.6 !important;
-  }
-
-  .print-receipt .print-terms {
-    margin-top: 40px !important;
-    border-top: 1px dashed #000 !important;
-    padding-top: 20px !important;
-    font-size: 10pt !important;
-    text-align: center !important;
-    color: #444 !important;
-  }
-
-  /* Invoice print elements adjustments */
-  .invoice-print-area h1 {
-    font-size: 24pt !important;
-    font-weight: 800 !important;
-    margin: 0 0 10px 0 !important;
-    text-transform: uppercase !important;
-    letter-spacing: 1px !important;
-  }
-
-  table {
-    width: 100% !important;
-    border-collapse: collapse !important;
-    margin-top: 25px !important;
-  }
-
-  th {
-    background-color: #f2f2f2 !important;
-    font-weight: bold !important;
-    border-bottom: 2px solid #000 !important;
-    padding: 10px 8px !important;
-  }
-
-  td {
-    border-bottom: 1px solid #ddd !important;
-    padding: 12px 8px !important;
   }
 }
 
