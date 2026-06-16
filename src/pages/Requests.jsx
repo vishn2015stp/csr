@@ -18,9 +18,16 @@ export default function Requests() {
     const [printConfig, setPrintConfig] = useState({
         shopName: 'Hypertech Digital',
         shopAddress: '',
-        showTechnician: true,
+        shopPhone: '',
+        shopEmail: '',
+        showCustomerPhone: true,
+        showCustomerEmail: false,
         showSerialNo: true,
-        intakeTerms: 'Not responsible for data loss.\nEstimate valid for 7 days.'
+        showTechnician: true,
+        showServiceMode: true,
+        showDeviceIntaken: true,
+        intakeTerms: 'Not responsible for data loss.\nEstimate valid for 7 days.',
+        invoiceTerms: 'Thank you for choosing Hypertech Digital.\nAll repairs come with a standard 30-day warranty unless otherwise stated.'
     });
 
     const loadRequests = async () => {
@@ -327,24 +334,41 @@ export default function Requests() {
                             <button onClick={triggerPrint} style={{ background: 'var(--border-color)', color: 'white', border: 'none', padding: '0.5rem 1rem', borderRadius: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}><Printer size={16} /> Print</button>
                             <button onClick={() => setPrintIntakeData(null)} style={{ background: '#e53e3e', color: 'white', border: 'none', padding: '0.5rem 1rem', borderRadius: '4px', cursor: 'pointer' }}>Close</button>
                         </div>
-                        <div className="print-receipt" style={{ color: 'black' }}>
-                            <div className="print-header" style={{ textAlign: 'center', borderBottom: '1px dashed black', paddingBottom: '10px', marginBottom: '15px' }}>
-                                <h2 style={{ color: 'black', margin: '0 0 5px 0' }}>{printConfig.shopName}</h2>
-                                {printConfig.shopAddress && <p style={{ fontSize: '0.8rem', margin: '5px 0', whiteSpace: 'pre-line' }}>{printConfig.shopAddress}</p>}
-                                <p style={{ fontSize: '0.9rem', margin: '5px 0 0 0', fontWeight: 'bold' }}>Service Request Receipt</p>
+                        <div className="print-receipt" style={{
+                            background: '#fff', color: '#000',
+                            padding: '20px', borderRadius: '0',
+                            fontFamily: "'Courier New', monospace", fontSize: '12px',
+                            width: '100%', margin: '0 auto',
+                        }}>
+                            <div style={{ textAlign: 'center', borderBottom: '1px dashed #000', paddingBottom: '12px', marginBottom: '12px' }}>
+                                <div style={{ fontSize: '16px', fontWeight: 'bold' }}>{printConfig.shopName || 'Your Shop Name'}</div>
+                                {printConfig.shopAddress && <div style={{ fontSize: '10px', marginTop: '4px', whiteSpace: 'pre-line' }}>{printConfig.shopAddress}</div>}
+                                {printConfig.shopPhone && <div style={{ fontSize: '10px' }}>Tel: {printConfig.shopPhone}</div>}
+                                {printConfig.shopEmail && <div style={{ fontSize: '10px' }}>{printConfig.shopEmail}</div>}
+                                <div style={{ marginTop: '8px', fontWeight: 'bold' }}>SERVICE REQUEST SLIP</div>
                             </div>
-                            <p style={{ margin: '4px 0' }}><strong>Date:</strong> {printIntakeData.date}</p>
-                            <p style={{ margin: '4px 0' }}><strong>Request ID:</strong> <span style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>#{printIntakeData.csrNumber}</span></p>
-                            <br />
-                            <p style={{ margin: '4px 0' }}><strong>Customer:</strong> {printIntakeData.customerName}</p>
-                            <p style={{ margin: '4px 0' }}><strong>Phone:</strong> {printIntakeData.customerPhone}</p>
-                            <br />
-                            <p style={{ margin: '4px 0' }}><strong>Item:</strong> {printIntakeData.itemName}</p>
-                            {printConfig.showSerialNo && <p style={{ margin: '4px 0' }}><strong>S/N:</strong> {printIntakeData.serialNo}</p>}
-                            <p style={{ margin: '4px 0' }}><strong>Service Mode:</strong> {printIntakeData.serviceMode}</p>
-                            <p style={{ margin: '4px 0' }}><strong>Device Intaken:</strong> {printIntakeData.isDeviceIntaken ? 'Yes' : 'No'}</p>
-                            <div className="print-terms" style={{ marginTop: '20px', borderTop: '1px dashed black', paddingTop: '10px', fontSize: '8pt', textAlign: 'center', whiteSpace: 'pre-line' }}>
-                                {printConfig.intakeTerms}
+
+                            <div style={{ marginBottom: '10px' }}>
+                                <div><b>Date:</b> {printIntakeData.date}</div>
+                                <div style={{ fontSize: '14px', fontWeight: 'bold', marginTop: '4px' }}>CSR #: {printIntakeData.csrNumber}</div>
+                            </div>
+
+                            <div style={{ borderTop: '1px dashed #000', borderBottom: '1px dashed #000', padding: '8px 0', margin: '8px 0' }}>
+                                <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>Customer</div>
+                                <div>{printIntakeData.customerName}</div>
+                                {printConfig.showCustomerPhone && <div>Tel: {printIntakeData.customerPhone}</div>}
+                            </div>
+
+                            <div style={{ margin: '8px 0' }}>
+                                <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>Device</div>
+                                <div>{printIntakeData.itemName}</div>
+                                {printConfig.showSerialNo && <div>S/N: {printIntakeData.serialNo}</div>}
+                                {printConfig.showServiceMode && <div>Mode: {printIntakeData.serviceMode}</div>}
+                                {printConfig.showDeviceIntaken && <div>Intaken: {printIntakeData.isDeviceIntaken ? 'Yes' : 'No'}</div>}
+                            </div>
+
+                            <div style={{ borderTop: '1px dashed #000', margin: '10px 0', paddingTop: '8px', fontSize: '10px', textAlign: 'center', whiteSpace: 'pre-line' }}>
+                                {printConfig.intakeTerms || 'Your footer terms here.'}
                             </div>
                         </div>
                     </div>
@@ -359,48 +383,68 @@ export default function Requests() {
                             <button onClick={triggerPrint} style={{ background: 'var(--border-color)', color: 'white', border: 'none', padding: '0.5rem 1rem', borderRadius: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}><Printer size={16} /> Print</button>
                             <button onClick={() => setPrintInvoiceData(null)} style={{ background: '#e53e3e', color: 'white', border: 'none', padding: '0.5rem 1rem', borderRadius: '4px', cursor: 'pointer' }}>Close</button>
                         </div>
-                        <div className="invoice-print-area" style={{ color: 'black' }}>
-                            <div style={{ textAlign: 'center', borderBottom: '2px solid black', paddingBottom: '0.5rem', marginBottom: '15px' }}>
-                                <h1 style={{ color: 'black', margin: 0, fontSize: '1.6rem' }}>{printConfig.shopName}</h1>
-                                <p style={{ margin: '2px 0', fontSize: '0.9rem' }}>Service Invoice</p>
+                        <div className="invoice-print-area" style={{
+                            background: '#fff', color: '#000',
+                            padding: '24px', borderRadius: '0',
+                            fontFamily: 'Arial, sans-serif', fontSize: '13px',
+                            width: '100%', margin: '0 auto',
+                        }}>
+                            <div style={{ textAlign: 'center', borderBottom: '2px solid #000', paddingBottom: '14px', marginBottom: '14px' }}>
+                                <div style={{ fontSize: '20px', fontWeight: 'bold' }}>{printConfig.shopName || 'Your Shop Name'}</div>
+                                {printConfig.shopAddress && <div style={{ fontSize: '11px', marginTop: '4px', whiteSpace: 'pre-line' }}>{printConfig.shopAddress}</div>}
+                                {printConfig.shopPhone && <div style={{ fontSize: '11px' }}>Tel: {printConfig.shopPhone}</div>}
+                                {printConfig.shopEmail && <div style={{ fontSize: '11px' }}>{printConfig.shopEmail}</div>}
+                                <div style={{ marginTop: '10px', fontSize: '15px', fontWeight: 'bold', letterSpacing: '1px' }}>TAX INVOICE</div>
                             </div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1.5rem', fontSize: '0.95rem' }}>
+
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', fontSize: '12px' }}>
                                 <div>
-                                    <p style={{ margin: '4px 0' }}><strong>Receipt #:</strong> {printInvoiceData.invoice.receipt_number || 'Pending'}</p>
-                                    <p style={{ margin: '4px 0' }}><strong>CSR #:</strong> {printInvoiceData.job.csr_number || printInvoiceData.job.id.split('-')[0].toUpperCase()}</p>
-                                    <p style={{ margin: '4px 0' }}><strong>Customer:</strong> {printInvoiceData.customer.name}</p>
-                                    <p style={{ margin: '4px 0' }}><strong>Product:</strong> {printInvoiceData.job.item_name}</p>
+                                    <div><b>Receipt #:</b> {printInvoiceData.invoice.receipt_number || 'Pending'}</div>
+                                    <div><b>Date:</b> {new Date().toLocaleDateString('en-GB').replace(/\//g, '-')}</div>
                                 </div>
                                 <div style={{ textAlign: 'right' }}>
-                                    <p style={{ margin: '4px 0' }}><strong>Date:</strong> {new Date().toLocaleDateString('en-GB').replace(/\//g, '-')}</p>
-                                    <p style={{ margin: '4px 0' }}><strong>Phone:</strong> {printInvoiceData.customer.phone}</p>
+                                    <div><b>CSR #:</b> {printInvoiceData.job.csr_number || printInvoiceData.job.id.split('-')[0].toUpperCase()}</div>
+                                    {printConfig.showTechnician && <div><b>Tech:</b> {user?.username || 'Admin'}</div>}
                                 </div>
                             </div>
-                            <table style={{ width: '100%', marginTop: '1.5rem', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
+
+                            <div style={{ background: '#f5f5f5', padding: '8px 10px', borderRadius: '4px', marginBottom: '12px', fontSize: '12px' }}>
+                                <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>Customer</div>
+                                <div>{printInvoiceData.customer.name}</div>
+                                {printConfig.showCustomerPhone && <div>{printInvoiceData.customer.phone}</div>}
+                                <div style={{ marginTop: '4px' }}><b>Device:</b> {printInvoiceData.job.item_name}</div>
+                                {printConfig.showSerialNo && <div><b>S/N:</b> {printInvoiceData.job.serial_no || '—'}</div>}
+                            </div>
+
+                            <div style={{ marginBottom: '12px', fontSize: '12px' }}>
+                                <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>Work Performed</div>
+                                <div style={{ background: '#f9f9f9', padding: '6px', border: '1px solid #ddd' }}>
+                                    {printInvoiceData.job.issue}
+                                </div>
+                            </div>
+
+                            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px', marginBottom: '12px' }}>
                                 <thead>
-                                    <tr style={{ borderBottom: '1px solid black' }}>
-                                        <th style={{ textAlign: 'left', padding: '0.5rem' }}>Description</th>
-                                        <th style={{ textAlign: 'right', padding: '0.5rem' }}>Amount</th>
+                                    <tr style={{ background: '#e0e0e0', color: '#000' }}>
+                                        <th style={{ padding: '5px 8px', textAlign: 'left', borderBottom: '1px solid #000' }}>Description</th>
+                                        <th style={{ padding: '5px 8px', textAlign: 'right', borderBottom: '1px solid #000' }}>Amount</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td style={{ padding: '0.5rem' }}>
-                                            <strong>Service & Repair Fee</strong>
-                                            <div style={{ fontSize: '0.8rem', color: '#555', marginTop: '2px' }}>({printInvoiceData.job.issue})</div>
-                                        </td>
-                                        <td style={{ textAlign: 'right', padding: '0.5rem', fontWeight: 'bold' }}>₹{printInvoiceData.invoice.service_fees || 0}</td>
+                                    <tr style={{ borderBottom: '1px solid #ddd' }}>
+                                        <td style={{ padding: '5px 8px' }}>Service & Labor</td>
+                                        <td style={{ padding: '5px 8px', textAlign: 'right' }}>₹{printInvoiceData.invoice.service_fees || 0}</td>
                                     </tr>
-                                    <tr>
-                                        <td style={{ padding: '0.5rem' }}>
-                                            <strong>Spare Parts Charge</strong>
+                                    <tr style={{ borderBottom: '1px solid #ddd' }}>
+                                        <td style={{ padding: '5px 8px' }}>
+                                            Spare Parts
                                             {printInvoiceData.invoice.spares && (
-                                                <div style={{ fontSize: '0.8rem', color: '#555', marginTop: '2px' }}>
-                                                    Spares used: {(() => {
+                                                <div style={{ fontSize: '10px', color: '#555', marginTop: '2px' }}>
+                                                    {(() => {
                                                         const sparesStr = printInvoiceData.invoice.spares;
                                                         if (sparesStr.startsWith('[')) {
                                                             try {
-                                                                return JSON.parse(sparesStr).map(s => `${s.name} (₹${s.cost})`).join(', ');
+                                                                return JSON.parse(sparesStr).map(s => `${s.name}`).join(', ');
                                                             } catch (e) {
                                                                 return sparesStr;
                                                             }
@@ -409,16 +453,20 @@ export default function Requests() {
                                                     })()}
                                                 </div>
                                             )}
-                                            {printInvoiceData.invoice.warranty && <div style={{ fontSize: '0.8rem', color: '#555', marginTop: '2px' }}>Warranty: {printInvoiceData.invoice.warranty}</div>}
+                                            {printInvoiceData.invoice.warranty && <div style={{ fontSize: '10px', color: '#555', marginTop: '2px' }}>Warranty: {printInvoiceData.invoice.warranty}</div>}
                                         </td>
-                                        <td style={{ textAlign: 'right', padding: '0.5rem', fontWeight: 'bold' }}>₹{printInvoiceData.invoice.part_costs || 0}</td>
+                                        <td style={{ padding: '5px 8px', textAlign: 'right' }}>₹{printInvoiceData.invoice.part_costs || 0}</td>
                                     </tr>
-                                    <tr style={{ borderTop: '2px solid black', fontWeight: 'bold', fontSize: '1.05rem' }}>
-                                        <td style={{ padding: '0.5rem' }}>Total Amount</td>
-                                        <td style={{ textAlign: 'right', padding: '0.5rem' }}>₹{printInvoiceData.invoice.total || (parseFloat(printInvoiceData.invoice.service_fees || 0) + parseFloat(printInvoiceData.invoice.part_costs || 0))}</td>
+                                    <tr style={{ fontWeight: 'bold', background: '#f0f0f0' }}>
+                                        <td style={{ padding: '8px' }}>TOTAL</td>
+                                        <td style={{ padding: '8px', textAlign: 'right' }}>₹{printInvoiceData.invoice.total || (parseFloat(printInvoiceData.invoice.service_fees || 0) + parseFloat(printInvoiceData.invoice.part_costs || 0))}</td>
                                     </tr>
                                 </tbody>
                             </table>
+
+                            <div style={{ textAlign: 'center', fontSize: '10px', color: '#555', borderTop: '1px dashed #ccc', paddingTop: '8px', whiteSpace: 'pre-line' }}>
+                                {printConfig.invoiceTerms || 'Your footer terms here.'}
+                            </div>
                         </div>
                     </div>
                 </div>

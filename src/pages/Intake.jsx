@@ -19,8 +19,14 @@ export default function Intake() {
     const [printConfig, setPrintConfig] = useState({
         shopName: 'Hypertech Digital',
         shopAddress: '',
-        showTechnician: true,
+        shopPhone: '',
+        shopEmail: '',
+        showCustomerPhone: true,
+        showCustomerEmail: false,
         showSerialNo: true,
+        showTechnician: true,
+        showServiceMode: true,
+        showDeviceIntaken: true,
         intakeTerms: 'Not responsible for data loss.\nEstimate valid for 7 days.'
     })
 

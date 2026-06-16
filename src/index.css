@@ -436,40 +436,7 @@ button:disabled {
     line-height: 1.6 !important;
   }
 
-  /* Intake slip grid layout on A4 */
-  .print-receipt {
-    display: grid !important;
-    grid-template-columns: 1fr 1fr;
-    gap: 15px;
-  }
-
-  .print-receipt .print-header {
-    grid-column: span 2;
-    text-align: center !important;
-    border-bottom: 2px solid #000 !important;
-    padding-bottom: 15px !important;
-    margin-bottom: 25px !important;
-  }
-
-  .print-receipt .print-header h2 {
-    font-size: 24pt !important;
-    font-weight: 800 !important;
-    margin: 0 0 10px 0 !important;
-    text-transform: uppercase !important;
-    letter-spacing: 1px !important;
-  }
-
-  .print-receipt p {
-    margin: 4px 0 !important;
-    font-size: 11pt !important;
-  }
-
-  .print-receipt br {
-    display: none;
-  }
-
   .print-receipt .print-terms {
-    grid-column: span 2;
     margin-top: 40px !important;
     border-top: 1px dashed #000 !important;
     padding-top: 20px !important;

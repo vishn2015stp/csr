@@ -424,6 +424,7 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                             <div style={{ fontSize: '20px', fontWeight: 'bold' }}>{printConfig.shopName || 'Your Shop Name'}</div>
                             {printConfig.shopAddress && <div style={{ fontSize: '11px', marginTop: '4px', whiteSpace: 'pre-line' }}>{printConfig.shopAddress}</div>}
                             {printConfig.shopPhone && <div style={{ fontSize: '11px' }}>Tel: {printConfig.shopPhone}</div>}
+                            {printConfig.shopEmail && <div style={{ fontSize: '11px' }}>{printConfig.shopEmail}</div>}
                             <div style={{ marginTop: '10px', fontSize: '15px', fontWeight: 'bold', letterSpacing: '1px' }}>TAX INVOICE</div>
                         </div>
 

@@ -104,6 +104,7 @@ function InvoicePreview({ config }) {
                 <div style={{ fontSize: '20px', fontWeight: 'bold' }}>{config.shopName || 'Your Shop Name'}</div>
                 {config.shopAddress && <div style={{ fontSize: '11px', marginTop: '4px', whiteSpace: 'pre-line' }}>{config.shopAddress}</div>}
                 {config.shopPhone && <div style={{ fontSize: '11px' }}>Tel: {config.shopPhone}</div>}
+                {config.shopEmail && <div style={{ fontSize: '11px' }}>{config.shopEmail}</div>}
                 <div style={{ marginTop: '10px', fontSize: '15px', fontWeight: 'bold', letterSpacing: '1px' }}>TAX INVOICE</div>
             </div>
 
