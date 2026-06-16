@@ -17,6 +17,15 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
         warranty: '',
         total: 0
     });
+    const [printConfig, setPrintConfig] = useState({
+        shopName: 'Hypertech Digital',
+        shopAddress: '',
+        shopPhone: '',
+        showTechnician: true,
+        showSerialNo: true,
+        showCustomerPhone: true,
+        invoiceTerms: 'Thank you for choosing Hypertech Digital.\nAll repairs come with a standard 30-day warranty unless otherwise stated.'
+    });
 
     // Product editing states
     const [isEditingProduct, setIsEditingProduct] = useState(false);
@@ -63,6 +72,13 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
             } catch (err) {
                 console.error('Error fetching invoice:', err);
             }
+
+            try {
+                const settings = await api.getSettings();
+                if (settings.print_settings) {
+                    setPrintConfig(JSON.parse(settings.print_settings));
+                }
+            } catch (e) {}
         };
         load();
     }, [jobId]);
@@ -398,45 +414,66 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                         <button onClick={() => window.print()} style={{ marginRight: '1rem', background: 'var(--border-color)' }}><Printer size={16} /> Print</button>
                         <button onClick={() => setShowInvoice(false)} style={{ background: '#e53e3e' }}>Close</button>
                     </div>
-                    <div className="invoice-print-area">
-                        <h1 style={{ textAlign: 'center', borderBottom: '2px solid black', paddingBottom: '0.5rem' }}>Hypertech Digital</h1>
-                        <p style={{ textAlign: 'center' }}>Service Invoice</p>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '2rem' }}>
+                    <div className="invoice-print-area" style={{
+                        background: '#fff', color: '#000',
+                        padding: '24px', borderRadius: '0',
+                        fontFamily: 'Arial, sans-serif', fontSize: '13px',
+                        width: '100%', margin: '0 auto',
+                    }}>
+                        <div style={{ textAlign: 'center', borderBottom: '2px solid #000', paddingBottom: '14px', marginBottom: '14px' }}>
+                            <div style={{ fontSize: '20px', fontWeight: 'bold' }}>{printConfig.shopName || 'Your Shop Name'}</div>
+                            {printConfig.shopAddress && <div style={{ fontSize: '11px', marginTop: '4px', whiteSpace: 'pre-line' }}>{printConfig.shopAddress}</div>}
+                            {printConfig.shopPhone && <div style={{ fontSize: '11px' }}>Tel: {printConfig.shopPhone}</div>}
+                            <div style={{ marginTop: '10px', fontSize: '15px', fontWeight: 'bold', letterSpacing: '1px' }}>TAX INVOICE</div>
+                        </div>
+
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', fontSize: '12px' }}>
                             <div>
-                                <p><strong>Receipt #:</strong> {invoice.receipt_number || 'Pending'}</p>
-                                <p><strong>CSR #:</strong> {job.csr_number || job.id.split('-')[0].toUpperCase()}</p>
-                                <p><strong>Customer:</strong> {customer.name}</p>
-                                <p><strong>Product:</strong> {job.item_name}</p>
+                                <div><b>Receipt #:</b> {invoice.receipt_number || 'Pending'}</div>
+                                <div><b>Date:</b> {new Date().toLocaleDateString('en-GB').replace(/\//g, '-')}</div>
                             </div>
                             <div style={{ textAlign: 'right' }}>
-                                <p><strong>Date:</strong> {new Date().toLocaleDateString('en-GB').replace(/\//g, '-')}</p>
-                                <p><strong>Phone:</strong> {customer.phone}</p>
+                                <div><b>CSR #:</b> {job.csr_number || job.id.split('-')[0].toUpperCase()}</div>
+                                {printConfig.showTechnician && <div><b>Tech:</b> {user?.username || 'Admin'}</div>}
                             </div>
                         </div>
-                        <table style={{ width: '100%', marginTop: '2rem', borderCollapse: 'collapse' }}>
+
+                        <div style={{ background: '#f5f5f5', padding: '8px 10px', borderRadius: '4px', marginBottom: '12px', fontSize: '12px' }}>
+                            <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>Customer</div>
+                            <div>{customer.name}</div>
+                            {printConfig.showCustomerPhone && <div>{customer.phone}</div>}
+                            <div style={{ marginTop: '4px' }}><b>Device:</b> {job.item_name}</div>
+                            {printConfig.showSerialNo && <div><b>S/N:</b> {job.serial_no || '—'}</div>}
+                        </div>
+
+                        <div style={{ marginBottom: '12px', fontSize: '12px' }}>
+                            <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>Work Performed</div>
+                            <div style={{ background: '#f9f9f9', padding: '6px', border: '1px solid #ddd' }}>
+                                {job.issue}
+                            </div>
+                        </div>
+
+                        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px', marginBottom: '12px' }}>
                             <thead>
-                                <tr style={{ borderBottom: '1px solid black' }}>
-                                    <th style={{ textAlign: 'left', padding: '0.5rem' }}>Description</th>
-                                    <th style={{ textAlign: 'right', padding: '0.5rem' }}>Amount</th>
+                                <tr style={{ background: '#e0e0e0', color: '#000' }}>
+                                    <th style={{ padding: '5px 8px', textAlign: 'left', borderBottom: '1px solid #000' }}>Description</th>
+                                    <th style={{ padding: '5px 8px', textAlign: 'right', borderBottom: '1px solid #000' }}>Amount</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td style={{ padding: '0.5rem' }}>
-                                        <strong>Service & Repair Fee</strong>
-                                        <div style={{ fontSize: '0.85rem', color: '#555', marginTop: '4px' }}>({job.issue})</div>
-                                    </td>
-                                    <td style={{ textAlign: 'right', padding: '0.5rem', fontWeight: 'bold' }}>₹{invoice.service_fees || 0}</td>
+                                <tr style={{ borderBottom: '1px solid #ddd' }}>
+                                    <td style={{ padding: '5px 8px' }}>Service & Labor</td>
+                                    <td style={{ padding: '5px 8px', textAlign: 'right' }}>₹{invoice.service_fees || 0}</td>
                                 </tr>
-                                <tr>
-                                    <td style={{ padding: '0.5rem' }}>
-                                        <strong>Spare Parts Charge</strong>
+                                <tr style={{ borderBottom: '1px solid #ddd' }}>
+                                    <td style={{ padding: '5px 8px' }}>
+                                        Spare Parts
                                         {invoice.spares && (
-                                            <div style={{ fontSize: '0.85rem', color: '#555', marginTop: '4px' }}>
-                                                Spares used: {(() => {
+                                            <div style={{ fontSize: '10px', color: '#555', marginTop: '2px' }}>
+                                                {(() => {
                                                     if (invoice.spares.startsWith('[')) {
                                                         try {
-                                                            return JSON.parse(invoice.spares).map(s => `${s.name} (₹${s.cost})`).join(', ');
+                                                            return JSON.parse(invoice.spares).map(s => `${s.name}`).join(', ');
                                                         } catch (e) {
                                                             return invoice.spares;
                                                         }
@@ -445,16 +482,20 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                                                 })()}
                                             </div>
                                         )}
-                                        {invoice.warranty && <div style={{ fontSize: '0.85rem', color: '#555', marginTop: '4px' }}>Warranty: {invoice.warranty}</div>}
+                                        {invoice.warranty && <div style={{ fontSize: '10px', color: '#555', marginTop: '2px' }}>Warranty: {invoice.warranty}</div>}
                                     </td>
-                                    <td style={{ textAlign: 'right', padding: '0.5rem', fontWeight: 'bold' }}>₹{invoice.part_costs || 0}</td>
+                                    <td style={{ padding: '5px 8px', textAlign: 'right' }}>₹{invoice.part_costs || 0}</td>
                                 </tr>
-                                <tr style={{ borderTop: '2px solid black', fontWeight: 'bold', fontSize: '1.1rem' }}>
-                                    <td style={{ padding: '0.5rem' }}>Total Amount</td>
-                                    <td style={{ textAlign: 'right', padding: '0.5rem' }}>₹{invoice.total || (parseFloat(invoice.service_fees || 0) + parseFloat(invoice.part_costs || 0))}</td>
+                                <tr style={{ fontWeight: 'bold', background: '#f0f0f0' }}>
+                                    <td style={{ padding: '8px' }}>TOTAL</td>
+                                    <td style={{ padding: '8px', textAlign: 'right' }}>₹{invoice.total || (parseFloat(invoice.service_fees || 0) + parseFloat(invoice.part_costs || 0))}</td>
                                 </tr>
                             </tbody>
                         </table>
+
+                        <div style={{ textAlign: 'center', fontSize: '10px', color: '#555', borderTop: '1px dashed #ccc', paddingTop: '8px', whiteSpace: 'pre-line' }}>
+                            {printConfig.invoiceTerms || 'Your footer terms here.'}
+                        </div>
                     </div>
                 </div>
             </div>

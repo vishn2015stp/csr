@@ -146,6 +146,7 @@ export default function Intake() {
                 csrNumber: created.csr_number,
                 customerName: formData.name,
                 customerPhone: formData.phone,
+                customerEmail: formData.email,
                 itemName: formData.itemName || 'Onsite Service Request',
                 serialNo: formData.serialNo || '—',
                 serviceMode: formData.serviceMode,
@@ -300,24 +301,41 @@ export default function Intake() {
 
             {/* Print receipt */}
             {successData && (
-                <div className="print-receipt">
-                    <div className="print-header">
-                        <h2>{printConfig.shopName}</h2>
-                        {printConfig.shopAddress && <p style={{ fontSize: '0.8rem', margin: '5px 0', whiteSpace: 'pre-line' }}>{printConfig.shopAddress}</p>}
-                        <p style={{ fontSize: '0.9rem', margin: '5px 0 0 0', fontWeight: 'bold' }}>Service Request Receipt</p>
+                <div className="print-receipt" style={{
+                    color: '#000',
+                    fontFamily: "'Courier New', monospace", fontSize: '12px',
+                    width: '100%', margin: '0 auto',
+                }}>
+                    <div style={{ textAlign: 'center', borderBottom: '1px dashed #000', paddingBottom: '12px', marginBottom: '12px' }}>
+                        <div style={{ fontSize: '16px', fontWeight: 'bold' }}>{printConfig.shopName || 'Your Shop Name'}</div>
+                        {printConfig.shopAddress && <div style={{ fontSize: '10px', marginTop: '4px', whiteSpace: 'pre-line' }}>{printConfig.shopAddress}</div>}
+                        {printConfig.shopPhone && <div style={{ fontSize: '10px' }}>Tel: {printConfig.shopPhone}</div>}
+                        {printConfig.shopEmail && <div style={{ fontSize: '10px' }}>{printConfig.shopEmail}</div>}
+                        <div style={{ marginTop: '8px', fontWeight: 'bold' }}>SERVICE REQUEST SLIP</div>
                     </div>
-                    <p><strong>Date:</strong> {successData.date}</p>
-                    <p><strong>Request ID:</strong> <span style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>#{successData.csrNumber}</span></p>
-                    <br />
-                    <p><strong>Customer:</strong> {successData.customerName}</p>
-                    <p><strong>Phone:</strong> {successData.customerPhone}</p>
-                    <br />
-                    <p><strong>Item:</strong> {successData.itemName}</p>
-                    {printConfig.showSerialNo && <p><strong>S/N:</strong> {successData.serialNo}</p>}
-                    <p><strong>Service Mode:</strong> {successData.serviceMode}</p>
-                    <p><strong>Device Intaken:</strong> {successData.isDeviceIntaken ? 'Yes' : 'No'}</p>
-                    <div className="print-terms" style={{ whiteSpace: 'pre-line' }}>
-                        {printConfig.intakeTerms}
+
+                    <div style={{ marginBottom: '10px' }}>
+                        <div><b>Date:</b> {successData.date}</div>
+                        <div style={{ fontSize: '14px', fontWeight: 'bold', marginTop: '4px' }}>CSR #: {successData.csrNumber}</div>
+                    </div>
+
+                    <div style={{ borderTop: '1px dashed #000', borderBottom: '1px dashed #000', padding: '8px 0', margin: '8px 0' }}>
+                        <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>Customer</div>
+                        <div>{successData.customerName}</div>
+                        {printConfig.showCustomerPhone && <div>Tel: {successData.customerPhone}</div>}
+                        {printConfig.showCustomerEmail && successData.customerEmail && <div>{successData.customerEmail}</div>}
+                    </div>
+
+                    <div style={{ margin: '8px 0' }}>
+                        <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>Device</div>
+                        <div>{successData.itemName}</div>
+                        {printConfig.showSerialNo && <div>S/N: {successData.serialNo}</div>}
+                        {printConfig.showServiceMode && <div>Mode: {successData.serviceMode}</div>}
+                        {printConfig.showDeviceIntaken && <div>Intaken: {successData.isDeviceIntaken ? 'Yes' : 'No'}</div>}
+                    </div>
+
+                    <div style={{ borderTop: '1px dashed #000', margin: '10px 0', paddingTop: '8px', fontSize: '10px', textAlign: 'center', whiteSpace: 'pre-line' }}>
+                        {printConfig.intakeTerms || 'Your footer terms here.'}
                     </div>
                 </div>
             )}
