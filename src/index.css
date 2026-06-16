@@ -372,7 +372,7 @@ button:disabled {
 @media print {
   @page {
     size: A4 portrait;
-    margin: 20mm;
+    margin: 0;
   }
 
   body {
@@ -431,6 +431,8 @@ button:disabled {
     width: 100% !important;
     max-width: 100% !important;
     margin: 0 auto !important;
+    padding: 20mm !important;
+    box-sizing: border-box !important;
     color: #000 !important;
   }
 }
