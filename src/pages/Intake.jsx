@@ -27,7 +27,7 @@ export default function Intake() {
         showTechnician: true,
         showServiceMode: true,
         showDeviceIntaken: true,
-        intakeTerms: 'Not responsible for data loss.\nEstimate valid for 7 days.'
+        intakeTerms: 'By leaving your device, you agree to our standard terms of service.\nNot responsible for data loss.'
     })
 
     const fetchRecent = async () => {
@@ -308,7 +308,8 @@ export default function Intake() {
             {/* Print receipt */}
             {successData && (
                 <div className="print-receipt" style={{
-                    color: '#000',
+                    background: '#fff', color: '#000',
+                    padding: '20px', borderRadius: '0',
                     fontFamily: "'Courier New', monospace", fontSize: '12px',
                     width: '100%', margin: '0 auto',
                 }}>

@@ -456,7 +456,7 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
 
                         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px', marginBottom: '12px' }}>
                             <thead>
-                                <tr style={{ background: '#e0e0e0', color: '#000' }}>
+                                <tr style={{ background: 'var(--border-color)', color: 'var(--text-primary)' }}>
                                     <th style={{ padding: '5px 8px', textAlign: 'left', borderBottom: '1px solid #000' }}>Description</th>
                                     <th style={{ padding: '5px 8px', textAlign: 'right', borderBottom: '1px solid #000' }}>Amount</th>
                                 </tr>
@@ -494,9 +494,9 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                             </tbody>
                         </table>
 
-                        <div style={{ textAlign: 'center', fontSize: '10px', color: '#555', borderTop: '1px dashed #ccc', paddingTop: '8px', whiteSpace: 'pre-line' }}>
-                            {printConfig.invoiceTerms || 'Your footer terms here.'}
-                        </div>
+                    <div style={{ textAlign: 'center', fontSize: '10px', color: '#555', borderTop: '1px dashed var(--text-secondary)', paddingTop: '8px', whiteSpace: 'pre-line' }}>
+                        {printConfig.invoiceTerms || 'Your footer terms here.'}
+                    </div>
                     </div>
                 </div>
             </div>

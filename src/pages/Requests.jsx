@@ -26,7 +26,7 @@ export default function Requests() {
         showTechnician: true,
         showServiceMode: true,
         showDeviceIntaken: true,
-        intakeTerms: 'Not responsible for data loss.\nEstimate valid for 7 days.',
+        intakeTerms: 'By leaving your device, you agree to our standard terms of service.\nNot responsible for data loss.',
         invoiceTerms: 'Thank you for choosing Hypertech Digital.\nAll repairs come with a standard 30-day warranty unless otherwise stated.'
     });
 
@@ -71,12 +71,17 @@ export default function Requests() {
 
     // Load full details for Intake Slip printing
     const handlePrintIntake = async (req) => {
-        // Find or build intake print payload
+        let customerEmail = '';
+        try {
+            const cust = await api.getCustomer(req.customer_id);
+            customerEmail = cust?.email || '';
+        } catch (e) {}
         setPrintIntakeData({
             date: new Date(req.created_at).toLocaleString('en-GB').replace(/\//g, '-'),
             csrNumber: req.csr_number || req.id.split('-')[0].toUpperCase(),
             customerName: req.customerName,
             customerPhone: req.customerPhone,
+            customerEmail,
             itemName: req.item_name,
             serialNo: req.serial_no || '—',
             serviceMode: req.service_mode || req.service_type || 'On Center',
@@ -357,6 +362,7 @@ export default function Requests() {
                                 <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>Customer</div>
                                 <div>{printIntakeData.customerName}</div>
                                 {printConfig.showCustomerPhone && <div>Tel: {printIntakeData.customerPhone}</div>}
+                                {printConfig.showCustomerEmail && printIntakeData.customerEmail && <div>{printIntakeData.customerEmail}</div>}
                             </div>
 
                             <div style={{ margin: '8px 0' }}>
@@ -425,7 +431,7 @@ export default function Requests() {
 
                             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px', marginBottom: '12px' }}>
                                 <thead>
-                                    <tr style={{ background: '#e0e0e0', color: '#000' }}>
+                                    <tr style={{ background: 'var(--border-color)', color: 'var(--text-primary)' }}>
                                         <th style={{ padding: '5px 8px', textAlign: 'left', borderBottom: '1px solid #000' }}>Description</th>
                                         <th style={{ padding: '5px 8px', textAlign: 'right', borderBottom: '1px solid #000' }}>Amount</th>
                                     </tr>
@@ -464,7 +470,7 @@ export default function Requests() {
                                 </tbody>
                             </table>
 
-                            <div style={{ textAlign: 'center', fontSize: '10px', color: '#555', borderTop: '1px dashed #ccc', paddingTop: '8px', whiteSpace: 'pre-line' }}>
+                            <div style={{ textAlign: 'center', fontSize: '10px', color: '#555', borderTop: '1px dashed var(--text-secondary)', paddingTop: '8px', whiteSpace: 'pre-line' }}>
                                 {printConfig.invoiceTerms || 'Your footer terms here.'}
                             </div>
                         </div>
