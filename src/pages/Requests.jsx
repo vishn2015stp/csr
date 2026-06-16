@@ -298,7 +298,7 @@ export default function Requests() {
                                                     </button>
                                                     <button 
                                                         onClick={() => handlePrintInvoice(req)}
-                                                        title="Print Invoice"
+                                                        title="Print Service Report"
                                                         style={{ background: '#a3be8c', color: 'var(--panel-bg)', padding: '0.35rem 0.6rem', borderRadius: '4px', cursor: 'pointer', border: 'none', display: 'flex', alignItems: 'center' }}
                                                     >
                                                         <FileText size={15} />
@@ -400,7 +400,7 @@ export default function Requests() {
                                 {printConfig.shopAddress && <div style={{ fontSize: '11px', marginTop: '4px', whiteSpace: 'pre-line' }}>{printConfig.shopAddress}</div>}
                                 {printConfig.shopPhone && <div style={{ fontSize: '11px' }}>Tel: {printConfig.shopPhone}</div>}
                                 {printConfig.shopEmail && <div style={{ fontSize: '11px' }}>{printConfig.shopEmail}</div>}
-                                <div style={{ marginTop: '10px', fontSize: '15px', fontWeight: 'bold', letterSpacing: '1px' }}>TAX INVOICE</div>
+                                <div style={{ marginTop: '10px', fontSize: '15px', fontWeight: 'bold', letterSpacing: '1px' }}>SERVICE REPORT</div>
                             </div>
 
                             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', fontSize: '12px' }}>

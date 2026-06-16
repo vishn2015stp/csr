@@ -105,7 +105,7 @@ function InvoicePreview({ config }) {
                 {config.shopAddress && <div style={{ fontSize: '11px', marginTop: '4px', whiteSpace: 'pre-line' }}>{config.shopAddress}</div>}
                 {config.shopPhone && <div style={{ fontSize: '11px' }}>Tel: {config.shopPhone}</div>}
                 {config.shopEmail && <div style={{ fontSize: '11px' }}>{config.shopEmail}</div>}
-                <div style={{ marginTop: '10px', fontSize: '15px', fontWeight: 'bold', letterSpacing: '1px' }}>TAX INVOICE</div>
+                <div style={{ marginTop: '10px', fontSize: '15px', fontWeight: 'bold', letterSpacing: '1px' }}>SERVICE REPORT</div>
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', fontSize: '12px' }}>
@@ -441,7 +441,7 @@ export default function Settings() {
                                 <Toggle label="Device Serial Number" checked={printConfig.showSerialNo} onChange={() => set('showSerialNo', !printConfig.showSerialNo)} />
                                 <Toggle label="Service Mode" description="On Center / On-Site" checked={printConfig.showServiceMode} onChange={() => set('showServiceMode', !printConfig.showServiceMode)} />
                                 <Toggle label="Device Intaken status" checked={printConfig.showDeviceIntaken} onChange={() => set('showDeviceIntaken', !printConfig.showDeviceIntaken)} />
-                                <Toggle label="Technician Name on Invoice" checked={printConfig.showTechnician} onChange={() => set('showTechnician', !printConfig.showTechnician)} />
+                                <Toggle label="Technician Name on Service Report" checked={printConfig.showTechnician} onChange={() => set('showTechnician', !printConfig.showTechnician)} />
                             </div>
 
                             {/* Footer Text */}
@@ -449,7 +449,7 @@ export default function Settings() {
                                 <div style={sectionTitleStyle}>Footer / Terms Text</div>
                                 <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Intake Slip Footer</label>
                                 <textarea style={{ ...inputStyle, resize: 'vertical' }} rows={3} value={printConfig.intakeTerms} onChange={e => set('intakeTerms', e.target.value)} />
-                                <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Invoice Footer</label>
+                                <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Service Report Footer</label>
                                 <textarea style={{ ...inputStyle, resize: 'vertical' }} rows={3} value={printConfig.invoiceTerms} onChange={e => set('invoiceTerms', e.target.value)} />
                             </div>
 
@@ -473,7 +473,7 @@ export default function Settings() {
                                         transition: 'all 0.2s'
                                     }}>
                                         <Eye size={16} />
-                                        {tab === 'intake' ? 'Intake Slip Preview' : 'Invoice Preview'}
+                                        {tab === 'intake' ? 'Intake Slip Preview' : 'Service Report Preview'}
                                     </button>
                                 ))}
                             </div>

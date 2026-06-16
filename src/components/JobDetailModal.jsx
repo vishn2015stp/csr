@@ -425,7 +425,7 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                             {printConfig.shopAddress && <div style={{ fontSize: '11px', marginTop: '4px', whiteSpace: 'pre-line' }}>{printConfig.shopAddress}</div>}
                             {printConfig.shopPhone && <div style={{ fontSize: '11px' }}>Tel: {printConfig.shopPhone}</div>}
                             {printConfig.shopEmail && <div style={{ fontSize: '11px' }}>{printConfig.shopEmail}</div>}
-                            <div style={{ marginTop: '10px', fontSize: '15px', fontWeight: 'bold', letterSpacing: '1px' }}>TAX INVOICE</div>
+                            <div style={{ marginTop: '10px', fontSize: '15px', fontWeight: 'bold', letterSpacing: '1px' }}>SERVICE REPORT</div>
                         </div>
 
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', fontSize: '12px' }}>
@@ -988,7 +988,7 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
 
                         <div style={{ marginTop: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                             <button onClick={() => setShowInvoice(true)} style={{ background: '#4c566a', color: '#fff', padding: '1rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
-                                <Printer size={20} /> Generate & Print Invoice
+                                <Printer size={20} /> Generate & Print Service Report
                             </button>
                         </div>
                     </div>
