@@ -386,7 +386,8 @@ button:disabled {
   .sidebar,
   .non-print,
   button,
-  .mobile-header {
+  .mobile-header,
+  .app-header {
     display: none !important;
   }
 
