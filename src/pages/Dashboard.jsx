@@ -81,7 +81,11 @@ export default function Dashboard() {
     
     // For recent requests, if searching, show all matching. Otherwise, show the top 8 (excluding delivered/completed).
     const activeComplaints = filteredComplaints.filter(c => c.status !== 'Delivered' && c.status !== 'Completed' && c.status !== 'Returned');
-    const sortedFiltered = [...activeComplaints].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    const sortedFiltered = [...activeComplaints].sort((a, b) => {
+        const aNum = parseInt(a.csr_number) || 0;
+        const bNum = parseInt(b.csr_number) || 0;
+        return bNum - aNum;
+    });
     const displayedRecentRequests = query ? sortedFiltered : sortedFiltered.slice(0, 8);
 
     const WidgetHeader = ({ title, icon: Icon }) => (
