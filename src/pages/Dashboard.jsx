@@ -25,7 +25,11 @@ export default function Dashboard() {
     const refreshDashboard = async () => {
         const statsData = await api.getDashboardStats();
         // Since we don't have customers count quickly, we'll just show total complaints
-        const complaints = statsData.complaints || [];
+        const complaints = (statsData.complaints || []).sort((a, b) => {
+            const aNum = parseInt(a.csr_number) || 0;
+            const bNum = parseInt(b.csr_number) || 0;
+            return bNum - aNum;
+        });
         setAllComplaints(complaints);
 
         const pending = complaints.filter(c => c.status !== 'Delivered' && c.status !== 'Completed' && c.status !== 'Returned');
@@ -44,8 +48,7 @@ export default function Dashboard() {
         });
 
         // Most recent 8 complaints for the Recent Requests widget
-        const sorted = [...complaints].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-        setRecentRequests(sorted.slice(0, 8));
+        setRecentRequests(complaints.slice(0, 8));
     };
 
     useEffect(() => {

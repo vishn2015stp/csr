@@ -67,6 +67,10 @@ export default function Requests() {
         }
 
         return matchesSearch && matchesStatus && matchesMode;
+    }).sort((a, b) => {
+        const aNum = parseInt(a.csr_number) || 0;
+        const bNum = parseInt(b.csr_number) || 0;
+        return bNum - aNum;
     });
 
     // Load full details for Intake Slip printing
