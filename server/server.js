@@ -11,6 +11,23 @@ const PORT = 3001;
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 
+// =============== NOTIFICATION HELPER ===============
+async function createNotification({ message, complaint_id, csr_number, created_by }) {
+    try {
+        const id = uuidv4();
+        if (!csr_number && complaint_id) {
+            const result = await db.query('SELECT csr_number FROM complaints WHERE id = $1', [complaint_id]);
+            csr_number = result.rows[0]?.csr_number || '';
+        }
+        await db.query(
+            'INSERT INTO notifications (id, message, complaint_id, csr_number, created_by) VALUES ($1, $2, $3, $4, $5)',
+            [id, message, complaint_id, csr_number || null, created_by || 'System']
+        );
+    } catch (err) {
+        console.error('Failed to create notification:', err.message);
+    }
+}
+
 // Serve static frontend files from 'dist' (used for local runs)
 app.use(express.static(path.join(__dirname, '../dist')));
 
@@ -365,6 +382,14 @@ app.post('/api/complaints', async (req, res) => {
             `, [logId, id, 'Pending (Request Created)', req.body.created_by, ts]);
         }
 
+        // Notification: new service request created
+        createNotification({
+            message: `New service request #${finalCsrNumber} (${item_name}) created by ${req.body.created_by || 'admin'}`,
+            complaint_id: id,
+            csr_number: finalCsrNumber,
+            created_by: req.body.created_by
+        });
+
         const result = await db.query('SELECT * FROM complaints WHERE id = $1', [id]);
         res.json(result.rows[0]);
     } catch (err) {
@@ -450,6 +475,19 @@ app.post('/api/service_records', async (req, res) => {
             'INSERT INTO service_records (id, complaint_id, technician, issues, resolution_status, created_at) VALUES ($1, $2, $3, $4, $5, $6)',
             [id, complaint_id, technician, issues, resolution_status, ts]
         );
+
+        // Notification: service record added
+        if (issues || resolution_status) {
+            const csrRes = await db.query('SELECT csr_number FROM complaints WHERE id = $1', [complaint_id]);
+            const csrNum = csrRes.rows[0]?.csr_number || '';
+            createNotification({
+                message: `Service record added for #${csrNum} by ${technician || 'System'}`,
+                complaint_id,
+                csr_number: csrNum,
+                created_by: technician
+            });
+        }
+
         res.json({ id });
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -481,6 +519,19 @@ app.post('/api/status_logs', async (req, res) => {
             'INSERT INTO status_logs (id, complaint_id, status, technician, created_at) VALUES ($1, $2, $3, $4, $5)',
             [id, complaint_id, status, technician, ts]
         );
+
+        // Notification for status changes (skip initial creation log)
+        if (status && status !== 'Pending (Request Created)') {
+            const csrRes = await db.query('SELECT csr_number FROM complaints WHERE id = $1', [complaint_id]);
+            const csrNum = csrRes.rows[0]?.csr_number || '';
+            createNotification({
+                message: `Status changed to ${status} for #${csrNum} by ${technician || 'System'}`,
+                complaint_id,
+                csr_number: csrNum,
+                created_by: technician
+            });
+        }
+
         res.json({ id });
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -524,6 +575,17 @@ app.post('/api/invoices', async (req, res) => {
                 'UPDATE invoices SET receipt_number = $1, service_fees = $2, part_costs = $3, total = $4, spares = $5, warranty = $6 WHERE complaint_id = $7',
                 [receipt_number || existing.receipt_number, service_fees ?? 0, part_costs ?? 0, total ?? 0, spares || '', warranty || '', complaint_id]
             );
+
+            // Notification: invoice updated
+            const csrResUpd = await db.query('SELECT csr_number FROM complaints WHERE id = $1', [complaint_id]);
+            const csrNumUpd = csrResUpd.rows[0]?.csr_number || '';
+            createNotification({
+                message: `Invoice updated for #${csrNumUpd}`,
+                complaint_id,
+                csr_number: csrNumUpd,
+                created_by: null
+            });
+
             const updated = await db.query('SELECT * FROM invoices WHERE complaint_id = $1', [complaint_id]);
             return res.json(updated.rows[0]);
         }
@@ -533,6 +595,17 @@ app.post('/api/invoices', async (req, res) => {
             'INSERT INTO invoices (id, complaint_id, receipt_number, service_fees, part_costs, total, spares, warranty, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)',
             [id, complaint_id, invoiceNum, service_fees ?? 0, part_costs ?? 0, total ?? 0, spares || '', warranty || '', ts]
         );
+
+        // Notification: invoice created
+        const csrResNew = await db.query('SELECT csr_number FROM complaints WHERE id = $1', [complaint_id]);
+        const csrNumNew = csrResNew.rows[0]?.csr_number || '';
+        createNotification({
+            message: `Invoice created for #${csrNumNew}`,
+            complaint_id,
+            csr_number: csrNumNew,
+            created_by: null
+        });
+
         const created = await db.query('SELECT * FROM invoices WHERE id = $1', [id]);
         res.json(created.rows[0]);
     } catch (err) {
@@ -597,7 +670,7 @@ app.get('/api/dashboard', async (req, res) => {
 // =============== SETTINGS DOWNLOAD DB & TEMPLATES ===============
 app.get('/api/download-db', async (req, res) => {
     try {
-        const tables = ['users', 'customers', 'complaints', 'service_records', 'status_logs', 'invoices', 'settings'];
+        const tables = ['users', 'customers', 'complaints', 'service_records', 'status_logs', 'invoices', 'settings', 'notifications'];
         const backup = {};
         for (const table of tables) {
             const result = await db.query(`SELECT * FROM ${table}`);
@@ -632,6 +705,43 @@ app.put('/api/settings', async (req, res) => {
         } else {
             await db.query('INSERT INTO settings (setting_key, setting_value) VALUES ($1, $2)', [setting_key, setting_value]);
         }
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// =============== NOTIFICATIONS ===============
+app.get('/api/notifications', async (req, res) => {
+    try {
+        const result = await db.query('SELECT * FROM notifications ORDER BY created_at DESC LIMIT 50');
+        res.json(result.rows);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.get('/api/notifications/unread-count', async (req, res) => {
+    try {
+        const result = await db.query('SELECT COUNT(*) as count FROM notifications WHERE is_read = false');
+        res.json({ count: parseInt(result.rows[0].count, 10) });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.put('/api/notifications/:id/read', async (req, res) => {
+    try {
+        await db.query('UPDATE notifications SET is_read = true WHERE id = $1', [req.params.id]);
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.put('/api/notifications/read-all', async (req, res) => {
+    try {
+        await db.query('UPDATE notifications SET is_read = true WHERE is_read = false');
         res.json({ success: true });
     } catch (err) {
         res.status(500).json({ error: err.message });

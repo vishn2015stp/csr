@@ -209,5 +209,26 @@ export const api = {
             throw new Error(data.message || data.error || 'Failed to update user');
         }
         return data;
+    },
+
+    // ---- NOTIFICATIONS ----
+    async getNotifications() {
+        const res = await fetch(`${API_URL}/notifications`);
+        if (!res.ok) throw new Error('Failed to fetch notifications');
+        return res.json();
+    },
+    async getUnreadNotificationCount() {
+        const res = await fetch(`${API_URL}/notifications/unread-count`);
+        if (!res.ok) return 0;
+        const data = await res.json();
+        return data.count || 0;
+    },
+    async markNotificationRead(id) {
+        const res = await fetch(`${API_URL}/notifications/${id}/read`, { method: 'PUT' });
+        return res.json();
+    },
+    async markAllNotificationsRead() {
+        const res = await fetch(`${API_URL}/notifications/read-all`, { method: 'PUT' });
+        return res.json();
     }
 };

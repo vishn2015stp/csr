@@ -101,6 +101,15 @@ function ensureInitialized() {
                         setting_key TEXT PRIMARY KEY,
                         setting_value TEXT
                     );
+                    CREATE TABLE IF NOT EXISTS notifications (
+                        id TEXT PRIMARY KEY,
+                        message TEXT NOT NULL,
+                        complaint_id TEXT,
+                        csr_number TEXT,
+                        created_by TEXT,
+                        is_read BOOLEAN DEFAULT false,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    );
                 `);
 
                 // Safely add columns if they don't exist

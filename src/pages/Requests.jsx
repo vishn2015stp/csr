@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { api } from '../lib/api';
 import { useAuth } from '../context/AuthContext';
+import { useLocation } from 'react-router-dom';
 import { Search, Filter, Printer, FileText, X, Eye } from 'lucide-react';
 import JobDetailModal from '../components/JobDetailModal';
 
 export default function Requests() {
     const { user } = useAuth();
+    const location = useLocation();
     const [requests, setRequests] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [statusFilter, setStatusFilter] = useState('All');
@@ -44,6 +46,14 @@ export default function Requests() {
     useEffect(() => {
         loadRequests();
     }, []);
+
+    // Auto-open job modal when navigated from notification
+    useEffect(() => {
+        if (location.state?.openJobId) {
+            setViewingJobId(location.state.openJobId);
+            window.history.replaceState({}, document.title);
+        }
+    }, [location.state]);
 
     // Filter requests
     const filteredRequests = requests.filter(req => {
