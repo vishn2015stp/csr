@@ -61,16 +61,16 @@ export default function NotificationBell() {
 
     return (
         <div ref={dropdownRef} style={{ position: 'relative' }}>
-            <button onClick={handleToggle} style={{
-                background: isOpen ? 'rgba(53, 167, 230, 0.15)' : 'transparent',
-                border: isOpen ? '1px solid rgba(53, 167, 230, 0.3)' : '1px solid transparent',
-                borderRadius: '50%', width: '36px', height: '36px', cursor: 'pointer',
+            <button onClick={handleToggle} title="Notifications" style={{
+                background: 'rgba(53, 167, 230, 0.12)',
+                border: '1px solid rgba(53, 167, 230, 0.25)',
+                borderRadius: '50%', width: '38px', height: '38px', cursor: 'pointer',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 position: 'relative', transition: 'all 0.2s', flexShrink: 0
             }}
-                onMouseEnter={e => { if (!isOpen) e.currentTarget.style.background = 'rgba(53, 167, 230, 0.1)'; }}
-                onMouseLeave={e => { if (!isOpen) e.currentTarget.style.background = 'transparent'; }}>
-                <Bell size={18} color="#35a7e6" />
+                onMouseEnter={e => { e.currentTarget.style.background = 'rgba(53, 167, 230, 0.25)'; e.currentTarget.style.borderColor = '#35a7e6'; }}
+                onMouseLeave={e => { e.currentTarget.style.background = 'rgba(53, 167, 230, 0.12)'; e.currentTarget.style.borderColor = 'rgba(53, 167, 230, 0.25)'; }}>
+                <Bell size={18} color="#fff" />
                 {unreadCount > 0 && (
                     <span style={{
                         position: 'absolute', top: '-2px', right: '-2px',
