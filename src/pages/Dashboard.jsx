@@ -25,7 +25,19 @@ export default function Dashboard() {
     const refreshDashboard = async () => {
         const statsData = await api.getDashboardStats();
         // Since we don't have customers count quickly, we'll just show total complaints
-        const complaints = (statsData.complaints || []).sort((a, b) => {
+        const statusLogs = statsData.status_logs || [];
+        const latestUpdates = {};
+        statusLogs.forEach(log => {
+            const logTime = new Date(log.created_at).getTime();
+            if (!latestUpdates[log.complaint_id] || logTime > latestUpdates[log.complaint_id]) {
+                latestUpdates[log.complaint_id] = logTime;
+            }
+        });
+
+        const complaints = (statsData.complaints || []).map(c => ({
+            ...c,
+            latest_update: latestUpdates[c.id] || new Date(c.created_at).getTime()
+        })).sort((a, b) => {
             const aNum = parseInt(a.csr_number) || 0;
             const bNum = parseInt(b.csr_number) || 0;
             return bNum - aNum;
@@ -82,9 +94,7 @@ export default function Dashboard() {
     // For recent requests, if searching, show all matching. Otherwise, show the top 8 (excluding delivered/completed).
     const activeComplaints = filteredComplaints.filter(c => c.status !== 'Delivered' && c.status !== 'Completed' && c.status !== 'Returned');
     const sortedFiltered = [...activeComplaints].sort((a, b) => {
-        const aNum = parseInt(a.csr_number) || 0;
-        const bNum = parseInt(b.csr_number) || 0;
-        return bNum - aNum;
+        return b.latest_update - a.latest_update;
     });
     const displayedRecentRequests = query ? sortedFiltered : sortedFiltered.slice(0, 8);
 
@@ -577,7 +587,7 @@ export default function Dashboard() {
 
                 {/* Recent Service Requests Widget */}
                 <div style={{ ...widgetStyle, marginTop: '1.5rem' }}>
-                    <WidgetHeader title="Recent Service Requests" icon={FileText} />
+                    <WidgetHeader title="Recent Updates" icon={FileText} />
                     <div style={{ overflowX: 'auto' }}>
                         <table style={{ width: '100%', fontSize: '0.9rem', borderCollapse: 'collapse', minWidth: '500px' }}>
                             <thead>
@@ -619,7 +629,7 @@ export default function Dashboard() {
                                                 {req.created_by || 'Admin'}
                                             </td>
                                             <td style={{ padding: '0.75rem', textAlign: 'right', fontSize: '0.8rem', color: '#35a7e6' }}>
-                                                {new Date(req.created_at).toLocaleString('en-GB').replace(/\//g, '-')}
+                                                {new Date(req.latest_update || req.created_at).toLocaleString('en-GB').replace(/\//g, '-')}
                                             </td>
                                         </tr>
                                     );
