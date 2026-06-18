@@ -66,6 +66,7 @@ export default function NotificationBell() {
                 border: '1px solid rgba(53, 167, 230, 0.25)',
                 borderRadius: '50%', width: '38px', height: '38px', cursor: 'pointer',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
+                padding: 0,
                 position: 'relative', transition: 'all 0.2s', flexShrink: 0
             }}
                 onMouseEnter={e => { e.currentTarget.style.background = 'rgba(53, 167, 230, 0.25)'; e.currentTarget.style.borderColor = '#35a7e6'; }}
