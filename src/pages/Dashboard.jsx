@@ -140,7 +140,7 @@ export default function Dashboard() {
         return (
             <div className="dashboard-container">
             <div style={{ padding: '1.5rem 1rem 1rem 1rem' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
+                    <div className="dashboard-detailed-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
                         <div>
                             <h2 style={{ margin: 0, fontSize: '1.8rem', color: 'var(--text-primary)', fontWeight: 'bold' }}>
                                 {isOnsite ? 'Detailed Pending On-Site Queue' : 'Detailed Pending In-Shop Queue'}
@@ -227,7 +227,7 @@ export default function Dashboard() {
                     </div>
 
                     <div style={{ ...widgetStyle, padding: '1.5rem' }}>
-                        <div style={{ overflowX: 'auto' }}>
+                        <div className="dashboard-detailed-table-wrapper" style={{ overflowX: 'auto' }}>
                             <table style={{ width: '100%', fontSize: '0.95rem', borderCollapse: 'collapse', minWidth: '800px' }}>
                                 <thead>
                                     <tr style={{ background: '#f6f3eb', textAlign: 'left' }}>
@@ -457,12 +457,12 @@ export default function Dashboard() {
                         )}
                     </div>
                 </div>
-                <div style={{ background: '#f6f3eb', padding: '0.5rem 1rem', borderRadius: '4px', fontSize: '0.9rem', border: '1px solid var(--border-color)', flexShrink: 0 }}>
+                <div className="dashboard-user-badge" style={{ background: '#f6f3eb', padding: '0.5rem 1rem', borderRadius: '4px', fontSize: '0.9rem', border: '1px solid var(--border-color)', flexShrink: 0 }}>
                     User: <span style={{ color: '#35a7e6', fontWeight: 'bold' }}>{user?.username}</span> | Host: Hyper-CSR
                 </div>
             </div>
 
-            <div style={{ padding: '0 1rem' }}>
+            <div className="dashboard-section-padding" style={{ padding: '0 1rem' }}>
 
                 <div className="dashboard-grid-widgets">
 
@@ -605,7 +605,7 @@ export default function Dashboard() {
                 {/* Recent Activity Widget */}
                 <div style={{ ...widgetStyle, marginTop: '1.5rem' }}>
                     <WidgetHeader title={recentViewMode === 'updates' ? "Recent Updates" : recentViewMode === 'delivered' ? "Recent Delivered" : "Recent Service Requests"} icon={FileText}>
-                        <div style={{ display: 'flex', background: 'var(--bg-color)', border: '1px solid var(--border-color)', borderRadius: '4px', overflow: 'hidden' }}>
+                        <div className="dashboard-recent-tabs" style={{ display: 'flex', background: 'var(--bg-color)', border: '1px solid var(--border-color)', borderRadius: '4px', overflow: 'hidden' }}>
                             <button
                                 onClick={() => setRecentViewMode('updates')}
                                 style={{
@@ -650,7 +650,7 @@ export default function Dashboard() {
                             </button>
                         </div>
                     </WidgetHeader>
-                    <div style={{ overflowX: 'auto' }}>
+                    <div className="dashboard-recent-table-wrapper" style={{ overflowX: 'auto' }}>
                         <table style={{ width: '100%', fontSize: '0.9rem', borderCollapse: 'collapse', minWidth: '500px' }}>
                             <thead>
                                 <tr style={{ background: '#f6f3eb', textAlign: 'left' }}>

@@ -507,6 +507,7 @@ button:disabled {
     margin: 0;
     padding: 0 0 2rem 0;
     min-height: auto;
+    overflow-x: hidden;
   }
   
   .dashboard-header {
@@ -525,6 +526,80 @@ button:disabled {
   .dashboard-grid-widgets {
     grid-template-columns: 1fr;
     gap: 1rem;
+  }
+
+  .dashboard-grid-widgets ul {
+    max-height: none !important;
+  }
+
+  .dashboard-grid-widgets li {
+    flex-direction: column !important;
+    gap: 6px;
+    padding: 0.6rem 0.75rem !important;
+  }
+
+  .dashboard-grid-widgets li > div:last-child {
+    text-align: left !important;
+    flex-direction: row !important;
+    justify-content: flex-start !important;
+    gap: 8px;
+  }
+
+  .dashboard-detailed-header {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
+  .dashboard-detailed-header > div:first-child h2 {
+    font-size: 1.2rem !important;
+  }
+
+  .dashboard-detailed-header > div:last-child {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
+  .dashboard-detailed-header > div:last-child > div {
+    max-width: 100% !important;
+  }
+
+  .dashboard-detailed-table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .dashboard-detailed-table-wrapper table {
+    min-width: 600px !important;
+  }
+
+  .dashboard-recent-table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .dashboard-recent-table-wrapper table {
+    min-width: 400px !important;
+  }
+
+  .dashboard-user-badge {
+    font-size: 0.8rem !important;
+    padding: 0.4rem 0.75rem !important;
+    text-align: center !important;
+  }
+
+  .dashboard-section-padding {
+    padding: 0 0.5rem !important;
+  }
+
+  .dashboard-recent-tabs {
+    flex-wrap: wrap !important;
+  }
+
+  .dashboard-recent-tabs button {
+    flex: 1;
+    text-align: center;
+    padding: 0.4rem 0.4rem !important;
+    font-size: 0.78rem !important;
   }
 }
 
