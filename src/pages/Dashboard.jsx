@@ -106,6 +106,12 @@ export default function Dashboard() {
     });
     const displayedRecentRequests = query ? sortedByCsr : sortedByCsr.slice(0, 8);
 
+    const deliveredComplaints = filteredComplaints.filter(c => c.status === 'Delivered' || c.status === 'Completed' || c.status === 'Returned');
+    const sortedByDelivered = [...deliveredComplaints].sort((a, b) => {
+        return b.latest_update - a.latest_update;
+    });
+    const displayedRecentDelivered = query ? sortedByDelivered : sortedByDelivered.slice(0, 8);
+
     const WidgetHeader = ({ title, icon: Icon, children }) => (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.75rem', marginBottom: '1rem', color: 'var(--text-primary)' }}>
             <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -598,7 +604,7 @@ export default function Dashboard() {
 
                 {/* Recent Activity Widget */}
                 <div style={{ ...widgetStyle, marginTop: '1.5rem' }}>
-                    <WidgetHeader title={recentViewMode === 'updates' ? "Recent Updates" : "Recent Service Requests"} icon={FileText}>
+                    <WidgetHeader title={recentViewMode === 'updates' ? "Recent Updates" : recentViewMode === 'delivered' ? "Recent Delivered" : "Recent Service Requests"} icon={FileText}>
                         <div style={{ display: 'flex', background: 'var(--bg-color)', border: '1px solid var(--border-color)', borderRadius: '4px', overflow: 'hidden' }}>
                             <button
                                 onClick={() => setRecentViewMode('updates')}
@@ -628,6 +634,20 @@ export default function Dashboard() {
                             >
                                 Requests
                             </button>
+                            <button
+                                onClick={() => setRecentViewMode('delivered')}
+                                style={{
+                                    padding: '0.4rem 0.8rem',
+                                    border: 'none',
+                                    background: recentViewMode === 'delivered' ? '#35a7e6' : 'transparent',
+                                    color: recentViewMode === 'delivered' ? '#fff' : 'var(--text-secondary)',
+                                    cursor: 'pointer',
+                                    fontWeight: '500',
+                                    fontSize: '0.85rem'
+                                }}
+                            >
+                                Delivered
+                            </button>
                         </div>
                     </WidgetHeader>
                     <div style={{ overflowX: 'auto' }}>
@@ -643,7 +663,7 @@ export default function Dashboard() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {(recentViewMode === 'updates' ? displayedRecentUpdates : displayedRecentRequests).map(req => {
+                                {(recentViewMode === 'updates' ? displayedRecentUpdates : recentViewMode === 'delivered' ? displayedRecentDelivered : displayedRecentRequests).map(req => {
                                     let statusColor = 'var(--text-primary)';
                                     if (req.status === 'Pending') statusColor = '#bf616a';
                                     else if (req.status === 'Delivered' || req.status === 'Completed' || req.status === 'Returned') statusColor = '#a3be8c';
@@ -676,7 +696,7 @@ export default function Dashboard() {
                                         </tr>
                                     );
                                 })}
-                                {(recentViewMode === 'updates' ? displayedRecentUpdates : displayedRecentRequests).length === 0 && (
+                                {(recentViewMode === 'updates' ? displayedRecentUpdates : recentViewMode === 'delivered' ? displayedRecentDelivered : displayedRecentRequests).length === 0 && (
                                     <tr>
                                         <td colSpan="6" style={{ padding: '2rem', textAlign: 'center', color: '#4c566a' }}>No records found.</td>
                                     </tr>
