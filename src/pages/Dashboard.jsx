@@ -2,8 +2,50 @@ import { useState, useEffect } from 'react';
 import { api } from '../lib/api';
 import { useAuth } from '../context/AuthContext';
 import { Navigate } from 'react-router-dom';
-import { HardDrive, Server, Activity, Users, AlertCircle, CheckCircle, Clock, FileText, Search, X } from 'lucide-react';
+import { HardDrive, Server, Activity, Users, AlertCircle, CheckCircle, Clock, FileText, Search, X, ChevronDown, ChevronUp } from 'lucide-react';
 import JobDetailModal from '../components/JobDetailModal';
+
+function getStatusColor(status) {
+    switch (status) {
+        case 'Pending': return '#bf616a';
+        case 'Ready for Delivery':
+        case 'Ready': return '#8fbcbb';
+        case 'In Progress': return '#35a7e6';
+        case 'Intaken': return '#b48ead';
+        case 'Delivered':
+        case 'Completed':
+        case 'Returned': return '#a3be8c';
+        default: return '#ebcb8b';
+    }
+}
+
+function DonutChart({ data, size = 130 }) {
+    const total = data.reduce((s, d) => s + d.count, 0);
+    if (total === 0) return null;
+    const r = size * 0.4;
+    const sw = size * 0.14;
+    const circ = 2 * Math.PI * r;
+    let cumulative = 0;
+
+    return (
+        <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+            <g transform={`rotate(-90 ${size/2} ${size/2})`}>
+                {data.filter(d => d.count > 0).map((d, i) => {
+                    const length = (d.count / total) * circ;
+                    const dashArray = `${Math.max(length, 0.5)} ${circ - length}`;
+                    const dashOffset = -cumulative;
+                    cumulative += length;
+                    return (
+                        <circle key={i} cx={size/2} cy={size/2} r={r} fill="none" stroke={d.color} strokeWidth={sw} strokeDasharray={dashArray} strokeDashoffset={dashOffset} />
+                    );
+                })}
+                <circle cx={size/2} cy={size/2} r={r * 0.65} fill="var(--panel-bg)" />
+            </g>
+            <text x={size/2} y={size/2 - 6} textAnchor="middle" dominantBaseline="central" fontSize={size * 0.24} fontWeight="bold" fill="var(--text-primary)">{total}</text>
+            <text x={size/2} y={size/2 + 14} textAnchor="middle" dominantBaseline="central" fontSize={size * 0.09} fill="var(--text-secondary)">Total</text>
+        </svg>
+    );
+}
 
 export default function Dashboard() {
     const { isAdmin, loading, user } = useAuth();
@@ -21,6 +63,7 @@ export default function Dashboard() {
     const [showDetailedTable, setShowDetailedTable] = useState(false);
     const [detailedTableMode, setDetailedTableMode] = useState('in-shop');
     const [recentViewMode, setRecentViewMode] = useState('updates');
+    const [expandedWidget, setExpandedWidget] = useState(null);
 
 
     const refreshDashboard = async () => {
@@ -91,7 +134,16 @@ export default function Dashboard() {
     // Calculate onsite stats for the header badge
     const readyOnsiteCount = filteredPendingOnSite.filter(w => w.status === 'In Progress' || w.status === 'Ready' || w.status === 'Ready for Delivery').length;
     const totalOnsiteCount = filteredPendingOnSite.length;
-    
+
+    // Donut chart data
+    const inShopStatusCounts = {};
+    filteredPendingWorks.forEach(w => { inShopStatusCounts[w.status] = (inShopStatusCounts[w.status] || 0) + 1; });
+    const inShopDonutData = Object.entries(inShopStatusCounts).map(([status, count]) => ({ label: status, count, color: getStatusColor(status) }));
+
+    const onSiteStatusCounts = {};
+    filteredPendingOnSite.forEach(w => { onSiteStatusCounts[w.status] = (onSiteStatusCounts[w.status] || 0) + 1; });
+    const onSiteDonutData = Object.entries(onSiteStatusCounts).map(([status, count]) => ({ label: status, count, color: getStatusColor(status) }));
+
     // For recent requests, if searching, show all matching. Otherwise, show the top 8 (excluding delivered/completed).
     const activeComplaints = filteredComplaints.filter(c => c.status !== 'Delivered' && c.status !== 'Completed' && c.status !== 'Returned');
     const sortedByUpdates = [...activeComplaints].sort((a, b) => {
@@ -509,28 +561,53 @@ export default function Dashboard() {
                                 <span style={{ fontSize: '0.7rem' }}>➔</span>
                             </button>
                         </div>
-                        <ul style={{ listStyle: 'none', padding: 0, margin: 0, fontSize: '0.9rem', maxHeight: '300px', overflowY: 'auto' }}>
-                            {filteredPendingWorks.map(work => (
-                                <li
-                                    key={work.id}
-                                    onClick={() => setViewingJob(work.id)}
-                                    style={{ display: 'flex', justifyContent: 'space-between', padding: '0.75rem 1rem', background: '#f6f3eb', marginBottom: '0.5rem', borderRadius: '4px', borderLeft: `3px solid ${work.status === 'Ready for Delivery' ? '#8fbcbb' : '#ebcb8b'}`, cursor: 'pointer' }}>
-                                    <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                        <strong style={{ color: 'var(--text-primary)', fontSize: '1rem' }}>{work.item_name}</strong>
-                                        <span style={{ fontSize: '0.8rem', color: '#35a7e6', marginTop: '2px' }}>S/N: {work.serial_no}</span>
+                        {filteredPendingWorks.length === 0 ? (
+                            <div style={{ padding: '2rem 1rem', textAlign: 'center', color: '#4c566a', border: '1px dashed #4c566a', borderRadius: '4px' }}>
+                                All diagnostic queues are clear.
+                            </div>
+                        ) : (
+                            <>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', cursor: 'pointer', marginBottom: expandedWidget === 'in-shop' ? '1rem' : 0 }}
+                                    onClick={() => setExpandedWidget(expandedWidget === 'in-shop' ? null : 'in-shop')}>
+                                    <DonutChart data={inShopDonutData} size={120} />
+                                    <div style={{ flex: 1 }}>
+                                        <div style={{ fontWeight: 'bold', fontSize: '1rem', color: 'var(--text-primary)' }}>
+                                            {filteredPendingWorks.length} Device{filteredPendingWorks.length !== 1 ? 's' : ''} Waiting
+                                        </div>
+                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px 16px', marginTop: '8px' }}>
+                                            {inShopDonutData.map(d => (
+                                                <div key={d.label} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', color: 'var(--text-primary)' }}>
+                                                    <span style={{ width: '10px', height: '10px', borderRadius: '2px', background: d.color, flexShrink: 0 }} />
+                                                    {d.label}: <strong>{d.count}</strong>
+                                                </div>
+                                            ))}
+                                        </div>
                                     </div>
-                                    <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                                        <div style={{ color: 'var(--text-primary)', fontWeight: 'bold', fontSize: '0.85rem' }}>{work.status}</div>
-                                        <div style={{ color: '#4c566a', fontSize: '0.75rem', marginTop: '2px' }}>CSR: {work.csr_number || work.id.split('-')[0]}</div>
+                                    <div style={{ color: 'var(--text-secondary)', flexShrink: 0 }}>
+                                        {expandedWidget === 'in-shop' ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
                                     </div>
-                                </li>
-                            ))}
-                            {filteredPendingWorks.length === 0 && (
-                                <li style={{ padding: '2rem 1rem', textAlign: 'center', color: '#4c566a', border: '1px dashed #4c566a', borderRadius: '4px' }}>
-                                    All diagnostic queues are clear.
-                                </li>
-                            )}
-                        </ul>
+                                </div>
+                                {expandedWidget === 'in-shop' && (
+                                    <ul style={{ listStyle: 'none', padding: 0, margin: '0.5rem 0 0 0', fontSize: '0.9rem', maxHeight: '250px', overflowY: 'auto' }}>
+                                        {filteredPendingWorks.map(work => (
+                                            <li
+                                                key={work.id}
+                                                onClick={() => setViewingJob(work.id)}
+                                                style={{ display: 'flex', justifyContent: 'space-between', padding: '0.65rem 1rem', background: '#f6f3eb', marginBottom: '0.4rem', borderRadius: '4px', borderLeft: `3px solid ${work.status === 'Ready for Delivery' ? '#8fbcbb' : '#ebcb8b'}`, cursor: 'pointer' }}>
+                                                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                                    <strong style={{ color: 'var(--text-primary)', fontSize: '1rem' }}>{work.item_name}</strong>
+                                                    <span style={{ fontSize: '0.8rem', color: '#35a7e6', marginTop: '2px' }}>S/N: {work.serial_no}</span>
+                                                </div>
+                                                <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                                                    <div style={{ color: 'var(--text-primary)', fontWeight: 'bold', fontSize: '0.85rem' }}>{work.status}</div>
+                                                    <div style={{ color: '#4c566a', fontSize: '0.75rem', marginTop: '2px' }}>CSR: {work.csr_number || work.id.split('-')[0]}</div>
+                                                </div>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
+                            </>
+                        )}
                     </div>
 
                     <div style={widgetStyle}>
@@ -573,32 +650,56 @@ export default function Dashboard() {
                                 <span style={{ fontSize: '0.7rem' }}>➔</span>
                             </button>
                         </div>
-                        <ul style={{ listStyle: 'none', padding: 0, margin: 0, fontSize: '0.9rem', maxHeight: '300px', overflowY: 'auto' }}>
-                            {filteredPendingOnSite.map(work => {
-                                let borderLeftColor = 'var(--danger)'; // Pending
-                                if (work.status === 'In Progress') borderLeftColor = '#35a7e6'; // Blue
-                                
-                                return (
-                                    <li
-                                        key={work.id}
-                                        onClick={() => setViewingJob(work.id)}
-                                        style={{ display: 'flex', justifyContent: 'space-between', padding: '0.75rem 1rem', background: '#f6f3eb', marginBottom: '0.5rem', borderRadius: '4px', borderLeft: `3px solid ${borderLeftColor}`, cursor: 'pointer' }}>
-                                        <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                            <strong style={{ color: 'var(--text-primary)', fontSize: '1rem' }}>{work.item_name}</strong>
-                                            <span style={{ fontSize: '0.8rem', color: '#35a7e6', marginTop: '2px' }}>{work.customerName} - {work.customerPhone}</span>
+                        {filteredPendingOnSite.length === 0 ? (
+                            <div style={{ padding: '2rem 1rem', textAlign: 'center', color: '#4c566a', border: '1px dashed #4c566a', borderRadius: '4px' }}>
+                                No pending on-site requests.
+                            </div>
+                        ) : (
+                            <>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', cursor: 'pointer', marginBottom: expandedWidget === 'onsite' ? '1rem' : 0 }}
+                                    onClick={() => setExpandedWidget(expandedWidget === 'onsite' ? null : 'onsite')}>
+                                    <DonutChart data={onSiteDonutData} size={120} />
+                                    <div style={{ flex: 1 }}>
+                                        <div style={{ fontWeight: 'bold', fontSize: '1rem', color: 'var(--text-primary)' }}>
+                                            {totalOnsiteCount} Field Task{totalOnsiteCount !== 1 ? 's' : ''} Pending
                                         </div>
-                                        <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                                            <div style={{ color: 'var(--text-primary)', fontWeight: 'bold', fontSize: '0.85rem' }}>{work.status}</div>
+                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px 16px', marginTop: '8px' }}>
+                                            {onSiteDonutData.map(d => (
+                                                <div key={d.label} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', color: 'var(--text-primary)' }}>
+                                                    <span style={{ width: '10px', height: '10px', borderRadius: '2px', background: d.color, flexShrink: 0 }} />
+                                                    {d.label}: <strong>{d.count}</strong>
+                                                </div>
+                                            ))}
                                         </div>
-                                    </li>
-                                );
-                            })}
-                            {filteredPendingOnSite.length === 0 && (
-                                <li style={{ padding: '2rem 1rem', textAlign: 'center', color: '#4c566a', border: '1px dashed #4c566a', borderRadius: '4px' }}>
-                                    No pending on-site requests.
-                                </li>
-                            )}
-                        </ul>
+                                    </div>
+                                    <div style={{ color: 'var(--text-secondary)', flexShrink: 0 }}>
+                                        {expandedWidget === 'onsite' ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                                    </div>
+                                </div>
+                                {expandedWidget === 'onsite' && (
+                                    <ul style={{ listStyle: 'none', padding: 0, margin: '0.5rem 0 0 0', fontSize: '0.9rem', maxHeight: '250px', overflowY: 'auto' }}>
+                                        {filteredPendingOnSite.map(work => {
+                                            let borderLeftColor = 'var(--danger)';
+                                            if (work.status === 'In Progress') borderLeftColor = '#35a7e6';
+                                            return (
+                                                <li
+                                                    key={work.id}
+                                                    onClick={() => setViewingJob(work.id)}
+                                                    style={{ display: 'flex', justifyContent: 'space-between', padding: '0.65rem 1rem', background: '#f6f3eb', marginBottom: '0.4rem', borderRadius: '4px', borderLeft: `3px solid ${borderLeftColor}`, cursor: 'pointer' }}>
+                                                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                                        <strong style={{ color: 'var(--text-primary)', fontSize: '1rem' }}>{work.item_name}</strong>
+                                                        <span style={{ fontSize: '0.8rem', color: '#35a7e6', marginTop: '2px' }}>{work.customerName} - {work.customerPhone}</span>
+                                                    </div>
+                                                    <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                                                        <div style={{ color: 'var(--text-primary)', fontWeight: 'bold', fontSize: '0.85rem' }}>{work.status}</div>
+                                                    </div>
+                                                </li>
+                                            );
+                                        })}
+                                    </ul>
+                                )}
+                            </>
+                        )}
                     </div>
                 </div>
 
