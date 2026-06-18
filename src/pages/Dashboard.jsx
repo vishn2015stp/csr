@@ -93,10 +93,17 @@ export default function Dashboard() {
     
     // For recent requests, if searching, show all matching. Otherwise, show the top 8 (excluding delivered/completed).
     const activeComplaints = filteredComplaints.filter(c => c.status !== 'Delivered' && c.status !== 'Completed' && c.status !== 'Returned');
-    const sortedFiltered = [...activeComplaints].sort((a, b) => {
+    const sortedByUpdates = [...activeComplaints].sort((a, b) => {
         return b.latest_update - a.latest_update;
     });
-    const displayedRecentRequests = query ? sortedFiltered : sortedFiltered.slice(0, 8);
+    const displayedRecentUpdates = query ? sortedByUpdates : sortedByUpdates.slice(0, 8);
+
+    const sortedByCsr = [...activeComplaints].sort((a, b) => {
+        const aNum = parseInt(a.csr_number) || 0;
+        const bNum = parseInt(b.csr_number) || 0;
+        return bNum - aNum;
+    });
+    const displayedRecentRequests = query ? sortedByCsr : sortedByCsr.slice(0, 8);
 
     const WidgetHeader = ({ title, icon: Icon }) => (
         <div style={{ display: 'flex', alignItems: 'center', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.75rem', marginBottom: '1rem', color: 'var(--text-primary)' }}>
@@ -587,7 +594,7 @@ export default function Dashboard() {
 
                 {/* Recent Service Requests Widget */}
                 <div style={{ ...widgetStyle, marginTop: '1.5rem' }}>
-                    <WidgetHeader title="Recent Updates" icon={FileText} />
+                    <WidgetHeader title="Recent Service Requests" icon={FileText} />
                     <div style={{ overflowX: 'auto' }}>
                         <table style={{ width: '100%', fontSize: '0.9rem', borderCollapse: 'collapse', minWidth: '500px' }}>
                             <thead>
@@ -629,7 +636,7 @@ export default function Dashboard() {
                                                 {req.created_by || 'Admin'}
                                             </td>
                                             <td style={{ padding: '0.75rem', textAlign: 'right', fontSize: '0.8rem', color: '#35a7e6' }}>
-                                                {new Date(req.latest_update || req.created_at).toLocaleString('en-GB').replace(/\//g, '-')}
+                                                {new Date(req.created_at).toLocaleString('en-GB').replace(/\//g, '-')}
                                             </td>
                                         </tr>
                                     );
@@ -637,6 +644,65 @@ export default function Dashboard() {
                                 {displayedRecentRequests.length === 0 && (
                                     <tr>
                                         <td colSpan="6" style={{ padding: '2rem', textAlign: 'center', color: '#4c566a' }}>No service requests logged yet.</td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                {/* Recent Updates Widget */}
+                <div style={{ ...widgetStyle, marginTop: '1.5rem' }}>
+                    <WidgetHeader title="Recent Updates" icon={FileText} />
+                    <div style={{ overflowX: 'auto' }}>
+                        <table style={{ width: '100%', fontSize: '0.9rem', borderCollapse: 'collapse', minWidth: '500px' }}>
+                            <thead>
+                                <tr style={{ background: '#f6f3eb', textAlign: 'left' }}>
+                                    <th style={{ padding: '0.5rem 0.75rem', borderRadius: '4px 0 0 4px', fontWeight: '600', color: '#35a7e6' }}>CSR #</th>
+                                    <th style={{ padding: '0.5rem 0.75rem', fontWeight: '600' }}>Customer</th>
+                                    <th style={{ padding: '0.5rem 0.75rem', fontWeight: '600' }}>Item</th>
+                                    <th style={{ padding: '0.5rem 0.75rem', fontWeight: '600' }}>Status</th>
+                                    <th style={{ padding: '0.5rem 0.75rem', fontWeight: '600' }}>Logged By</th>
+                                    <th style={{ padding: '0.5rem 0.75rem', textAlign: 'right', borderRadius: '0 4px 4px 0', fontWeight: '600' }}>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {displayedRecentUpdates.map(req => {
+                                    let statusColor = 'var(--text-primary)';
+                                    if (req.status === 'Pending') statusColor = '#bf616a';
+                                    else if (req.status === 'Delivered' || req.status === 'Completed' || req.status === 'Returned') statusColor = '#a3be8c';
+                                    else if (req.status === 'Ready for Delivery' || req.status === 'Ready') statusColor = '#8fbcbb';
+                                    else if (req.status === 'In Progress') statusColor = '#35a7e6';
+                                    else if (req.status === 'Intaken') statusColor = '#b48ead';
+                                    else statusColor = '#ebcb8b';
+                                    return (
+                                        <tr
+                                            key={req.id}
+                                            onClick={() => setViewingJob(req.id)}
+                                            style={{ borderBottom: '1px solid var(--border-color)', cursor: 'pointer', transition: 'background 0.15s' }}
+                                            onMouseEnter={e => e.currentTarget.style.background = '#f6f3eb'}
+                                            onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                                        >
+                                            <td style={{ padding: '0.75rem', fontWeight: 'bold', color: '#35a7e6' }}>#{req.csr_number || req.id.split('-')[0].toUpperCase()}</td>
+                                            <td style={{ padding: '0.75rem', color: 'var(--text-primary)' }}>{req.customerName || '—'}</td>
+                                            <td style={{ padding: '0.75rem' }}>{req.item_name}</td>
+                                            <td style={{ padding: '0.75rem' }}>
+                                                <span style={{ background: 'rgba(0, 0, 0, 0.04)', padding: '3px 10px', borderRadius: '12px', color: statusColor, fontSize: '0.75rem', fontWeight: 'bold', textTransform: 'uppercase', border: `1px solid ${statusColor}40` }}>
+                                                    {req.status}
+                                                </span>
+                                            </td>
+                                            <td style={{ padding: '0.75rem', color: 'var(--text-secondary)', fontSize: '0.8rem', textTransform: 'capitalize' }}>
+                                                {req.created_by || 'Admin'}
+                                            </td>
+                                            <td style={{ padding: '0.75rem', textAlign: 'right', fontSize: '0.8rem', color: '#35a7e6' }}>
+                                                {new Date(req.latest_update || req.created_at).toLocaleString('en-GB').replace(/\//g, '-')}
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                                {displayedRecentUpdates.length === 0 && (
+                                    <tr>
+                                        <td colSpan="6" style={{ padding: '2rem', textAlign: 'center', color: '#4c566a' }}>No recent updates.</td>
                                     </tr>
                                 )}
                             </tbody>
