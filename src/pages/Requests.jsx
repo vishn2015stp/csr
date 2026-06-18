@@ -136,7 +136,7 @@ export default function Requests() {
             
             {/* Standard non-print content */}
             <div className="non-print">
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', marginBottom: '2rem' }}>
                     <h1 style={{ margin: 0, fontSize: '1.8rem', color: 'var(--text-primary)' }}>Service Request Directory</h1>
                     <div style={{ background: '#f6f3eb', padding: '0.5rem 1rem', borderRadius: '4px', fontSize: '0.9rem', border: '1px solid var(--border-color)' }}>
                         Total Records: <span style={{ color: '#35a7e6', fontWeight: 'bold' }}>{filteredRequests.length}</span>

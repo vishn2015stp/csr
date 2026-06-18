@@ -84,12 +84,7 @@ export default function NotificationBell() {
             </button>
 
             {isOpen && (
-                <div style={{
-                    position: 'absolute', right: 0, top: '100%', marginTop: '8px', width: '400px', maxHeight: '480px',
-                    background: 'var(--panel-bg)', border: '1px solid var(--border-color)',
-                    borderRadius: '8px', boxShadow: '0 10px 25px rgba(0,0,0,0.5)', zIndex: 9999,
-                    overflow: 'hidden', display: 'flex', flexDirection: 'column'
-                }}>
+                <div className="notification-dropdown">
                     <div style={{ padding: '0.75rem 1rem', borderBottom: '1px solid var(--border-color)', fontWeight: 'bold', color: 'var(--text-primary)', fontSize: '0.95rem' }}>
                         Notifications
                     </div>

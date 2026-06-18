@@ -742,3 +742,35 @@ button:disabled {
     font-size: 0.9rem;
   }
 }
+
+/* Notification Dropdown styles */
+.notification-dropdown {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  margin-top: 8px;
+  width: 400px;
+  max-height: 480px;
+  background: var(--panel-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+  z-index: 9999;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 768px) {
+  .notification-dropdown {
+    right: auto !important;
+    left: -12px !important;
+    width: calc(100vw - 32px) !important;
+    max-width: 400px !important;
+  }
+  
+  .dashboard-top-actions {
+    width: 100% !important;
+    justify-content: space-between !important;
+  }
+}

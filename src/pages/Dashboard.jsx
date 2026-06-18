@@ -166,7 +166,7 @@ export default function Dashboard() {
     const displayedRecentDelivered = query ? sortedByDelivered : sortedByDelivered.slice(0, 8);
 
     const WidgetHeader = ({ title, icon: Icon, children }) => (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.75rem', marginBottom: '1rem', color: 'var(--text-primary)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.75rem', marginBottom: '1rem', color: 'var(--text-primary)' }}>
             <div style={{ display: 'flex', alignItems: 'center' }}>
                 <Icon size={18} style={{ marginRight: '8px', color: '#35a7e6' }} />
                 <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '500' }}>{title}</h3>
@@ -510,7 +510,7 @@ export default function Dashboard() {
                         )}
                     </div>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexShrink: 0 }}>
+                <div className="dashboard-top-actions" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexShrink: 0 }}>
                     <NotificationBell />
                     <div className="dashboard-user-badge" style={{ background: '#f6f3eb', padding: '0.5rem 1rem', borderRadius: '4px', fontSize: '0.9rem', border: '1px solid var(--border-color)' }}>
                         User: <span style={{ color: '#35a7e6', fontWeight: 'bold' }}>{user?.username}</span> | Host: Hyper-CSR
