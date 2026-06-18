@@ -1,7 +1,7 @@
 import { NavLink, useNavigate } from 'react-router-dom'
 import { Database, LayoutDashboard, LogOut, X, History } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
-import NotificationBell from './NotificationBell'
+
 
 export default function Sidebar({ isOpen, closeSidebar }) {
     const { logout } = useAuth();
@@ -41,7 +41,6 @@ export default function Sidebar({ isOpen, closeSidebar }) {
                     <Database size={20} />
                     Settings
                 </NavLink>
-                <NotificationBell />
             </nav>
             <div style={{ padding: '0.5rem 1rem', borderTop: '1px solid var(--border-color)' }}>
                 <button onClick={handleLogout} className="nav-item" style={{ background: 'transparent', border: 'none', color: '#c53030', width: '100%', cursor: 'pointer', textAlign: 'left', fontWeight: 'bold' }}>

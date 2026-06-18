@@ -61,13 +61,21 @@ export default function NotificationBell() {
 
     return (
         <div ref={dropdownRef} style={{ position: 'relative' }}>
-            <button onClick={handleToggle} className="nav-item" style={{ background: 'transparent', border: 'none', width: '100%', cursor: 'pointer', textAlign: 'left', position: 'relative', display: 'flex', alignItems: 'center' }}>
-                <Bell size={20} style={{ marginRight: '10px', flexShrink: 0 }} />
-                <span style={{ flex: 1 }}>Notifications</span>
+            <button onClick={handleToggle} style={{
+                background: isOpen ? 'rgba(53, 167, 230, 0.15)' : 'transparent',
+                border: isOpen ? '1px solid rgba(53, 167, 230, 0.3)' : '1px solid transparent',
+                borderRadius: '50%', width: '36px', height: '36px', cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                position: 'relative', transition: 'all 0.2s', flexShrink: 0
+            }}
+                onMouseEnter={e => { if (!isOpen) e.currentTarget.style.background = 'rgba(53, 167, 230, 0.1)'; }}
+                onMouseLeave={e => { if (!isOpen) e.currentTarget.style.background = 'transparent'; }}>
+                <Bell size={18} color="var(--text-primary)" />
                 {unreadCount > 0 && (
                     <span style={{
-                        background: '#bf616a', color: '#fff', borderRadius: '50%', width: '20px', height: '20px',
-                        fontSize: '0.7rem', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', flexShrink: 0
+                        position: 'absolute', top: '-2px', right: '-2px',
+                        background: '#bf616a', color: '#fff', borderRadius: '50%', width: '18px', height: '18px',
+                        fontSize: '0.65rem', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold'
                     }}>
                         {unreadCount > 9 ? '9+' : unreadCount}
                     </span>
@@ -76,7 +84,7 @@ export default function NotificationBell() {
 
             {isOpen && (
                 <div style={{
-                    position: 'absolute', left: '100%', top: 0, width: '380px', maxHeight: '440px',
+                    position: 'absolute', right: 0, top: '100%', marginTop: '8px', width: '400px', maxHeight: '480px',
                     background: 'var(--panel-bg)', border: '1px solid var(--border-color)',
                     borderRadius: '8px', boxShadow: '0 10px 25px rgba(0,0,0,0.5)', zIndex: 9999,
                     overflow: 'hidden', display: 'flex', flexDirection: 'column'

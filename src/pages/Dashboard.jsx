@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { Navigate } from 'react-router-dom';
 import { HardDrive, Server, Activity, Users, AlertCircle, CheckCircle, Clock, FileText, Search, X, ChevronDown, ChevronUp } from 'lucide-react';
 import JobDetailModal from '../components/JobDetailModal';
+import NotificationBell from '../components/NotificationBell';
 
 function getStatusColor(status) {
     switch (status) {
@@ -509,8 +510,11 @@ export default function Dashboard() {
                         )}
                     </div>
                 </div>
-                <div className="dashboard-user-badge" style={{ background: '#f6f3eb', padding: '0.5rem 1rem', borderRadius: '4px', fontSize: '0.9rem', border: '1px solid var(--border-color)', flexShrink: 0 }}>
-                    User: <span style={{ color: '#35a7e6', fontWeight: 'bold' }}>{user?.username}</span> | Host: Hyper-CSR
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexShrink: 0 }}>
+                    <NotificationBell />
+                    <div className="dashboard-user-badge" style={{ background: '#f6f3eb', padding: '0.5rem 1rem', borderRadius: '4px', fontSize: '0.9rem', border: '1px solid var(--border-color)' }}>
+                        User: <span style={{ color: '#35a7e6', fontWeight: 'bold' }}>{user?.username}</span> | Host: Hyper-CSR
+                    </div>
                 </div>
             </div>
 
