@@ -70,7 +70,7 @@ export default function NotificationBell() {
             }}
                 onMouseEnter={e => { if (!isOpen) e.currentTarget.style.background = 'rgba(53, 167, 230, 0.1)'; }}
                 onMouseLeave={e => { if (!isOpen) e.currentTarget.style.background = 'transparent'; }}>
-                <Bell size={18} color="var(--text-primary)" />
+                <Bell size={18} color="#35a7e6" />
                 {unreadCount > 0 && (
                     <span style={{
                         position: 'absolute', top: '-2px', right: '-2px',
