@@ -571,14 +571,14 @@ export default function Dashboard() {
                             </div>
                         ) : (
                             <>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', cursor: 'pointer', marginBottom: expandedWidget === 'in-shop' ? '1rem' : 0 }}
+                                <div className="pending-box-detail" style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', cursor: 'pointer', marginBottom: expandedWidget === 'in-shop' ? '1rem' : 0 }}
                                     onClick={() => setExpandedWidget(expandedWidget === 'in-shop' ? null : 'in-shop')}>
                                     <DonutChart data={inShopDonutData} size={120} />
                                     <div style={{ flex: 1 }}>
                                         <div style={{ fontWeight: 'bold', fontSize: '1rem', color: 'var(--text-primary)' }}>
                                             {filteredPendingWorks.length} Device{filteredPendingWorks.length !== 1 ? 's' : ''} Waiting
                                         </div>
-                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px 16px', marginTop: '8px' }}>
+                                        <div className="pending-box-legend" style={{ display: 'flex', flexWrap: 'wrap', gap: '6px 16px', marginTop: '8px' }}>
                                             {inShopDonutData.map(d => (
                                                 <div key={d.label} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', color: 'var(--text-primary)' }}>
                                                     <span style={{ width: '10px', height: '10px', borderRadius: '2px', background: d.color, flexShrink: 0 }} />
@@ -660,14 +660,14 @@ export default function Dashboard() {
                             </div>
                         ) : (
                             <>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', cursor: 'pointer', marginBottom: expandedWidget === 'onsite' ? '1rem' : 0 }}
+                                <div className="pending-box-detail" style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', cursor: 'pointer', marginBottom: expandedWidget === 'onsite' ? '1rem' : 0 }}
                                     onClick={() => setExpandedWidget(expandedWidget === 'onsite' ? null : 'onsite')}>
                                     <DonutChart data={onSiteDonutData} size={120} />
                                     <div style={{ flex: 1 }}>
                                         <div style={{ fontWeight: 'bold', fontSize: '1rem', color: 'var(--text-primary)' }}>
                                             {totalOnsiteCount} Field Task{totalOnsiteCount !== 1 ? 's' : ''} Pending
                                         </div>
-                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px 16px', marginTop: '8px' }}>
+                                        <div className="pending-box-legend" style={{ display: 'flex', flexWrap: 'wrap', gap: '6px 16px', marginTop: '8px' }}>
                                             {onSiteDonutData.map(d => (
                                                 <div key={d.label} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', color: 'var(--text-primary)' }}>
                                                     <span style={{ width: '10px', height: '10px', borderRadius: '2px', background: d.color, flexShrink: 0 }} />

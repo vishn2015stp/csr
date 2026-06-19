@@ -774,3 +774,52 @@ button:disabled {
     justify-content: space-between !important;
   }
 }
+
+/* Responsive adjustments for pending boxes and details */
+@media (max-width: 480px) {
+  .pending-box-detail {
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    gap: 1rem !important;
+  }
+  
+  .pending-box-legend {
+    justify-content: center !important;
+  }
+}
+
+/* Modal Title and Billing Responsiveness */
+.modal-title {
+  font-size: 1.5rem;
+}
+
+.billing-inputs-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.billing-save-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+  align-items: end;
+}
+
+@media (max-width: 480px) {
+  .modal-title {
+    font-size: 1.15rem !important;
+  }
+  
+  .billing-inputs-grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .billing-save-grid {
+    grid-template-columns: 1fr !important;
+    gap: 0.75rem !important;
+  }
+}

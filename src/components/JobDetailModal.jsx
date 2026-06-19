@@ -509,7 +509,7 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
 
                 {/* Header */}
                 <div style={{ padding: '1rem', borderBottom: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--bg-color)', borderRadius: '8px 8px 0 0' }}>
-                    <h2 style={{ margin: 0, color: 'var(--text-primary)' }}>PENDING BOOK DETAIL</h2>
+                    <h2 className="modal-title" style={{ margin: 0, color: 'var(--text-primary)' }}>PENDING BOOK DETAIL</h2>
                     <button onClick={onClose} style={{ background: 'transparent', color: 'var(--text-primary)', border: 'none', cursor: 'pointer', padding: '0.5rem' }}>
                         <X size={24} />
                     </button>
@@ -879,7 +879,7 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                                 <>
                                     <h3 style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem', margin: '0 0 1rem 0', color: '#35a7e6' }}>Billing & Warranty</h3>
                                     
-                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.75rem', marginBottom: '0.75rem' }}>
+                                    <div className="billing-inputs-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.75rem', marginBottom: '0.75rem' }}>
                                         <div>
                                             <label style={{ fontSize: '0.8rem', color: 'var(--text-primary)', display: 'block', marginBottom: '4px' }}>Service Charge (₹)</label>
                                             <input 
@@ -949,7 +949,7 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                                         </div>
                                     </div>
 
-                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '0.5rem', alignItems: 'end' }}>
+                                    <div className="billing-save-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '0.5rem', alignItems: 'end' }}>
                                         <div>
                                             <label style={{ fontSize: '0.8rem', color: 'var(--text-primary)', display: 'block', marginBottom: '4px' }}>Warranty Period</label>
                                             <input 
