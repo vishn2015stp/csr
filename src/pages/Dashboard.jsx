@@ -100,7 +100,7 @@ export default function Dashboard() {
     const [isSearchFocused, setIsSearchFocused] = useState(false);
     const [showDetailedTable, setShowDetailedTable] = useState(false);
     const [detailedTableMode, setDetailedTableMode] = useState('in-shop');
-    const [recentViewMode, setRecentViewMode] = useState('updates');
+    const [recentViewMode, setRecentViewMode] = useState('delivered');
     const [expandedWidget, setExpandedWidget] = useState(null);
     const [dashboardLoading, setDashboardLoading] = useState(true);
 
