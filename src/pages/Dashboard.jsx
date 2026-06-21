@@ -29,6 +29,29 @@ function isToday(timestamp) {
            date.getFullYear() === today.getFullYear();
 }
 
+function categorizeItem(itemName) {
+    const name = (itemName || '').toLowerCase();
+    if (name.includes('laptop') || name.includes('notebook') || name.includes('macbook') || name.includes('thinkpad')) {
+        return 'Laptop';
+    }
+    if (name.includes('desktop') || name.includes('computer') || name.includes('pc') || name.includes('cpu') || name.includes('imac') || name.includes('cabinet') || name.includes('monitor')) {
+        return 'Desktop';
+    }
+    if (name.includes('printer') || name.includes('scanner') || name.includes('copier') || name.includes('epson') || name.includes('canon') || name.includes('hp ') && !name.includes('laptop')) {
+        return 'Printer';
+    }
+    return 'Others';
+}
+
+function getCategoryColor(category) {
+    switch (category) {
+        case 'Laptop': return '#35a7e6';
+        case 'Desktop': return '#b48ead';
+        case 'Printer': return '#a3be8c';
+        default: return '#ebcb8b';
+    }
+}
+
 function DonutChart({ data, size = 130 }) {
     const total = data.reduce((s, d) => s + d.count, 0);
     if (total === 0) return null;
@@ -153,6 +176,18 @@ export default function Dashboard() {
     const onSiteStatusCounts = {};
     filteredPendingOnSite.forEach(w => { onSiteStatusCounts[w.status] = (onSiteStatusCounts[w.status] || 0) + 1; });
     const onSiteDonutData = Object.entries(onSiteStatusCounts).map(([status, count]) => ({ label: status, count, color: getStatusColor(status) }));
+
+    // Category chart data for all pending items
+    const categoryCounts = { Laptop: 0, Desktop: 0, Printer: 0, Others: 0 };
+    filteredPending.forEach(c => {
+        const cat = categorizeItem(c.item_name);
+        categoryCounts[cat] = (categoryCounts[cat] || 0) + 1;
+    });
+    const categoryDonutData = Object.entries(categoryCounts).map(([cat, count]) => ({
+        label: cat,
+        count,
+        color: getCategoryColor(cat)
+    }));
 
     // For recent updates, filter active complaints that were updated today.
     const activeComplaints = filteredComplaints.filter(c => c.status !== 'Delivered' && c.status !== 'Completed' && c.status !== 'Returned');
