@@ -12,7 +12,8 @@ export default function Requests() {
     const [searchQuery, setSearchQuery] = useState('');
     const [statusFilter, setStatusFilter] = useState('All');
     const [modeFilter, setModeFilter] = useState('All');
-    const [dateFilter, setDateFilter] = useState('');
+    const [startDateFilter, setStartDateFilter] = useState('');
+    const [endDateFilter, setEndDateFilter] = useState('');
     
     // Modals & print states
     const [viewingJobId, setViewingJobId] = useState(null);
@@ -77,17 +78,20 @@ export default function Requests() {
             }
         }
 
-        let matchesDate = true;
-        if (dateFilter) {
-            const reqDate = new Date(req.created_at);
-            const y = reqDate.getFullYear();
-            const m = String(reqDate.getMonth() + 1).padStart(2, '0');
-            const d = String(reqDate.getDate()).padStart(2, '0');
-            const formattedDate = `${y}-${m}-${d}`;
-            matchesDate = formattedDate === dateFilter;
+        let matchesDateRange = true;
+        if (startDateFilter || endDateFilter) {
+            const reqTime = new Date(req.created_at).getTime();
+            if (startDateFilter) {
+                const startTime = new Date(`${startDateFilter}T00:00:00`).getTime();
+                if (reqTime < startTime) matchesDateRange = false;
+            }
+            if (endDateFilter) {
+                const endTime = new Date(`${endDateFilter}T23:59:59.999`).getTime();
+                if (reqTime > endTime) matchesDateRange = false;
+            }
         }
 
-        return matchesSearch && matchesStatus && matchesMode && matchesDate;
+        return matchesSearch && matchesStatus && matchesMode && matchesDateRange;
     }).sort((a, b) => {
         const aNum = parseInt(a.csr_number) || 0;
         const bNum = parseInt(b.csr_number) || 0;
@@ -249,36 +253,59 @@ export default function Requests() {
                         </select>
                     </div>
 
-                    {/* Date filter */}
-                    <div style={{ flex: '1 1 200px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <input
-                            type="date"
-                            value={dateFilter}
-                            onChange={e => setDateFilter(e.target.value)}
-                            style={{
-                                width: '100%',
-                                padding: '0.5rem 0.75rem',
-                                background: 'var(--bg-color)',
-                                border: '1px solid var(--border-color)',
-                                color: 'var(--text-primary)',
-                                borderRadius: '4px',
-                                fontSize: '0.9rem',
-                                outline: 'none',
-                                margin: 0
-                            }}
-                        />
-                        {dateFilter && (
+                    {/* Date Range filter */}
+                    <div style={{ flex: '1 1 360px', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flex: 1 }}>
+                            <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>From:</span>
+                            <input
+                                type="date"
+                                value={startDateFilter}
+                                onChange={e => setStartDateFilter(e.target.value)}
+                                style={{
+                                    width: '100%',
+                                    padding: '0.5rem',
+                                    background: 'var(--bg-color)',
+                                    border: '1px solid var(--border-color)',
+                                    color: 'var(--text-primary)',
+                                    borderRadius: '4px',
+                                    fontSize: '0.85rem',
+                                    outline: 'none',
+                                    margin: 0
+                                }}
+                            />
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flex: 1 }}>
+                            <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>To:</span>
+                            <input
+                                type="date"
+                                value={endDateFilter}
+                                onChange={e => setEndDateFilter(e.target.value)}
+                                style={{
+                                    width: '100%',
+                                    padding: '0.5rem',
+                                    background: 'var(--bg-color)',
+                                    border: '1px solid var(--border-color)',
+                                    color: 'var(--text-primary)',
+                                    borderRadius: '4px',
+                                    fontSize: '0.85rem',
+                                    outline: 'none',
+                                    margin: 0
+                                }}
+                            />
+                        </div>
+                        {(startDateFilter || endDateFilter) && (
                             <button
-                                onClick={() => setDateFilter('')}
+                                onClick={() => { setStartDateFilter(''); setEndDateFilter(''); }}
                                 style={{
                                     background: 'transparent',
                                     border: 'none',
                                     color: '#35a7e6',
                                     cursor: 'pointer',
-                                    fontSize: '0.9rem',
+                                    fontSize: '0.85rem',
                                     fontWeight: 'bold',
                                     padding: '0.25rem 0.5rem',
-                                    whiteSpace: 'nowrap'
+                                    whiteSpace: 'nowrap',
+                                    margin: 0
                                 }}
                             >
                                 Clear
