@@ -12,6 +12,7 @@ export default function Requests() {
     const [searchQuery, setSearchQuery] = useState('');
     const [statusFilter, setStatusFilter] = useState('All');
     const [modeFilter, setModeFilter] = useState('All');
+    const [dateFilter, setDateFilter] = useState('');
     
     // Modals & print states
     const [viewingJobId, setViewingJobId] = useState(null);
@@ -76,7 +77,17 @@ export default function Requests() {
             }
         }
 
-        return matchesSearch && matchesStatus && matchesMode;
+        let matchesDate = true;
+        if (dateFilter) {
+            const reqDate = new Date(req.created_at);
+            const y = reqDate.getFullYear();
+            const m = String(reqDate.getMonth() + 1).padStart(2, '0');
+            const d = String(reqDate.getDate()).padStart(2, '0');
+            const formattedDate = `${y}-${m}-${d}`;
+            matchesDate = formattedDate === dateFilter;
+        }
+
+        return matchesSearch && matchesStatus && matchesMode && matchesDate;
     }).sort((a, b) => {
         const aNum = parseInt(a.csr_number) || 0;
         const bNum = parseInt(b.csr_number) || 0;
@@ -236,6 +247,43 @@ export default function Requests() {
                             <option value="In-Shop">In-Shop</option>
                             <option value="On-Site">On-Site</option>
                         </select>
+                    </div>
+
+                    {/* Date filter */}
+                    <div style={{ flex: '1 1 200px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <input
+                            type="date"
+                            value={dateFilter}
+                            onChange={e => setDateFilter(e.target.value)}
+                            style={{
+                                width: '100%',
+                                padding: '0.5rem 0.75rem',
+                                background: 'var(--bg-color)',
+                                border: '1px solid var(--border-color)',
+                                color: 'var(--text-primary)',
+                                borderRadius: '4px',
+                                fontSize: '0.9rem',
+                                outline: 'none',
+                                margin: 0
+                            }}
+                        />
+                        {dateFilter && (
+                            <button
+                                onClick={() => setDateFilter('')}
+                                style={{
+                                    background: 'transparent',
+                                    border: 'none',
+                                    color: '#35a7e6',
+                                    cursor: 'pointer',
+                                    fontSize: '0.9rem',
+                                    fontWeight: 'bold',
+                                    padding: '0.25rem 0.5rem',
+                                    whiteSpace: 'nowrap'
+                                }}
+                            >
+                                Clear
+                            </button>
+                        )}
                     </div>
                 </div>
 
