@@ -31,6 +31,14 @@ async function createNotification({ message, complaint_id, csr_number, created_b
 // Serve static frontend files from 'dist' (used for local runs)
 app.use(express.static(path.join(__dirname, '../dist')));
 
+// Middleware: detect app WebView by User-Agent
+app.use((req, res, next) => {
+    if ((req.headers['user-agent'] || '').includes('Hyper-CSR-App')) {
+        req.isApp = true;
+    }
+    next();
+});
+
 // Middleware to ensure database connection and schemas are initialized before query processing
 app.use(async (req, res, next) => {
     try {
@@ -46,7 +54,8 @@ app.use(async (req, res, next) => {
 
 // =============== USERS ===============
 app.post('/api/users/login', async (req, res) => {
-    const { username, password, force, platform = 'browser' } = req.body;
+    const { username, password, force, platform: bodyPlatform } = req.body;
+    const platform = bodyPlatform || (req.isApp ? 'app' : 'browser');
     try {
         const result = await db.query('SELECT * FROM users WHERE username = $1', [username]);
         const user = result.rows[0];
@@ -88,7 +97,8 @@ app.post('/api/users/login', async (req, res) => {
 });
 
 app.post('/api/users/logout', async (req, res) => {
-    const { userId, platform = 'browser' } = req.body;
+    const { userId, platform: bodyPlatform } = req.body;
+    const platform = bodyPlatform || (req.isApp ? 'app' : 'browser');
     try {
         if (userId) {
             if (platform === 'app') {
@@ -122,7 +132,8 @@ app.post('/api/users/change-password', async (req, res) => {
 });
 
 app.get('/api/users/:id', async (req, res) => {
-    const { sessionId, platform = 'browser' } = req.query;
+    const { sessionId, platform: queryPlatform } = req.query;
+    const platform = queryPlatform || (req.isApp ? 'app' : 'browser');
     try {
         const result = await db.query('SELECT * FROM users WHERE id = $1', [req.params.id]);
         const user = result.rows[0];

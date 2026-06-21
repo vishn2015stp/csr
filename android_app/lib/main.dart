@@ -52,8 +52,14 @@ class _WebViewScreenState extends State<WebViewScreen> {
   @override
   void initState() {
     super.initState();
+    _initWebView();
+  }
+
+  Future<void> _initWebView() async {
+    final defaultUA = await WebViewController.currentUserAgent();
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..setUserAgent('$defaultUA Hyper-CSR-App')
       ..setBackgroundColor(const Color(0xFF0D1B2A))
       ..setNavigationDelegate(
         NavigationDelegate(

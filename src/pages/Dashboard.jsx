@@ -102,54 +102,70 @@ export default function Dashboard() {
     const [detailedTableMode, setDetailedTableMode] = useState('in-shop');
     const [recentViewMode, setRecentViewMode] = useState('updates');
     const [expandedWidget, setExpandedWidget] = useState(null);
-
+    const [dashboardLoading, setDashboardLoading] = useState(true);
 
     const refreshDashboard = async () => {
-        const statsData = await api.getDashboardStats();
-        // Since we don't have customers count quickly, we'll just show total complaints
-        const statusLogs = statsData.status_logs || [];
-        const latestUpdates = {};
-        statusLogs.forEach(log => {
-            const logTime = new Date(log.created_at).getTime();
-            if (!latestUpdates[log.complaint_id] || logTime > latestUpdates[log.complaint_id]) {
-                latestUpdates[log.complaint_id] = logTime;
-            }
-        });
+        try {
+            const statsData = await api.getDashboardStats();
+            // Since we don't have customers count quickly, we'll just show total complaints
+            const statusLogs = statsData.status_logs || [];
+            const latestUpdates = {};
+            statusLogs.forEach(log => {
+                const logTime = new Date(log.created_at).getTime();
+                if (!latestUpdates[log.complaint_id] || logTime > latestUpdates[log.complaint_id]) {
+                    latestUpdates[log.complaint_id] = logTime;
+                }
+            });
 
-        const complaints = (statsData.complaints || []).map(c => ({
-            ...c,
-            latest_update: latestUpdates[c.id] || new Date(c.created_at).getTime()
-        })).sort((a, b) => {
-            const aNum = parseInt(a.csr_number) || 0;
-            const bNum = parseInt(b.csr_number) || 0;
-            return bNum - aNum;
-        });
-        setAllComplaints(complaints);
+            const complaints = (statsData.complaints || []).map(c => ({
+                ...c,
+                latest_update: latestUpdates[c.id] || new Date(c.created_at).getTime()
+            })).sort((a, b) => {
+                const aNum = parseInt(a.csr_number) || 0;
+                const bNum = parseInt(b.csr_number) || 0;
+                return bNum - aNum;
+            });
+            setAllComplaints(complaints);
 
-        const pending = complaints.filter(c => c.status !== 'Delivered' && c.status !== 'Completed' && c.status !== 'Returned');
-        const onSite = pending.filter(c => c.service_type === 'On-Site' || c.service_mode === 'Onsite');
+            const pending = complaints.filter(c => c.status !== 'Delivered' && c.status !== 'Completed' && c.status !== 'Returned');
+            const onSite = pending.filter(c => c.service_type === 'On-Site' || c.service_mode === 'Onsite');
 
-        const statusCounts = {};
-        complaints.forEach(c => {
-            statusCounts[c.status] = (statusCounts[c.status] || 0) + 1;
-        });
+            const statusCounts = {};
+            complaints.forEach(c => {
+                statusCounts[c.status] = (statusCounts[c.status] || 0) + 1;
+            });
 
-        setStats({
-            totalProducts: statsData.total || 0,
-            pendingWorks: pending.filter(c => c.service_type !== 'On-Site' && c.service_mode !== 'Onsite'),
-            pendingOnSite: onSite,
-            productStatus: statusCounts
-        });
+            setStats({
+                totalProducts: statsData.total || 0,
+                pendingWorks: pending.filter(c => c.service_type !== 'On-Site' && c.service_mode !== 'Onsite'),
+                pendingOnSite: onSite,
+                productStatus: statusCounts
+            });
 
-        // Most recent 8 complaints for the Recent Requests widget
-        setRecentRequests(complaints.slice(0, 8));
+            // Most recent 8 complaints for the Recent Requests widget
+            setRecentRequests(complaints.slice(0, 8));
+        } catch (error) {
+            console.error("Error fetching dashboard statistics:", error);
+        } finally {
+            setDashboardLoading(false);
+        }
     };
 
     useEffect(() => {
+        setDashboardLoading(true);
         refreshDashboard();
     }, [isAdmin]);
 
-    if (loading) return null;
+    if (loading || dashboardLoading) {
+        return (
+            <div className="dashboard-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
+                <div className="spinner-container">
+                    <div className="spinner"></div>
+                    <p style={{ margin: 0, fontSize: '0.95rem', color: 'var(--text-secondary)' }}>Loading dashboard...</p>
+                </div>
+            </div>
+        );
+    }
 
     const query = searchQuery.trim().toLowerCase();
     
