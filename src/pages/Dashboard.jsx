@@ -255,9 +255,6 @@ export default function Dashboard() {
                                 <h2 style={{ margin: 0, fontSize: '1.8rem', color: 'var(--text-primary)', fontWeight: 'bold' }}>
                                     Pending Category Breakdown
                                 </h2>
-                                <p style={{ margin: '4px 0 0 0', color: '#35a7e6', fontSize: '0.95rem' }}>
-                                    Showing pending items by Laptop, Desktop, Printer, and Others
-                                </p>
                             </div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap', width: '100%', justifyContent: 'space-between', maxWidth: '600px' }}>
                                 <div style={{ position: 'relative', flex: 1, maxWidth: '300px' }}>
