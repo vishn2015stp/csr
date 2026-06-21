@@ -13,6 +13,11 @@ function getStatusColor(status) {
         case 'Ready': return '#8fbcbb';
         case 'In Progress': return '#35a7e6';
         case 'Intaken': return '#b48ead';
+        case 'Waiting for Spare': return '#ebcb8b';
+        case 'Send to Service Center': return '#d08770';
+        case 'Replaced': return '#5e81ac';
+        case 'Return': return '#81a1c1';
+        case 'Warranty': return '#4c566a';
         case 'Delivered':
         case 'Completed':
         case 'Returned': return '#a3be8c';
@@ -224,6 +229,235 @@ export default function Dashboard() {
     };
 
     if (showDetailedTable) {
+        if (detailedTableMode === 'category') {
+            const categories = ['Laptop', 'Desktop', 'Printer', 'Others'];
+            return (
+                <div className="dashboard-container">
+                    <div style={{ padding: '1.5rem 1rem 1rem 1rem' }}>
+                        <div className="dashboard-detailed-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
+                            <div>
+                                <h2 style={{ margin: 0, fontSize: '1.8rem', color: 'var(--text-primary)', fontWeight: 'bold' }}>
+                                    Pending Category Breakdown
+                                </h2>
+                                <p style={{ margin: '4px 0 0 0', color: '#35a7e6', fontSize: '0.95rem' }}>
+                                    Showing pending items by Laptop, Desktop, Printer, and Others
+                                </p>
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap', width: '100%', justifyContent: 'space-between', maxWidth: '600px' }}>
+                                <div style={{ position: 'relative', flex: 1, maxWidth: '300px' }}>
+                                    <div style={{
+                                        background: 'var(--panel-bg)',
+                                        border: '1px solid var(--border-color)',
+                                        borderRadius: '24px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        padding: '0.5rem 1rem',
+                                        gap: '10px',
+                                        width: '100%',
+                                    }}>
+                                        <Search size={16} color="#35a7e6" />
+                                        <input
+                                            type="text"
+                                            value={searchQuery}
+                                            onChange={e => setSearchQuery(e.target.value)}
+                                            placeholder="Filter items..."
+                                            style={{
+                                                background: 'transparent',
+                                                border: 'none',
+                                                outline: 'none',
+                                                color: 'var(--text-primary)',
+                                                fontSize: '0.9rem',
+                                                width: '100%',
+                                                margin: 0,
+                                                padding: 0
+                                            }}
+                                        />
+                                        {searchQuery && (
+                                            <button
+                                                onClick={() => setSearchQuery('')}
+                                                style={{
+                                                    background: 'transparent',
+                                                    border: 'none',
+                                                    color: '#35a7e6',
+                                                    cursor: 'pointer',
+                                                    padding: '2px',
+                                                    display: 'flex',
+                                                    alignItems: 'center'
+                                                }}
+                                            >
+                                                <X size={14} />
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
+                                <button 
+                                    onClick={() => setShowDetailedTable(false)}
+                                    style={{
+                                        background: 'transparent',
+                                        border: '1px solid #35a7e6',
+                                        color: '#35a7e6',
+                                        padding: '0.6rem 1.2rem',
+                                        borderRadius: '24px',
+                                        cursor: 'pointer',
+                                        fontWeight: 'bold',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '8px',
+                                        transition: 'all 0.2s',
+                                        flexShrink: 0
+                                    }}
+                                    onMouseEnter={e => {
+                                        e.currentTarget.style.background = 'rgba(53, 167, 230, 0.1)';
+                                    }}
+                                    onMouseLeave={e => {
+                                        e.currentTarget.style.background = 'transparent';
+                                    }}
+                                >
+                                    ← Back to Dashboard
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Grid of category breakdown cards */}
+                        <div style={{
+                            display: 'grid',
+                            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+                            gap: '1.5rem',
+                            marginTop: '1rem'
+                        }}>
+                            {categories.map(cat => {
+                                const catItems = filteredPending.filter(item => categorizeItem(item.item_name) === cat);
+                                
+                                // Group catItems by status
+                                const statusCounts = {};
+                                catItems.forEach(item => {
+                                    statusCounts[item.status] = (statusCounts[item.status] || 0) + 1;
+                                });
+                                
+                                const catDonutData = Object.entries(statusCounts).map(([status, count]) => ({
+                                    label: status,
+                                    count,
+                                    color: getStatusColor(status)
+                                }));
+
+                                const catColor = getCategoryColor(cat);
+
+                                return (
+                                    <div key={cat} style={{ ...widgetStyle, display: 'flex', flexDirection: 'column', minHeight: '400px' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.75rem', marginBottom: '1rem' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', color: 'var(--text-primary)' }}>
+                                                <HardDrive size={18} style={{ marginRight: '8px', color: catColor }} />
+                                                <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: '600', color: catColor }}>{cat}</h3>
+                                            </div>
+                                            <div style={{
+                                                background: `${catColor}20`,
+                                                color: catColor,
+                                                border: `1px solid ${catColor}40`,
+                                                borderRadius: '16px',
+                                                padding: '3px 10px',
+                                                fontSize: '0.8rem',
+                                                fontWeight: 'bold'
+                                            }}>
+                                                <span>{catItems.length} Pending</span>
+                                            </div>
+                                        </div>
+
+                                        {catItems.length === 0 ? (
+                                            <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '3rem 1rem', textAlign: 'center', color: '#4c566a', border: '1px dashed var(--border-color)', borderRadius: '4px' }}>
+                                                No pending {cat.toLowerCase()} requests.
+                                            </div>
+                                        ) : (
+                                            <>
+                                                {/* Donut & Legend row */}
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', marginBottom: '1.25rem' }}>
+                                                    <div style={{ flexShrink: 0 }}>
+                                                        <DonutChart data={catDonutData} size={110} />
+                                                    </div>
+                                                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                                        {catDonutData.map(d => (
+                                                            <div key={d.label} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', color: 'var(--text-primary)' }}>
+                                                                <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: d.color, flexShrink: 0 }} />
+                                                                <span style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>{d.label}: <strong>{d.count}</strong></span>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+
+                                                {/* List of items */}
+                                                <div style={{ flex: 1, overflowY: 'auto', maxHeight: '280px', paddingRight: '4px' }}>
+                                                    <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                                                        {catItems.map(work => {
+                                                            const statusCol = getStatusColor(work.status);
+                                                            return (
+                                                                <li
+                                                                    key={work.id}
+                                                                    onClick={() => setViewingJob(work.id)}
+                                                                    style={{ 
+                                                                        display: 'flex', 
+                                                                        justifyContent: 'space-between', 
+                                                                        padding: '0.65rem 1rem', 
+                                                                        background: '#f6f3eb', 
+                                                                        marginBottom: '0.4rem', 
+                                                                        borderRadius: '4px', 
+                                                                        borderLeft: `3px solid ${statusCol}`, 
+                                                                        cursor: 'pointer',
+                                                                        transition: 'transform 0.15s ease-in-out, background 0.15s',
+                                                                    }}
+                                                                    onMouseEnter={e => {
+                                                                        e.currentTarget.style.background = '#ebe5d8';
+                                                                        e.currentTarget.style.transform = 'translateX(2px)';
+                                                                    }}
+                                                                    onMouseLeave={e => {
+                                                                        e.currentTarget.style.background = '#f6f3eb';
+                                                                        e.currentTarget.style.transform = 'translateX(0)';
+                                                                    }}
+                                                                >
+                                                                    <div style={{ display: 'flex', flexDirection: 'column', maxWidth: '65%' }}>
+                                                                        <strong style={{ color: 'var(--text-primary)', fontSize: '0.9rem', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>{work.item_name}</strong>
+                                                                        <span style={{ fontSize: '0.75rem', color: '#35a7e6', marginTop: '2px', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>{work.customerName}</span>
+                                                                    </div>
+                                                                    <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-end', maxWidth: '35%' }}>
+                                                                        <span style={{ 
+                                                                            color: statusCol, 
+                                                                            fontWeight: 'bold', 
+                                                                            fontSize: '0.75rem',
+                                                                            textTransform: 'uppercase',
+                                                                            background: `${statusCol}12`,
+                                                                            padding: '2px 6px',
+                                                                            borderRadius: '4px',
+                                                                            border: `1px solid ${statusCol}25`,
+                                                                            textOverflow: 'ellipsis',
+                                                                            overflow: 'hidden',
+                                                                            whiteSpace: 'nowrap',
+                                                                            maxWidth: '100%'
+                                                                        }}>
+                                                                            {work.status}
+                                                                        </span>
+                                                                        <span style={{ color: '#4c566a', fontSize: '0.7rem', marginTop: '4px' }}>CSR: #{work.csr_number || work.id.split('-')[0].toUpperCase()}</span>
+                                                                    </div>
+                                                                </li>
+                                                            );
+                                                        })}
+                                                    </ul>
+                                                </div>
+                                            </>
+                                        )}
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                    {viewingJob && (
+                        <JobDetailModal
+                            jobId={viewingJob}
+                            onClose={() => setViewingJob(null)}
+                            onRefresh={refreshDashboard}
+                        />
+                    )}
+                </div>
+            );
+        }
+
         const isOnsite = detailedTableMode === 'onsite';
         const dataList = isOnsite ? filteredPendingOnSite : filteredPendingWorks;
         const readyCount = isOnsite
@@ -753,16 +987,51 @@ export default function Dashboard() {
                                 <HardDrive size={18} style={{ marginRight: '8px', color: '#35a7e6' }} />
                                 <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '500' }}>Pending by Category</h3>
                             </div>
-                            <div style={{
-                                background: 'rgba(53, 167, 230, 0.1)',
-                                color: '#35a7e6',
-                                border: '1px solid rgba(53, 167, 230, 0.3)',
-                                borderRadius: '16px',
-                                padding: '3px 10px',
-                                fontSize: '0.8rem',
-                                fontWeight: 'bold'
-                            }}>
-                                <span>{filteredPending.length} Total</span>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <div style={{
+                                    background: 'rgba(53, 167, 230, 0.1)',
+                                    color: '#35a7e6',
+                                    border: '1px solid rgba(53, 167, 230, 0.3)',
+                                    borderRadius: '16px',
+                                    padding: '3px 10px',
+                                    fontSize: '0.8rem',
+                                    fontWeight: 'bold'
+                                }}>
+                                    <span>{filteredPending.length} Total</span>
+                                </div>
+                                <button 
+                                    onClick={() => {
+                                        setDetailedTableMode('category');
+                                        setShowDetailedTable(true);
+                                    }}
+                                    title="View category breakdown details"
+                                    style={{
+                                        background: 'rgba(53, 167, 230, 0.1)',
+                                        color: '#35a7e6',
+                                        border: '1px solid rgba(53, 167, 230, 0.3)',
+                                        borderRadius: '16px',
+                                        padding: '3px 10px',
+                                        fontSize: '0.8rem',
+                                        cursor: 'pointer',
+                                        fontWeight: 'bold',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '6px',
+                                        transition: 'all 0.2s',
+                                        margin: 0
+                                    }}
+                                    onMouseEnter={e => {
+                                        e.currentTarget.style.background = 'rgba(53, 167, 230, 0.2)';
+                                        e.currentTarget.style.borderColor = '#35a7e6';
+                                    }}
+                                    onMouseLeave={e => {
+                                        e.currentTarget.style.background = 'rgba(53, 167, 230, 0.1)';
+                                        e.currentTarget.style.borderColor = 'rgba(53, 167, 230, 0.3)';
+                                    }}
+                                >
+                                    <span>Details</span>
+                                    <span style={{ fontSize: '0.7rem' }}>➔</span>
+                                </button>
                             </div>
                         </div>
                         {filteredPending.length === 0 ? (
