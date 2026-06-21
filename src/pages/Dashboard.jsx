@@ -20,6 +20,15 @@ function getStatusColor(status) {
     }
 }
 
+function isToday(timestamp) {
+    if (!timestamp) return false;
+    const date = new Date(timestamp);
+    const today = new Date();
+    return date.getDate() === today.getDate() &&
+           date.getMonth() === today.getMonth() &&
+           date.getFullYear() === today.getFullYear();
+}
+
 function DonutChart({ data, size = 130 }) {
     const total = data.reduce((s, d) => s + d.count, 0);
     if (total === 0) return null;
@@ -145,25 +154,21 @@ export default function Dashboard() {
     filteredPendingOnSite.forEach(w => { onSiteStatusCounts[w.status] = (onSiteStatusCounts[w.status] || 0) + 1; });
     const onSiteDonutData = Object.entries(onSiteStatusCounts).map(([status, count]) => ({ label: status, count, color: getStatusColor(status) }));
 
-    // For recent requests, if searching, show all matching. Otherwise, show the top 8 (excluding delivered/completed).
+    // For recent updates, filter active complaints that were updated today.
     const activeComplaints = filteredComplaints.filter(c => c.status !== 'Delivered' && c.status !== 'Completed' && c.status !== 'Returned');
-    const sortedByUpdates = [...activeComplaints].sort((a, b) => {
+    const todayUpdates = activeComplaints.filter(c => isToday(c.latest_update));
+    const sortedByUpdates = [...todayUpdates].sort((a, b) => {
         return b.latest_update - a.latest_update;
     });
-    const displayedRecentUpdates = query ? sortedByUpdates : sortedByUpdates.slice(0, 8);
+    const displayedRecentUpdates = sortedByUpdates;
 
-    const sortedByCsr = [...activeComplaints].sort((a, b) => {
-        const aNum = parseInt(a.csr_number) || 0;
-        const bNum = parseInt(b.csr_number) || 0;
-        return bNum - aNum;
-    });
-    const displayedRecentRequests = query ? sortedByCsr : sortedByCsr.slice(0, 8);
-
+    // For recent delivered, filter delivered/completed/returned complaints delivered/completed/returned today.
     const deliveredComplaints = filteredComplaints.filter(c => c.status === 'Delivered' || c.status === 'Completed' || c.status === 'Returned');
-    const sortedByDelivered = [...deliveredComplaints].sort((a, b) => {
+    const todayDelivered = deliveredComplaints.filter(c => isToday(c.latest_update));
+    const sortedByDelivered = [...todayDelivered].sort((a, b) => {
         return b.latest_update - a.latest_update;
     });
-    const displayedRecentDelivered = query ? sortedByDelivered : sortedByDelivered.slice(0, 8);
+    const displayedRecentDelivered = todayDelivered;
 
     const WidgetHeader = ({ title, icon: Icon, children }) => (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.75rem', marginBottom: '1rem', color: 'var(--text-primary)' }}>
@@ -709,7 +714,7 @@ export default function Dashboard() {
 
                 {/* Recent Activity Widget */}
                 <div style={{ ...widgetStyle, marginTop: '1.5rem' }}>
-                    <WidgetHeader title={recentViewMode === 'updates' ? "Recent Updates" : recentViewMode === 'delivered' ? "Recent Delivered" : "Recent Service Requests"} icon={FileText}>
+                    <WidgetHeader title={recentViewMode === 'updates' ? "Today's Updates" : "Today's Delivered Requests"} icon={FileText}>
                         <div className="dashboard-recent-tabs" style={{ display: 'flex', background: 'var(--bg-color)', border: '1px solid var(--border-color)', borderRadius: '4px', overflow: 'hidden' }}>
                             <button
                                 onClick={() => setRecentViewMode('updates')}
@@ -724,20 +729,6 @@ export default function Dashboard() {
                                 }}
                             >
                                 Updates
-                            </button>
-                            <button
-                                onClick={() => setRecentViewMode('requests')}
-                                style={{
-                                    padding: '0.4rem 0.8rem',
-                                    border: 'none',
-                                    background: recentViewMode === 'requests' ? '#35a7e6' : 'transparent',
-                                    color: recentViewMode === 'requests' ? '#fff' : 'var(--text-secondary)',
-                                    cursor: 'pointer',
-                                    fontWeight: '500',
-                                    fontSize: '0.85rem'
-                                }}
-                            >
-                                Requests
                             </button>
                             <button
                                 onClick={() => setRecentViewMode('delivered')}
@@ -768,7 +759,7 @@ export default function Dashboard() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {(recentViewMode === 'updates' ? displayedRecentUpdates : recentViewMode === 'delivered' ? displayedRecentDelivered : displayedRecentRequests).map(req => {
+                                {(recentViewMode === 'updates' ? displayedRecentUpdates : displayedRecentDelivered).map(req => {
                                     let statusColor = 'var(--text-primary)';
                                     if (req.status === 'Pending') statusColor = '#bf616a';
                                     else if (req.status === 'Delivered' || req.status === 'Completed' || req.status === 'Returned') statusColor = '#a3be8c';
@@ -796,12 +787,12 @@ export default function Dashboard() {
                                                 {req.created_by || 'Admin'}
                                             </td>
                                             <td style={{ padding: '0.75rem', textAlign: 'right', fontSize: '0.8rem', color: '#35a7e6' }}>
-                                                {new Date(recentViewMode === 'updates' ? (req.latest_update || req.created_at) : req.created_at).toLocaleString('en-GB').replace(/\//g, '-')}
+                                                {new Date(req.latest_update || req.created_at).toLocaleString('en-GB').replace(/\//g, '-')}
                                             </td>
                                         </tr>
                                     );
                                 })}
-                                {(recentViewMode === 'updates' ? displayedRecentUpdates : recentViewMode === 'delivered' ? displayedRecentDelivered : displayedRecentRequests).length === 0 && (
+                                {(recentViewMode === 'updates' ? displayedRecentUpdates : displayedRecentDelivered).length === 0 && (
                                     <tr>
                                         <td colSpan="6" style={{ padding: '2rem', textAlign: 'center', color: '#4c566a' }}>No records found.</td>
                                     </tr>
