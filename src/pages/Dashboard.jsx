@@ -710,6 +710,78 @@ export default function Dashboard() {
                             </>
                         )}
                     </div>
+
+                    {/* Category Breakdown Widget */}
+                    <div style={widgetStyle}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.75rem', marginBottom: '1rem' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', color: 'var(--text-primary)' }}>
+                                <HardDrive size={18} style={{ marginRight: '8px', color: '#35a7e6' }} />
+                                <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '500' }}>Pending by Category</h3>
+                            </div>
+                            <div style={{
+                                background: 'rgba(53, 167, 230, 0.1)',
+                                color: '#35a7e6',
+                                border: '1px solid rgba(53, 167, 230, 0.3)',
+                                borderRadius: '16px',
+                                padding: '3px 10px',
+                                fontSize: '0.8rem',
+                                fontWeight: 'bold'
+                            }}>
+                                <span>{filteredPending.length} Total</span>
+                            </div>
+                        </div>
+                        {filteredPending.length === 0 ? (
+                            <div style={{ padding: '2rem 1rem', textAlign: 'center', color: '#4c566a', border: '1px dashed #4c566a', borderRadius: '4px' }}>
+                                No pending requests.
+                            </div>
+                        ) : (
+                            <>
+                                <div className="pending-box-detail" style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', cursor: 'pointer', marginBottom: expandedWidget === 'category' ? '1rem' : 0 }}
+                                    onClick={() => setExpandedWidget(expandedWidget === 'category' ? null : 'category')}>
+                                    <DonutChart data={categoryDonutData} size={120} />
+                                    <div style={{ flex: 1 }}>
+                                        <div style={{ fontWeight: 'bold', fontSize: '1rem', color: 'var(--text-primary)' }}>
+                                            Pending Items
+                                        </div>
+                                        <div className="pending-box-legend" style={{ display: 'flex', flexWrap: 'wrap', gap: '6px 16px', marginTop: '8px' }}>
+                                            {categoryDonutData.map(d => (
+                                                <div key={d.label} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', color: 'var(--text-primary)' }}>
+                                                    <span style={{ width: '10px', height: '10px', borderRadius: '2px', background: d.color, flexShrink: 0 }} />
+                                                    {d.label}: <strong>{d.count}</strong>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <div style={{ color: 'var(--text-secondary)', flexShrink: 0 }}>
+                                        {expandedWidget === 'category' ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                                    </div>
+                                </div>
+                                {expandedWidget === 'category' && (
+                                    <ul style={{ listStyle: 'none', padding: 0, margin: '0.5rem 0 0 0', fontSize: '0.9rem', maxHeight: '250px', overflowY: 'auto' }}>
+                                        {filteredPending.map(work => {
+                                            const cat = categorizeItem(work.item_name);
+                                            const borderLeftColor = getCategoryColor(cat);
+                                            return (
+                                                <li
+                                                    key={work.id}
+                                                    onClick={() => setViewingJob(work.id)}
+                                                    style={{ display: 'flex', justifyContent: 'space-between', padding: '0.65rem 1rem', background: '#f6f3eb', marginBottom: '0.4rem', borderRadius: '4px', borderLeft: `3px solid ${borderLeftColor}`, cursor: 'pointer' }}>
+                                                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                                        <strong style={{ color: 'var(--text-primary)', fontSize: '1rem' }}>{work.item_name}</strong>
+                                                        <span style={{ fontSize: '0.8rem', color: '#35a7e6', marginTop: '2px' }}>{work.customerName} ({cat})</span>
+                                                    </div>
+                                                    <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                                                        <div style={{ color: 'var(--text-primary)', fontWeight: 'bold', fontSize: '0.85rem' }}>{work.status}</div>
+                                                        <div style={{ color: '#4c566a', fontSize: '0.75rem', marginTop: '2px' }}>CSR: {work.csr_number || work.id.split('-')[0]}</div>
+                                                    </div>
+                                                </li>
+                                            );
+                                        })}
+                                    </ul>
+                                )}
+                            </>
+                        )}
+                    </div>
                 </div>
 
                 {/* Recent Activity Widget */}
