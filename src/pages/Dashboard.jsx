@@ -100,7 +100,7 @@ export default function Dashboard() {
     const [isSearchFocused, setIsSearchFocused] = useState(false);
     const [showDetailedTable, setShowDetailedTable] = useState(false);
     const [detailedTableMode, setDetailedTableMode] = useState('in-shop');
-    const [recentViewMode, setRecentViewMode] = useState('delivered');
+    const [recentViewMode, setRecentViewMode] = useState('requests');
     const [expandedWidget, setExpandedWidget] = useState(null);
     const [dashboardLoading, setDashboardLoading] = useState(true);
 
@@ -209,6 +209,15 @@ export default function Dashboard() {
         count,
         color: getCategoryColor(cat)
     }));
+
+    // For today's requests, filter complaints created today.
+    const todayRequests = filteredComplaints.filter(c => isToday(c.created_at));
+    const sortedByCreated = [...todayRequests].sort((a, b) => {
+        const aTime = new Date(a.created_at).getTime();
+        const bTime = new Date(b.created_at).getTime();
+        return bTime - aTime;
+    });
+    const displayedRecentRequests = sortedByCreated;
 
     // For recent updates, filter active complaints that were updated today.
     const activeComplaints = filteredComplaints.filter(c => c.status !== 'Delivered' && c.status !== 'Completed' && c.status !== 'Returned');
@@ -1103,8 +1112,22 @@ export default function Dashboard() {
 
                 {/* Recent Activity Widget */}
                 <div style={{ ...widgetStyle, marginTop: '1.5rem' }}>
-                    <WidgetHeader title={recentViewMode === 'updates' ? "Today's Updates" : "Today's Delivered Requests"} icon={FileText}>
+                    <WidgetHeader title={recentViewMode === 'requests' ? "Today's Requests" : recentViewMode === 'updates' ? "Today's Updates" : "Today's Delivered Requests"} icon={FileText}>
                         <div className="dashboard-recent-tabs" style={{ display: 'flex', background: 'var(--bg-color)', border: '1px solid var(--border-color)', borderRadius: '4px', overflow: 'hidden' }}>
+                            <button
+                                onClick={() => setRecentViewMode('requests')}
+                                style={{
+                                    padding: '0.4rem 0.8rem',
+                                    border: 'none',
+                                    background: recentViewMode === 'requests' ? '#35a7e6' : 'transparent',
+                                    color: recentViewMode === 'requests' ? '#fff' : 'var(--text-secondary)',
+                                    cursor: 'pointer',
+                                    fontWeight: '500',
+                                    fontSize: '0.85rem'
+                                }}
+                            >
+                                Requests
+                            </button>
                             <button
                                 onClick={() => setRecentViewMode('updates')}
                                 style={{
@@ -1148,7 +1171,7 @@ export default function Dashboard() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {(recentViewMode === 'updates' ? displayedRecentUpdates : displayedRecentDelivered).map(req => {
+                                {(recentViewMode === 'requests' ? displayedRecentRequests : recentViewMode === 'updates' ? displayedRecentUpdates : displayedRecentDelivered).map(req => {
                                     let statusColor = 'var(--text-primary)';
                                     if (req.status === 'Pending') statusColor = '#bf616a';
                                     else if (req.status === 'Delivered' || req.status === 'Completed' || req.status === 'Returned') statusColor = '#a3be8c';
@@ -1176,12 +1199,12 @@ export default function Dashboard() {
                                                 {req.created_by || 'Admin'}
                                             </td>
                                             <td style={{ padding: '0.75rem', textAlign: 'right', fontSize: '0.8rem', color: '#35a7e6' }}>
-                                                {new Date(req.latest_update || req.created_at).toLocaleString('en-GB').replace(/\//g, '-')}
+                                                {new Date(recentViewMode === 'requests' ? req.created_at : (req.latest_update || req.created_at)).toLocaleString('en-GB').replace(/\//g, '-')}
                                             </td>
                                         </tr>
                                     );
                                 })}
-                                {(recentViewMode === 'updates' ? displayedRecentUpdates : displayedRecentDelivered).length === 0 && (
+                                {(recentViewMode === 'requests' ? displayedRecentRequests : recentViewMode === 'updates' ? displayedRecentUpdates : displayedRecentDelivered).length === 0 && (
                                     <tr>
                                         <td colSpan="6" style={{ padding: '2rem', textAlign: 'center', color: '#4c566a' }}>No records found.</td>
                                     </tr>
