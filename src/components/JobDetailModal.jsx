@@ -578,8 +578,8 @@ export default function JobDetailModal({ jobId, onClose, onRefresh }) {
                                         <input 
                                             type="text" 
                                             value={editSerialNo} 
-                                            onChange={e => setEditSerialNo(e.target.value)} 
-                                            style={{ width: '100%', padding: '0.4rem', background: 'var(--panel-bg)', border: '1px solid var(--border-color)', color: 'var(--text-primary)', borderRadius: '4px' }} 
+                                            onChange={e => setEditSerialNo(e.target.value.toUpperCase())} 
+                                            style={{ width: '100%', padding: '0.4rem', background: 'var(--panel-bg)', border: '1px solid var(--border-color)', color: 'var(--text-primary)', borderRadius: '4px', textTransform: 'uppercase' }} 
                                         />
                                     </div>
                                     <div>

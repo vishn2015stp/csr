@@ -51,7 +51,10 @@ export default function Intake() {
     }, [])
 
     const handleChange = (e) => {
-        const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
+        let value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
+        if (e.target.name === 'serialNo' && typeof value === 'string') {
+            value = value.toUpperCase();
+        }
         setFormData(prev => {
             const updated = { ...prev, [e.target.name]: value };
             if (e.target.name === 'phone') {
@@ -278,7 +281,7 @@ export default function Intake() {
                             <input type="text" name="model" value={formData.model} onChange={handleChange} placeholder="e.g. A2338" />
 
                             <label>Serial Number (Optional)</label>
-                            <input type="text" name="serialNo" value={formData.serialNo} onChange={handleChange} placeholder="e.g. C02..." />
+                            <input type="text" name="serialNo" value={formData.serialNo} onChange={handleChange} placeholder="e.g. C02..." style={{ textTransform: 'uppercase' }} />
 
                             <label>Device Password / PIN</label>
                             <input type="text" name="password" value={formData.password} onChange={handleChange} placeholder="If applicable" />
